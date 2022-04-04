@@ -5,7 +5,9 @@ Date: 22 march 2022
 Version: 0.1
 
 | Version number | Change |
+| ----------------- |:-----------|
 | 0.1 | compiled stakeholders, context diagram, interfaces, functional and non functional requirements |
+| 0.2 | fixed shareholder header |
 
 # Contents
 
@@ -44,6 +46,8 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 
 # Stakeholders
 
+| Stakeholder name  | Description |
+| ----------------- |:-----------:|
 | The company / retailer | Who owns the warehouse and resells the items |
 | Manager | Who supervises the availability of items in the Warehouse |
 | Supplier | Who provides items to the company |
