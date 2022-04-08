@@ -2,12 +2,13 @@
 
 Date: 22 march 2022
 
-Version: 0.1
+Version: 0.3
 
 | Version number | Change |
 | ----------------- |:-----------|
 | 0.1 | compiled stakeholders, context diagram, interfaces, functional and non functional requirements |
 | 0.2 | fixed shareholder header |
+| 0.3 | added two more personas |
 
 # Contents
 
@@ -119,6 +120,18 @@ Persona 3: Warehouse worker, 29 yo, female; this is my job:
 - I collect the ordered items
 - I package/prepare ordered items
 - I deliver them to the pick up area where other OU collects it
+
+Persona 4: OU manager, female, 42 yo; this is my job:
+- I check if my Organizatinal Unit has a need for a specific item
+- I check if the item is available in the warehouse
+- I place an order to the warehouse for that specific item using EZWH
+- I wait for the delivery of the item
+
+Persona 5: Software administrator, male, 35 yo; this is my job:
+- I check the ticketing system for any issue related to EZWH
+- I fix the issue remotely whenever possible
+- Whenever a new employee needs to use EZWH, I create the user account and assign the right permissions
+- Whenever there is a new update for EZWH, I make sure the update has beed installed correctly and everything works as intended
 
 
 # Functional and non functional requirements
