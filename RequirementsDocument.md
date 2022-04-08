@@ -2,13 +2,14 @@
 
 Date: 22 march 2022
 
-Version: 0.3
+Version: 0.4
 
 | Version number | Change |
 | ----------------- |:-----------|
 | 0.1 | compiled stakeholders, context diagram, interfaces, functional and non functional requirements |
 | 0.2 | fixed shareholder header |
 | 0.3 | added two more personas |
+| 0.4 | added use cases 1-7 |
 
 # Contents
 
@@ -193,47 +194,318 @@ Persona 5: Software administrator, male, 35 yo; this is my job:
 ## Use case diagram
 \<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
 
+### Use case 1, UC1 - Manage Items
 
-\<next describe here each use case in the UCD>
-
-### Use case 1, UC1
-
-| Actors Involved        |  |
+| Actors Involved        | Warehouse manager |
 | ------------- |:-------------:|
-|  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |
-|  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
-|  Nominal Scenario     | \<Textual description of actions executed by the UC> |
-|  Variants     | \<other normal executions> |
-|  Exceptions     | \<exceptions, errors > |
+|  Precondition |  |
+|  Post condition |  |
+|  Nominal Scenario |  Manager creates a new Item type IT populating its fields  |
+|  Variants     | IT exists already, Manager modifies its fields  |
+| | IT is assigned to an occupied location, issue warning |
+| | IT is assigned to an existing barcode , issue warning |
 
 ##### Scenario 1.1
 
-\<describe here scenarios instances of UC1>
-
-\<a scenario is a sequence of steps that corresponds to a particular execution of one use case>
-
-\<a scenario is a more formal description of a story>
-
-\<only relevant scenarios should be described>
-
-| Scenario 1.1 | |
+| Scenario 1.1 |  Creating new Item Type |
 | ------------- |:-------------:|
-|  Precondition     | \<Boolean expression, must evaluate to true before the scenario can start> |
-|  Post condition     | \<Boolean expression, must evaluate to true after scenario is finished> |
+|  Precondition     | Manager M exists and is logged in |
+|  Post condition     | New Item Type IT Added  |
 | Step#        | Description  |
-|  1     |  |
-|  2     |  |
-|  ...     |  |
+|  1    |  M click the 'Add' button |
+|  2    |  M insterts Item description in the forms |
+|  3    |  System checks if the Item already exists |
+|  4	|  IT is Added to the database 	|
 
-##### Scenario 1.2
+##### Scenario 1-2
 
-##### Scenario 1.x
+| Scenario |  Modify Item type fields (bar code)|
+| ------------- |:-------------:|
+|  Precondition     | Manager M exists and is logged in |
+|  | Item type I exists |
+|  | Location L is free |
+|  Post condition     | I fields are updated |
+| Step#        | Description  |
+|  1    |  M searches I via bar code |
+|  2    |  M selects I's record |
+|  3    |  M selects a new field |
 
-### Use case 2, UC2
-..
+##### Scenario 1-3
 
-### Use case x, UCx
-..
+| Scenario |  Modify Item type fields (ID)|
+| ------------- |:-------------:|
+|  Precondition     | Manager M exists and is logged in |
+|  | Item type I exists |
+|  | Location L is free |
+|  Post condition     | I fields are updated |
+| Step#        | Description  |
+|  1    |  M searches I via ID |
+|  2    |  M selects I's record |
+|  3    |  M selects a new field |
+
+### Use case 2, UC2 - Manage users and rights
+
+| Actors Involved        | Administrator, Warehouse workers |
+| ------------- |:-------------:|
+| Precondition | Administrator A logged in |
+| Post condition | |
+| Nominal Scenario | A defines a new user and its access rights |
+| Variants     | A modifies fields or access rights of an existing user |
+
+##### Scenario 2-1
+
+| Scenario |  Create user and define rights |
+| ------------- |:-------------:|
+| Precondition   | Administrator A exists and is logged in |
+| Post condition | Account X is created |
+| Step#        | Description  |
+|  1    |  A defines the credentials of the new Account X |
+|  2    |  A selects the access rights for the new account X |
+|  3    |  A confirms the inserted data |
+
+
+##### Scenario 2-2
+
+| Scenario |  Delete user |
+| ------------- |:-------------:|
+| Precondition     | Administrator A exists and is logged in |
+|                  | Account X exists |
+| Post condition   | Account X deleted |
+| Step#        | Description  |
+|  1    |  A selects account X  |
+|  2    |  X deleted from the system |
+
+##### Scenario 2-3
+
+| Scenario |  Modify user access rights |
+| ------------- |:-------------:|
+| Precondition     | Admin A exists and is logged in |
+|                  | Account X exists |
+| Post condition   | X's rights updated |
+| Step#        | Description  |
+|  1    |  A selects account X  |
+|  2    |  A selects the access rights for X |
+|  3    |  A confirms the inserted data |
+
+### Use case 3, UC3 - Manage External orders
+
+| Actors Involved        | Warehouse Manager, Supplier, Warehouse workers |
+| ------------- |:-------------:|
+|  Precondition | Item type IT exists |
+|  Post condition | External Order O for IT exists  |
+|  Nominal Scenario |  Manager creates new external order O for Item IT. Manager sends order to Supplier. When order arrives to the Warehouse, manager records order arrival and warehouse workers store the Item. |
+|  Variants     | Creation of external order, IT does not exist, issue warning |
+|  | IT quantity doesn't require an external orden |
+
+##### Scenario 3-1
+
+| Scenario |  Create new External Order|
+| ------------- |:-------------:|
+|  Precondition     | Manager M exists and is logged in |
+|	| Item Type IT exists|
+|  Post condition     | New External Order EO is created |
+| Step#        | Description  |
+|  1    |  M searches IT via ID or BarCode |
+|  2    |  M selects a Supplier form the Supplier List SL of the IT|
+|  3    |  M clicks button "Order" |
+|  4	|  M selects quantity and confirm|
+|  5	|  New EO is collected by the system |
+
+##### Scenario 3-2
+
+| Scenario | Store the External Order |
+| ------------- |:-------------:|
+|  Precondition     | Manager M exists and is logged in |
+| 				| Warehouse worker User U exists and is logged in |
+| 				| External order EO exists |
+|				| Quality Checker QC exists |
+|  Post condition     | EO is stored |
+| Step#        | Description  |
+|  1    |  EO is colected in the warehouse |
+|  2    |  U scan the barcode of the IT |
+|  3    | System updates the EO status |
+|  4	|  U sends the EO to the Quality Check |
+|  5	|  U receives the EO checked from the Qulity Check |
+|  6	|  U searches the IT position form the App |
+|  7	|  U stores the IT in the warehouse |
+|  8	|  System updates the quantity field of the IT |
+
+### Use case 4, UC4 - Manage quality checks
+
+| Actors Involved        | Quality Officer |
+| ------------- |:-------------:|
+|  Precondition   | Tests list TL for each item type IT exixts, Probability P for item type IT to be checked exists |
+|  Post condition     |                                 |
+|  Nominal Scenario     | Item is supplied to the Warehouse, Quality Office start to checks Item with his tests, Item passes tests, Item is stored   |
+|  Variants     | Item  doesn't pass tests, Item is returned |
+|  				| Adding/remove/modify quality tests to the list T |
+
+##### Scenario 4-1
+
+| Scenario | Test prepare |
+| ------------- |:-------------:|
+|  Precondition | Qualyty Officer QC exists and is logged in |
+| 				| External order EO exists |
+|  Post condition     | Item list from EO to be checked exists |
+| Step#        | Description  |
+|  1    |  EO is collected in the Quality Office |
+|  2    |  QC scan the barcode of the IT |
+|  3    | System updates the EO status |
+|  7	| QC clicks on 'Test' button |
+|  8	| System outputs a random list IT from the EO to be checked |
+
+##### Scenario 4-2
+
+| Scenario | Item Checking (Test Success) |
+| ------------- |:-------------:|
+|  Precondition | Quality Officer QC exists and is logged in |
+| 				| External order EO exists |
+|				| IT list ITL of item to be checked exists|
+|  Post condition     | EO is checked|
+| Step#        | Description  |
+|  1    |  QC select an item from ITL |
+|  2    |  System outputs a random Test Sublist from the TL of the IT to be checked |
+|  3    | QC tests the Item |
+|  7	| System records test results |
+|  8	| Item passed all test |
+|  9	| QC starts the storage procedure |
+
+##### Scenario 4-3
+
+| Scenario | Item Checking (Test Fails) |
+| ------------- |:-------------:|
+|  Precondition | Qualyty Officer QC exists and is logged in |
+| 				| External order EO exists |
+|				| IT list ITL of item to be checked exists|
+|  Post condition     | EO is returned |
+| Step#        | Description  |
+|  1    |  QC select an item from ITL |
+|  2    |  System outputs a random Test Sublist from the TL of the IT to be checked |
+|  3    | QC tests the Item |
+|  7	| System records test results |
+|  8	| Item fail one or more test |
+|  9	| QC notify the Manager about possible return procedure |
+
+##### Scenario 4-4
+
+| Scenario | Test List update |
+| ------------- |:-------------:|
+|  Precondition | Qualyty Officer QC exists and is logged in |
+|				| Item Type IT exists |
+|  Post condition     | Test List TL of an ites is updated |
+| Step#        | Description  |
+|  1    | QC searches an IT via ID |
+|  3    | QC clicks on the Test field |
+|  7	| QC clicks on 'modify' button |
+|  8	| QC inserts/deletes/updates a test from the TL |
+|  9	| QC confirms inserted data  |
+
+### Use case 5, UC5 - Manage internal orders
+
+| Actors Involved  | Warehouse Manager, Warehouse Worker, Organizational Unit (OU) |
+| ---------------- |:-------------:|
+| Precondition     | Item type IT exists |
+|                  | OU manager exists and is logged in |
+| Post condition   | Item IT is collected by OU |
+| Nominal Scenario | An OU creates and Internal Order IO for Item IT. OU sends order to Manager. Warehouse workers collect Item IT and place it in the pick up area. Item is collected by OU |
+| Variants         | Item IT is not available in the warehouse, issue warning |
+|                  | Internal order is canceled |
+
+##### Scenario 5-1
+
+| Scenario       | OU requests item to Warehouse |
+| -------------- |:-------------:|
+| Precondition   | Item type IT exists |
+|                | OU manager M exists and is logged in |
+| Post condition | Internal Order IO is processed by the system |
+| Step#          | Description  |
+|  1             | M opens the App in the page dedicated to Internal Orders |
+|  2             | M selects IT from a list |
+|  3             | M clicks on Order |
+|  4             | M inserts the quantity and confirms |
+|  5             | IO is successfully ordered and a notification is sento to the warehouse |
+
+##### Scenario 5-2
+
+| Scenario       | Internal order is processed by the warehouse |
+| -------------- |:-------------:|
+| Precondition   | Internal order IO exists |
+|                | Warehouse Worker WW exists and is logged in |
+| Post condition | Item IT is collected by OU in the pickup area |
+| Step#          | Description  |
+|  1             | WW receives a notification for IO |
+|  2             | WW collects and packages IT |
+|  3             | WW moves the package to pickup area |
+|  4             | WW marks the order as delivered |
+|  5             | Organizational Unit employee collects IT from pickup area |
+|  6             | OU employee marks the order as completed |
+
+### Use case 6, UC6 - Authenticate, authorize
+
+| Actors Involved  | Software Administrator, Warehouse Worker |
+| ------------- |:-------------:|
+|  Precondition | User U exists |
+|  Post condition     |                                 |
+|  Nominal Scenario     | Login: user enters credentials, system checks credentials, user is authenticated   |
+|  Variants     | Login, credentials wrong, user not authenticated |
+|  | Logout |
+
+##### Scenario 6-1
+
+| Scenario |  Login |
+| ------------- |:-------------:|
+|  Precondition     | Account  for User U existing  |
+|  Post condition     | U logged in  |
+| Step#        | Description  |
+|  1    |  User inserts his username |
+|  2    |  User inserts his password |
+|  3    |  User logged in,  system shows the functionalities offered by the access priviledges of  U |
+
+
+##### Scenario 6-2
+
+| Scenario |  Logout |
+| ------------- |:-------------:|
+|  Precondition     | U logged-in  |
+|  Post condition     | U logged-out  |
+| Step#        | Description  |
+|  1    |  Employee logs out |
+|  2    |  The system shows the login/sign in page |
+
+### Use case 7, UC7 - Manage Inventory
+
+| Actors Involved  | Warehouse Worker |
+| ---------------- |:-------------:|
+| Precondition     | Item type IT exists  |
+| Post condition   |                            |
+| Nominal Scenario | An external order O is supplied to the warehouse. Warehouse workers update Items fields scanning the bar code. Warehouse workers store Items  |
+| Variants         | Tracking Item position through the barcode |
+
+##### Scenario 7-1
+
+| Scenario       | The warehouse receives item IT and stores |
+| -------------- |:-------------:|
+| Precondition   | Item type IT exists |
+|                | IT has been delivered to the warehouse |
+|                | Warehouse Worker WW exists and is logged in |
+| Post condition | IT is stored and the location is recorded |
+| Step#          | Description  |
+|  1             | WW receives IT from courier |
+|  2             | WW scans the barcode confirming it is the correct item |
+|  3             | WW stores IT in the appropriate location  |
+|  4             | WW records the item position on the App |
+
+##### Scenario 7-2
+
+| Scenario       | Track Item position in the warehouse |
+| -------------- |:-------------:|
+| Precondition   | Item IT exists and is stored in the warehouse |
+|                | Warehouse Worker WW exists and is logged in |
+| Post condition | |
+| Step#          | Description  |
+|  1             | WW needs to track the item position in the warehouse |
+|  2             | WW enters the item name, ID or barcode on the App |
+|  3             | The app displays the location and provides instructions on how to reach it |
 
 
 # Glossary
