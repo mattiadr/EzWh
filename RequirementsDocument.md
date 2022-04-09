@@ -2,7 +2,7 @@
 
 Date: 22 march 2022
 
-Version: 0.4
+Version: 0.5
 
 | Version number | Change |
 | ----------------- |:-----------|
@@ -10,6 +10,7 @@ Version: 0.4
 | 0.2 | fixed shareholder header |
 | 0.3 | added two more personas |
 | 0.4 | added use cases 1-7 |
+| 0.5 | added use case diagram, glossary, system design and deployement diagram |
 
 # Contents
 
@@ -71,7 +72,7 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 
 ## Context Diagram
 
-![](ContextDiagram.jpg)
+![](images/ContextDiagram.jpg)
 
 Actors:
 - warehouse manager
@@ -192,7 +193,8 @@ Persona 5: Software administrator, male, 35 yo; this is my job:
 # Use case diagram and use cases
 
 ## Use case diagram
-\<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
+
+![](images/UseCaseDiagram.png)
 
 ### Use case 1, UC1 - Manage Items
 
@@ -510,18 +512,13 @@ Persona 5: Software administrator, male, 35 yo; this is my job:
 
 # Glossary
 
-\<use UML class diagram to define important terms, or concepts in the domain of the system, and their relationships>
-
-\<concepts are used consistently all over the document, ex in use cases, requirements etc>
+![](images/Glossary.png)
 
 
 # System Design
 
-\<describe here system design>
-
-\<must be consistent with Context diagram>
-
+![](images/SystemDesign.png)
 
 # Deployment Diagram
 
-\<describe here deployment diagram >
+![](images/DeployementDiagram.png)
