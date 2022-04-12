@@ -23,24 +23,36 @@ It all started from this sketch:
 | Intuitive colors | we opted for a minimal and pretty common color scheme: the main color is blue (which is known to be calming) and then we have magenta (secondary color) and the usual green vs red dichotomy (whenever something has gone right or wrong) |
 | Reachability | the main functions are located near to the user's thumb, making it comfortable to use everyday. No header is actionable nor needs to be touched |
 | Animations | they're natural and follow the flow of execution. They make the GUI more pleasant to use |
+
 # Please note 
-Uizard free account makes you add up to 3 projects (and up to 10 screens each). Hence, the admin view was implemented separately and may present some minor inconsistencies with the others. Also, the splashscreen and login screens are only provided in the OUI and quality check views. Managers will have mXXXXXX usernames, admins aXXXXXX, quality check qXXXXXX, OUI oXXXXXX
+Uizard free account makes you add up to 3 projects (and up to 10 screens each). Hence, the admin and employee view were implemented separately and may present some minor inconsistencies with the others. Also, the splashscreen and login screens are only provided in some views. Managers will have mXXXXXX usernames, admins aXXXXXX, quality check qXXXXXX, OUI oXXXXXX, employees eXXXXXX
+
 ## Manager view
 ![](images/M_1.png)
 ![](images/M_2.png)
 Clickable demo: https://app.uizard.io/p/15b61ed3
+
 ## Admin view
 ![](images/A_1.jpg)
 ![](images/A_2.jpg)
 ![](images/A_3.jpg)
-Clickable demo: https://app.uizard.io/p/d533cb8c
+Clickable demo: https://app.uizard.io/p/f9575cfd
+
 ## Quality check view
 ![](images/Q_1.png)
 ![](images/Q_2.png)
 ![](images/Q_3.png)
 Clickable demo: https://app.uizard.io/p/2dfd9fed
+
 ## OUI view 
 ![](images/O_1.png)
 ![](images/O_2.png)
 ![](images/O_3.png)
 Cliackable demo: https://app.uizard.io/p/c0ca3cdd
+
+## Employee view
+![](images/E_1.jpg)
+![](images/E_2.jpg)
+![](images/E_3.jpg)
+![](images/E_4.jpg)
+Cliackable demo: https://app.uizard.io/p/d533cb8c
