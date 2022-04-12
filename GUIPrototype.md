@@ -1,7 +1,9 @@
 # Graphical User Interface Prototype  
 
 Authors: team 48
+
 Date: 12/04/2022
+
 Version: 0.5
 
 | Version number | Change |
@@ -12,9 +14,11 @@ Version: 0.5
 | 0.4 | definitive peer review and fine tuning |
 
 It all started from this sketch:
+
 ![](images/EZWH_GUI.png)
 
 # Our GUI followed some main principles
+
 | Principle| Description |
 | ----------------- |:-----------:|
 | Simplicity | nothing is more complicated than it needs to be, and everything is just some clicks away. The GUI should be usable without heavy education from corporate (avoiding communication problems and other shortcomings) |
@@ -25,34 +29,45 @@ It all started from this sketch:
 | Animations | they're natural and follow the flow of execution. They make the GUI more pleasant to use |
 
 # Please note 
+
 Uizard free account makes you add up to 3 projects (and up to 10 screens each). Hence, the admin and employee view were implemented separately and may present some minor inconsistencies with the others. Also, the splashscreen and login screens are only provided in some views. Managers will have mXXXXXX usernames, admins aXXXXXX, quality check qXXXXXX, OUI oXXXXXX, employees eXXXXXX
 
-## Manager view
+## Warehouse Manager view
+
 ![](images/M_1.png)
 ![](images/M_2.png)
+
 Clickable demo: https://app.uizard.io/p/15b61ed3
 
 ## Admin view
+
 ![](images/A_1.jpg)
 ![](images/A_2.jpg)
 ![](images/A_3.jpg)
+
 Clickable demo: https://app.uizard.io/p/f9575cfd
 
 ## Quality check view
+
 ![](images/Q_1.png)
 ![](images/Q_2.png)
 ![](images/Q_3.png)
+
 Clickable demo: https://app.uizard.io/p/2dfd9fed
 
-## OUI view 
+## Organizational Unit Manager view
+
 ![](images/O_1.png)
 ![](images/O_2.png)
 ![](images/O_3.png)
+
 Cliackable demo: https://app.uizard.io/p/c0ca3cdd
 
-## Employee view
+## Warehouse Worker view
+
 ![](images/E_1.jpg)
 ![](images/E_2.jpg)
 ![](images/E_3.jpg)
 ![](images/E_4.jpg)
+
 Cliackable demo: https://app.uizard.io/p/d533cb8c
