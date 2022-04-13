@@ -2,7 +2,7 @@
 
 Date: 22 march 2022
 
-Version: 0.5
+Version: 0.6
 
 | Version number | Change |
 | ----------------- |:-----------|
@@ -11,6 +11,7 @@ Version: 0.5
 | 0.3 | added two more personas |
 | 0.4 | added use cases 1-7 |
 | 0.5 | added use case diagram, glossary, system design and deployement diagram |
+| 0.6 | added access rights |
 
 # Contents
 
@@ -78,7 +79,7 @@ Actors:
 - warehouse manager
 - warehouse worker
 - suppliers
-- Quality check officier
+- Quality check officer
 - OU managers
 - software administrator
 - cloud service server
@@ -91,7 +92,7 @@ Actors:
 | Warehouse manager | Graphical User Interface | Computer or smartphone's screen |
 | Warehouse worker | Graphical User Interface, Bar code | Computer or smartphone's screen, Bar code scanner |
 | Supplier | Email/Website/Telephone | Computer or smartphone's screen |
-| Quality check officier | Graphical User Interface | Computer or smartphone's screen |
+| Quality check officer | Graphical User Interface | Computer or smartphone's screen |
 | OU managers | Graphical User Interface | Computer or smartphone's screen |
 | Software Administrator | Management Tools | Computer or smartphone's screen |
 | Cloud service | API | Internet connection |
@@ -171,6 +172,23 @@ Persona 5: Software administrator, male, 35 yo; this is my job:
 |  FR8.1  | Automatic updates |
 |  FR9    | Backups |
 
+### Access right, actor vs function
+
+| Function | Administrator | Warehouse Manager | Warehouse Worker | QC officer | OU Manager |
+| -------- |:-------------:|:-----------------:|:----------------:|:-----------:|:----------:|
+| FR1      | no            | yes               | yes              | yes         | no         |
+| FR2      | no            | yes               | no               | yes*        | no         |
+| FR3      | no            | yes               | no               | no          | no         |
+| FR4.1    | no            | yes               | yes              | no          | no         |
+| FR4.2    | no            | yes               | yes              | yes         | no         |
+| FR4.3-4  | no            | yes               | no               | yes         | no         |
+| FR5      | no            | yes               | yes              | no          | no         |
+| FR5.1    | no            | yes               | no               | no          | no         |
+| FR6      | no            | yes               | no               | no          | yes        |
+| FR6.2    | no            | yes               | yes              | no          | yes        |
+| FR7      | yes           | no                | no               | no          | no         |
+
+\*QC officer can issue orders only in case the item does not pass the specified tests
 
 ## Non Functional Requirements
 
