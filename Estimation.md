@@ -2,7 +2,7 @@
 
 Date: 9 april 2022
 
-Version:
+Version: 0.3
 
 # Estimation approach
 
@@ -70,10 +70,14 @@ Consider the EZWH  project as described in YOUR requirement document, assume tha
 
 # Summary
 
-Report here the results of the three estimation approaches. The  estimates may differ. Discuss here the possible reasons for the difference
+The estimated duration is measured in weeks and has been calculated assuming a team of 4 people, 8 hours per day, 5 days per week.
 
 |                                    | Estimated effort | Estimated duration |
 | ---------------------------------- | ---------------- | ------------------ |
-| estimate by size                   | | |
-| estimate by product decomposition  | | |
-| estimate by activity decomposition | | |
+| estimate by size                   |  700             | 4.5                |
+| estimate by product decomposition  | 1230             | 7.5                |
+| estimate by activity decomposition | 1230             | 6.5                |
+
+Estimating by size got a lower amount of person hours compared to the two other methods because it didn't include an accurate breakdown of the planning phase of the software.
+
+When converting between estimated effort and estimated duration, we got different results between product and activity decomposition because the second one was based on the gantt chart, so some activities were estimated to be completed in parallel, instead of one after the other.
