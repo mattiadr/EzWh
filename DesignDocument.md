@@ -601,3 +601,542 @@ User -- UserRole
 
 # Verification sequence diagrams
 
+## Scenario 1.1 - Create SKU S
+
+```plantuml
+actor       Manager       as m
+participant ":EzWH" as ez
+participant ":WareHouse" as wh
+participant    ":Database"    as db
+alt Valid Data
+  m->ez:select positionID
+  activate ez
+    ez -> wh : createSKU(description, weight, volume, notes)
+    activate wh
+    group Confirm SKU Creation [confirm Data]
+    wh --> ez : [Yes] confirm Data
+        wh -> db: addSKU(Object)
+        activate db
+        db --> wh: void
+        deactivate db
+    else discard Data
+    wh --> ez : [No] confirm Data
+    deactivate wh
+  ez-->m:void
+  deactivate ez
+end
+else Invalid Data
+ez-->m : throw InvalidDataError
+end
+```
+
+## Scenario 2.1 - Create position
+
+```plantuml
+actor       Manager       as m
+participant ":EzWH" as ez
+participant ":WareHouse" as wh
+participant    ":Database"    as db
+alt Valid Data
+  m->ez:select positionID
+  activate ez
+    ez -> wh : createPosition(aise ID, row, column, positionID, maxWeight, maxVolume)
+    activate wh
+    group Confirm Deletion [confirm Create]
+    wh --> ez : [Yes] confirm Create
+        wh -> db: addPosition(positionID)
+        activate db
+        db --> wh: void
+        deactivate db
+    else discard Create
+    wh --> ez : [No] confirm Create
+    deactivate wh
+  ez-->m:void
+  deactivate ez
+end
+else Invalid Data
+ez-->m : throw InvalidDataError
+end
+```
+
+## Scenario 2.5 - Delete position P
+
+```plantuml
+actor       Manager       as m
+participant ":EzWH" as ez
+participant ":WareHouse" as wh
+participant    ":Database"    as db
+alt Valid Data
+  m->ez:select positionID
+  activate ez
+    ez -> wh : deletePosition(positionID)
+    activate wh
+    group Confirm Deletion [confirm Delete]
+    wh --> ez : [Yes] confirm Delete
+        wh -> db: removePosition(positionID)
+        activate db
+        db --> wh: void
+        deactivate db
+    else discard Delete
+    wh --> ez : [No] confirm Delete
+    deactivate wh
+  ez-->m:void
+  deactivate ez
+end
+else Invalid Data
+ez-->m : throw InvalidDataError
+end
+```
+
+## Scenario 3.1 - Restock Order of SKU S issued by quantity
+
+```plantuml
+actor       Manager            as m
+participant ":EzWh"         as ez
+participant ":Warehouse"    as wh
+participant ":DatabaseHelper"   as db
+alt valid Data
+m -> ez: create Restock Order
+activate ez
+ez -> wh: addItemToRestockOrder(restockOrderId, itemId, quantity)
+activate wh
+ez -> wh : setSupplier(supplierID)
+group Confirm Data [confirm Order]
+    wh --> ez : [Yes] confirm Data
+        wh -> db: storeRestockOrder(Object)
+        activate db
+        db --> wh: void
+        deactivate db
+    else discard Order
+    wh --> ez : [No] confirm Data
+    deactivate wh
+end
+ez --> m: void
+else Invalid Data
+ez-->m : throw InvalidDataError
+end
+```
+
+## Scenario 4.1 - Create user and define rights
+
+```plantuml
+actor       Administrator   as admin
+participant ":EzWh"         as ezwh
+participant ":Warehouse"    as wh
+participant ":User"         as user
+participant ":DatabaseHelper"   as db
+
+admin -> ezwh: Selects userID id, name n, surname s, email e, password p, role, r
+activate ezwh
+ezwh -> wh: getUserbyId(id)
+activate wh
+wh -> db: loadUser()
+activate db
+db --> wh: users : Map <String,User>
+deactivate db
+wh --> ezwh : user : User
+deactivate wh
+alt User doesn't exist
+    ezwh -> wh: createUser(id, n, s, e, p, r)
+    activate wh
+    wh -> user: new User(id, n, s, e, p, r)
+    activate user
+    user --> wh: newUser : User
+    deactivate user
+    wh -> db: storeUser(newuser)
+    activate db
+    db --> wh: void
+    deactivate db
+    wh --> ezwh: void
+    deactivate wh
+    ezwh --> admin: Integer
+    deactivate ezwh
+else User already exists
+    ezwh --> admin: throws UserAlreadyExist
+    end
+```
+
+## Scenario 4.3 - Delete user
+
+```plantuml
+actor       Administrator   as admin
+participant ":EzWh"         as ezwh
+participant ":Warehouse"    as wh
+participant ":DatabaseHelper"   as db
+
+admin -> ezwh: Selects userID id
+activate ezwh
+ezwh -> wh: deleteUser(id)
+activate wh
+wh -> db: removeUser(id)
+activate db
+db --> wh: void
+deactivate db
+wh --> ezwh : void
+deactivate wh
+ezwh --> admin: Integer
+deactivate ezwh
+```
+
+## Scenario 5.1.1 - Record restock order arrival
+
+```plantuml
+actor Clerk
+participant EzWh
+note over EzWh: Includes GUI and API interface
+participant Warehouse
+participant SKUItem
+participant RestockOrder
+
+Clerk -> EzWh : Selects RestockOrder RO and a List of SKU S and RFID R
+EzWh -> Warehouse : addSKUItemToRestockOrder(RO, S, R)
+activate Warehouse
+Warehouse -> SKUItem: new SKUItem(S, R)
+activate SKUItem
+SKUItem --> Warehouse : SKUItem SI
+deactivate SKUItem
+Warehouse -> Warehouse :getRestockOrderById(RO)
+Warehouse -> RestockOrder : setSKUItems(List<SI>)
+activate RestockOrder
+RestockOrder --> Warehouse : Done
+deactivate RestockOrder
+Warehouse -> Warehouse : updateRestockOrderState(RO, DELIVERED)
+Warehouse --> EzWh : Done
+deactivate Warehouse
+EzWh --> Clerk : Done
+```
+
+## Scenario 5.2.1 - Record positive test results of all SKU items of a RestockOrder
+
+```plantuml
+actor QualityEmployee as QE
+participant EzWh
+note over EzWh: Includes GUI and API interface
+participant Warehouse
+participant TestResult
+participant SKUItem
+participant RestockOrder
+
+QE -> EzWh : Selects Restock Order ROID, positive esit for all test results,\nDate D, RFID List RL, Test Descriptor IDs T
+activate EzWh
+EzWh -> Warehouse : for R in RL do createTestResult(R, T, D, TRUE)
+activate Warehouse
+Warehouse -> Warehouse : generate TestResult ID TRID
+Warehouse -> TestResult : new TestResult(TRID, T, D, TRUE)
+activate TestResult
+TestResult --> Warehouse : TestResult TR
+deactivate TestResult
+Warehouse -> Warehouse : getSKUItemByRFID(R)
+Warehouse -> SKUItem : addTestResults(TR)
+activate SKUItem
+SKUItem --> Warehouse : Done
+deactivate SKUItem
+Warehouse --> EzWh : Done
+deactivate Warehouse
+
+EzWh -> Warehouse : updateRestockOrderState(ROID, TESTED)
+activate Warehouse
+Warehouse -> Warehouse : getRestockOrderById(ROID)
+Warehouse -> RestockOrder : setState(TESTED)
+activate RestockOrder
+RestockOrder --> Warehouse : Done
+deactivate RestockOrder
+Warehouse --> EzWh : Done
+deactivate Warehouse
+EzWh --> QE : Done
+deactivate EzWh
+```
+
+## Scenario 5.3.1 - Stock all SKU items of a RO
+
+```plantuml
+actor Clerk
+participant EzWh
+note over EzWh: Includes GUI and API interface
+participant Warehouse
+note over Warehouse : Includes DatabaseHelper
+participant SKUItem
+participant RestockOrder
+participant SKU
+participant Position
+
+Clerk -> EzWh : Selects Restock Order ID ROID, RFID list RL
+activate EzWh
+EzWh -> Warehouse : for R in RL do getSKUItemByRFID(R)
+activate Warehouse
+Warehouse -> SKUItem : getSKUId()
+activate SKUItem
+SKUItem --> Warehouse : SKUID
+deactivate SKUItem
+
+Warehouse -> Warehouse : RO = getRestockOrderById(ROID)
+Warehouse -> RestockOrder : getQuantityBySKUid(SKUID)
+activate RestockOrder
+RestockOrder --> Warehouse : Quantity Q
+deactivate RestockOrder
+
+Warehouse -> Warehouse : S = getSKUbyId(SKUID)
+Warehouse -> SKU : addQuantity(Q)
+activate SKU
+SKU --> Warehouse : Done
+deactivate SKU
+
+Warehouse -> SKU : getWeight()
+activate SKU
+SKU --> Warehouse : Integer W
+deactivate SKU
+Warehouse -> SKU : getVolume()
+activate SKU
+SKU --> Warehouse : Integer V
+deactivate SKU
+Warehouse -> SKU : getPosition()
+activate SKU
+SKU --> Warehouse : Position P
+deactivate SKU
+
+Warehouse -> Position : addOccupiedWeight(W*Q)
+activate Position
+Position --> Warehouse : Done
+deactivate Position
+Warehouse -> Position : addOccupiedVolume(V*Q)
+activate Position
+Position --> Warehouse : Done
+deactivate Position
+Warehouse --> EzWh : Done
+deactivate Warehouse
+
+EzWh -> Warehouse : updateRestockOrderState(ROID, COMPLETED)
+activate Warehouse
+Warehouse -> RestockOrder : setState(COMPLETED)
+activate RestockOrder
+RestockOrder --> Warehouse : Done
+deactivate RestockOrder
+
+Warehouse --> EzWh : Done
+deactivate Warehouse
+
+EzWh --> Clerk : Done
+deactivate EzWh
+```
+
+## Scenario 6.1 - Return order of SKU items that failed quality test
+
+```plantuml
+actor Manager
+participant EzWh
+note over EzWh: Includes GUI and API interface
+participant Warehouse
+participant RestockOrder
+
+Manager -> EzWh : Selects Restock Order ID ROID,\nReturn Date D, Return Order ID REOID
+EzWh -> Warehouse : getRestockOrderById(ROID)
+activate Warehouse
+Warehouse -> RestockOrder : getSkuItems()
+activate RestockOrder
+RestockOrder --> Warehouse : List<SKUItems>
+deactivate RestockOrder
+
+Warehouse -> Warehouse : L = Filter SKUItems with failed test results
+Warehouse -> Warehouse : createReturnOrder(D, L, ROID)
+Warehouse -> Warehouse : generate REOID
+Warehouse -> ReturnOrder : new ReturnOrder(REOID, D, ROID)
+activate ReturnOrder
+ReturnOrder --> Warehouse : REO
+deactivate ReturnOrder
+Warehouse -> ReturnOrder : for I in L do REO.addSKUItem(I)
+activate ReturnOrder
+ReturnOrder --> Warehouse : Done
+deactivate ReturnOrder
+
+Warehouse --> EzWh : Done
+deactivate Warehouse
+EzWh --> Manager : Done
+```
+
+## Scenario 7.1 - Login
+
+```plantuml
+actor       User            as U
+participant ":EzWh"         as ezwh
+participant ":Warehouse"    as wh
+participant ":User"         as user
+participant ":DatabaseHelper"   as db
+
+U -> ezwh: Selects userID id, password p
+activate ezwh
+ezwh -> wh: getUserbyId(id)
+activate wh
+wh -> db: loadUser()
+activate db
+db --> wh: users : Map <String,User>
+deactivate db
+wh --> ezwh : user : User
+deactivate wh
+alt User exists
+    ezwh -> user: User::getPassword(user)
+    activate user
+    user --> ezwh: userPass : String
+    deactivate user
+    alt p == userPass
+    ezwh -> user: User::getRole(user)
+    activate user
+    user --> ezwh: userRole : UserRole
+    deactivate user
+    group Role [ADMINISTRATOR]
+        ezwh -> wh: administratorSession(id, p)
+        activate wh
+    else MANAGER
+        ezwh -> wh: managerSession(id, p)
+    else CLERK
+        ezwh -> wh: clerkSession(id, p)
+    else QUALITY CHECKER
+        ezwh -> wh: qualityEmployeeSession(id, p)
+    else DELIVERY
+        ezwh -> wh: deliveryEmployeeSession(id, p)
+    else CUSTOMER
+        ezwh -> wh: customerSession(id, p)
+    else SUPPLIER
+        ezwh -> wh: supplierSession(id, p)
+        end
+    wh --> ezwh: session: UserSession
+    deactivate wh
+    ezwh --> U: session: UserSession
+    else p != userPass
+        ezwh --> U: throws InvalidPasswordException
+        end
+else User doesn't exists
+    ezwh --> U: throws NullUserException
+    end
+```
+
+## Scenario 7.2 - Logout
+
+```plantuml
+actor       User            as U
+participant ":EzWh"         as ezwh
+participant ":Warehouse"    as wh
+participant ":DatabaseHelper"   as db
+
+U -> ezwh: Selects user U
+activate ezwh
+ezwh -> wh: logout()
+activate wh
+wh -> db: updateUser(U)
+activate db
+db --> wh: void
+deactivate db
+wh --> ezwh : void
+deactivate wh
+ezwh --> U: void
+```
+
+## Scenario 9.1 - Internal Order IO accepted
+
+```plantuml
+actor Manager
+actor Customer
+participant EzWh
+note over EzWh: Includes GUI and API interface
+participant Warehouse
+note over Warehouse: Includes DatabaseHelper
+participant InternalOrder
+Customer -> EzWh: IO started
+activate Warehouse
+Customer -> EzWh: Adds SKU
+EzWh -> Warehouse: initInternalOrder(id, date, customerId, from, priority)
+activate InternalOrder
+Warehouse -> InternalOrder: addSKUToInternalOrder(InternalOrderId, itemId, quantity)
+Customer -> EzWh: IO confirmed
+EzWh -> Warehouse: updateSKU(SKU)
+EzWh -> Warehouse: updatePosition(Object : Position)
+EzWh -> Warehouse: setInternalOrderIssued(id)
+Warehouse --> EzWh: Done
+deactivate Warehouse
+EzWh -> InternalOrder: setState(ISSUED)
+Manager -> EzWh: IO accepted
+EzWh -> InternalOrder: setState(ACCEPTED)
+InternalOrder --> EzWh: Done
+deactivate InternalOrder
+EzWh --> Manager: Done
+EzWh --> Customer: Done
+```
+
+## Scenario 10.1 - Internal Order IO Completed
+
+```plantuml
+actor DeliveryEmployee as D
+participant EzWh
+note over EzWh: Includes GUI and API interface
+participant Warehouse
+participant InternalOrder
+participant SKU
+participant SKUItem
+D -> EzWh: Views Internal Orders
+activate Warehouse
+EzWh -> Warehouse: GetInternalOrder()
+Warehouse --> EzWh: Collection<InternalOrder>
+D -> EzWh: IO selected
+EzWh -> Warehouse: getInternalOrderById(id)
+Warehouse --> EzWh: InternalOrder
+EzWh -> Warehouse: getInternalOrderSKUs(id)
+Warehouse --> EzWh: Collection<SKU>
+deactivate Warehouse
+activate SKU
+EzWh -> SKU: getSkuItemsID() :
+SKU --> EzWh: Collection<String>
+deactivate SKU
+activate SKUItem
+EzWh -> SKUItem: getRFID()
+SKUItem --> EzWh: RFID
+D -> EzWh: SKU items collected
+EzWh -> SKUItem: setAvailable(false)
+SKUItem --> EzWh: Done
+deactivate SKUItem
+activate InternalOrder
+EzWh -> InternalOrder: setState(COMPLETED)
+InternalOrder --> EzWh: Done
+deactivate InternalOrder
+EzWh --> D: Done
+```
+
+## Scenario 11.1 - Create Item I
+
+```plantuml
+actor Supplier
+participant EzWh
+note over EzWh: Includes GUI and API interface
+participant Warehouse
+Supplier -> EzWh: Inserts description, SKUid and price
+EzWh --> Supplier: Data preview
+Supplier -> EzWh: Confirms data
+activate Warehouse
+EzWh -> Warehouse: createItem(id, description, price, SKUid, supplierID)
+Warehouse --> EzWh: Done
+deactivate Warehouse
+EzWh --> Supplier: Done
+```
+
+## Scenario 12.1 - Create test description
+
+```plantuml
+actor Manager as M
+participant EzWh
+note over EzWh: Includes GUI and API interface
+participant Warehouse
+participant TestDescriptor
+M -> EzWh: Defines name and procedure description
+M -> EzWh: Selects S
+EzWh --> M: Data preview
+M -> EzWh: Confirms data
+activate Warehouse
+EzWh -> Warehouse: createTestDescriptor(id, name, description)
+Warehouse --> EzWh: Done
+EzWh -> Warehouse: getTestDescriptorById(id)
+Warehouse --> EzWh: TestDescriptor
+deactivate Warehouse
+activate TestDescriptor
+EzWh -> TestDescriptor: setIdSKU(newIdSKU)
+TestDescriptor --> EzWh: Done
+deactivate TestDescriptor
+EzWh --> M: Done
+```
