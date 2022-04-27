@@ -52,7 +52,12 @@ The back end is implemented using node.js developing applications.
 
 # Low level design
 
-```plantuml
+![](images/ClassDiagram.svg)
+
+<details>
+    <summary>Show Source</summary>
+
+```
 class EzWh {
     - warehouse : Warehouse
     __
@@ -306,7 +311,11 @@ class Position {
     + setMaxWeight(newMaxWeight : Double) : void
     + setMaxVolume(newMaxVolume : Double) : void
     + setOccupiedWeight(newOccupiedWeight : Integer) : void
+    + addOccupiedWeight(weight : Integer) : void
+    + subOccupiedWeight(weight : Integer) : void
     + setOccupiedVolume(newOccupiedVolume : Integer) : void
+    + addOccupiedVolume(volume : Integer) : void
+    + subOccupiedVolume(volume : Integer) : void
     + setPosition(newPositionID : String) : void
     + setSKU(newSKUid : String) : void
 }
@@ -370,6 +379,7 @@ class RestockOrder {
     + getSupplierId() : Integer
     + getTransportNote() : TransportNote
     + getSkuItems() : List<SKUItem>
+    + getQuantityBySKUid(SKUid : String) : Integer
     ..
     + setState(newState : StateRestock) : void
     + setSKUItems(SKUItems : List<SKUItem>) : void
@@ -573,6 +583,7 @@ User <|-- Supplier
 User -- UserRole
 ```
 
+</details>
 
 # Verification traceability matrix
 
