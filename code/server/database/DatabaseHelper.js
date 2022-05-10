@@ -2,11 +2,12 @@
 const sqlite = require("sqlite3");
 const SKU = require("../components/SKU");
 const SKUItem = require("../components/SKUItem");
+const dayjs = require("dayjs");
 
 class DatabaseHelper{
     constructor(){
-        this.SKUs = undefined;
-        this.SKUItems = undefined;
+        this.SKUs = new Map();
+        this.SKUItems = new Map();
     }
 
     connect(pathSQLite){
@@ -66,7 +67,7 @@ class DatabaseHelper{
             RFID varchar(50) PRIMARY KEY,
             SKUID varchar(12) NOT NULL,
             available boolean DEFAULT 0,
-            dateOfStock DATETIME NOT NULL
+            dateOfStock DATETIME
         );
         `);
         
@@ -74,12 +75,11 @@ class DatabaseHelper{
     }
 
     async loadSKU() {// -> //: Map <String,SKU>
-        if (this.SKUs == undefined) { //first time
+        if (this.SKUs.size == 0) { //first time
             let rows = await this.queryDBAll(`SELECT * FROM SKU;`);
-            this.SKUs = new Map();
 
             rows.map(row => {
-                const sku = new SKU(row.SKUID, row.description, row.weight, row.volume, row.price, row.notes, row.positionId, row.availableQuantity);
+                const sku = new SKU(row.SKUID, row.description, row.weight, row.volume, row.price, row.notes, row.availableQuantity, row.positionId);
                 this.SKUs.set(row.SKUID, sku);
             })
         } 
@@ -87,7 +87,7 @@ class DatabaseHelper{
     } 
     
     async loadSKUItem() { //-> Map<String,SKUItem>
-        if (this.SKUItems == null ) { //first time
+        if (this.SKUItems.size == 0 ) { //first time
             let rows = await this.queryDBAll(`SELECT * FROM SKUItem;`);
             this.SKUItems = new Map();
 
@@ -121,18 +121,19 @@ class DatabaseHelper{
             UPDATE SKU
             SET description = ?, weight = ?, volume = ?, price = ?, notes = ?, positionId = ?, availableQuantity = ?
             WHERE SKUID=?;
-        `,[newSKU.description, newSKU.weight, newSKU.volume, newSKU.price, newSKU.notes, newSKU.positionId, newSKU.availableQuantity, newSKU.id]);
+        `,[newSKU.description, newSKU.weight, newSKU.volume, newSKU.price, newSKU.notes, newSKU.position, newSKU.availableQuantity, newSKU.id]);
         this.SKUs.set(newSKU.id, newSKU);
 
     }
 
-    async updateSKUItem(newSKUItem /*: Object*/) {
+    async updateSKUItem(rfid, newSKUItem /*: Object*/) {
         await this.queryDBRun(`
             UPDATE SKUItem
             SET RFID = ?, available = ?, dateOfStock = ?
             WHERE RFID=?;
-        `,[newSKUItem.RFID, newSKUItem.available, newSKUItem.dateOfStock, newSKUItem.RFID]);
-        this.SKUItems.set(newSKUItem.RFID, newSKUItem);
+        `,[newSKUItem.RFID, newSKUItem.available, newSKUItem.dateOfStock, rfid]);
+        this.SKUItems.delete(rfid);
+        this.SKUItems.set(rfid, newSKUItem);
 
     }
 
