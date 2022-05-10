@@ -75,9 +75,9 @@ class DatabaseHelper{
 
     async loadSKU() {// -> //: Map <String,SKU>
         if (this.SKUs == undefined) { //first time
-            this.SKUs = new Map();
             let rows = await this.queryDBAll(`SELECT * FROM SKU;`);
-    
+            this.SKUs = new Map();
+
             rows.map(row => {
                 const sku = new SKU(row.SKUID, row.description, row.weight, row.volume, row.price, row.notes, row.positionId, row.availableQuantity);
                 this.SKUs.set(row.SKUID, sku);
@@ -88,9 +88,9 @@ class DatabaseHelper{
     
     async loadSKUItem() { //-> Map<String,SKUItem>
         if (this.SKUItems == null ) { //first time
-            this.SKUItems = new Map();
             let rows = await this.queryDBAll(`SELECT * FROM SKUItem;`);
-    
+            this.SKUItems = new Map();
+
             rows.map(row => {
                 const skuItem = new SKUItem(row.RFID, row.SKUID, row.available, row.dateOfStock);
                 this.SKUItems.set(row.RFID, skuItem);
@@ -101,59 +101,57 @@ class DatabaseHelper{
     }
 
     async storeSKU(newSKU /*: Object*/) {
-        this.SKUs.set(newSKU.id, newSKU);
         await this.queryDBRun(`
             INSERT INTO SKU(SKUID, description, weight, volume, price, notes, positionId, availableQuantity)
             VALUES(?, ?, ?, ?, ?, ?, ? , ?);
         `,[newSKU.id, newSKU.description, newSKU.weight, newSKU.volume, newSKU.price, newSKU.notes, newSKU.positionId, newSKU.availableQuantity]);
-        this.modifiedSKU = true;
+        this.SKUs.set(newSKU.id, newSKU);
     }
     
     async storeSKUItem(newSKUItem /*: Object*/) {
-        this.SKUItems.set(newSKUItem.RFID, newSKUItem);
         await this.queryDBRun(`
             INSERT INTO SKUItem(RFID, SKUID, available, dateOfStock)
             VALUES(?, ?, ?, ?);
         `,[newSKUItem.RFID, newSKUItem.SKUID, newSKUItem.available, newSKUItem.dateOfStock]);
-        this.modifiedSKUItem = true;
+        this.SKUItems.set(newSKUItem.RFID, newSKUItem);
     }
 
     async updateSKU(newSKU /*: Object*/) {
-        this.SKUs.set(newSKU.id, newSKU);
         await this.queryDBRun(`
             UPDATE SKU
             SET description = ?, weight = ?, volume = ?, price = ?, notes = ?, positionId = ?, availableQuantity = ?
             WHERE SKUID=?;
         `,[newSKU.description, newSKU.weight, newSKU.volume, newSKU.price, newSKU.notes, newSKU.positionId, newSKU.availableQuantity, newSKU.id]);
+        this.SKUs.set(newSKU.id, newSKU);
 
     }
 
     async updateSKUItem(newSKUItem /*: Object*/) {
-        this.SKUItems.set(newSKUItem.RFID, newSKUItem);
         await this.queryDBRun(`
             UPDATE SKUItem
             SET RFID = ?, available = ?, dateOfStock = ?
             WHERE RFID=?;
         `,[newSKUItem.RFID, newSKUItem.available, newSKUItem.dateOfStock, newSKUItem.RFID]);
+        this.SKUItems.set(newSKUItem.RFID, newSKUItem);
 
     }
 
     async deleteSKU(SKUid) {
-        this.SKUs.delete(SKUid);
         await this.queryDBRun(`
             DELETE
             FROM SKU
             WHERE SKUID=?;
         `, [SKUid]);
+        this.SKUs.delete(SKUid);
     }
 
     async deleteSKUItem(RFID) {
-        this.SKUItems.delete(RFID);
         await this.queryDBRun(`
             DELETE
             FROM SKUItem
             WHERE RFID=?;
         `, [RFID]);
+        this.SKUItems.delete(RFID);
     }
 }
 
