@@ -31,6 +31,11 @@ class DatabaseHelper {
 		// TODO database
 		this.users[id] = user;
 	}
+
+	deleteUser(id) {
+		// TODO database
+		delete this.users[id];
+	}
 }
 
 exports.DatabaseHelper = DatabaseHelper;

@@ -45,8 +45,8 @@ class Warehouse {
 
 	newUser(username, name, surname, password, type) {
 		const users = this.db_help.getUsers();
-		if (users.find((u) => u.email === username)) return 409; // conflict username already exists
-		if (!Object.values(UserRole).includes(type)) return 422; // unprocessable, type does not exist
+		if (users.find((u) => u.email === username)) return {status: 409, body: "username already exists"};
+		if (!Object.values(UserRole).includes(type)) return {status: 422, body: "type does not exist"};
 
 		const nextID = users.length;
 		const passwordSalt = "test123"; // TODO
@@ -56,7 +56,7 @@ class Warehouse {
 			.digest("base64");
 
 		this.db_help.addUser(nextID, new User(nextID, name, surname, username, passwordHash, passwordSalt, type));
-		return 201; // created
+		return {status: 201, body: ""};
 	}
 
 	session(email, password, role) {
@@ -72,7 +72,30 @@ class Warehouse {
 		}
 	}
 
+	modifyUserRights(username, oldType, newType) {
+		const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
+		if (!allowedTypes.includes(oldType) || !allowedTypes.includes(newType)) return {status: 422, body: "invalid type"};
 
+		const users = this.db_help.getUsers();
+		const user = users.find((u) => u.email === username);
+		if (!user || user.role !== oldType) return {status: 404, body: "wrong user or type"};
+
+		user.role = newType;
+		this.db_help.updateUser(user.id);
+		return {status: 200, body: ""};
+	}
+
+	deleteUser(username, type) {
+		const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
+		if (!allowedTypes.includes(type)) return {status: 422, body: "invalid type"};
+
+		const users = this.db_help.getUsers();
+		const user = users.find((u) => u.email === username);
+		if (!user.role === type) return {status: 422, body: "wrong type"};
+
+		this.db_help.deleteUser(user.id);
+		return {status: 200, body: ""};
+	}
 }
 
 exports.Warehouse = Warehouse;
