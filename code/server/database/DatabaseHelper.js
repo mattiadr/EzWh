@@ -2,12 +2,14 @@
 const sqlite = require("sqlite3");
 const SKU = require("../components/SKU");
 const SKUItem = require("../components/SKUItem");
+const Position = require("../components/Position")
 const dayjs = require("dayjs");
 
 class DatabaseHelper{
     constructor(){
         this.SKUs = new Map();
         this.SKUItems = new Map();
+        this.Positions = new Map();
     }
 
     connect(pathSQLite){
@@ -70,11 +72,25 @@ class DatabaseHelper{
             dateOfStock DATETIME
         );
         `);
+
+        // Create the table of SKUItem in the db if it not exist (just first time)
+        await this.queryDBRun(`
+        CREATE TABLE IF NOT EXISTS Position (
+            posID varchar(12) PRIMARY KEY,
+            aisleID varchar(4) NOT NULL,
+            row varchar(4) NOT NULL,
+            col varchar(4) NOT NULL,
+            maxWeight integer NOT NULL,
+            maxVolume integer NOT NULL,
+            occupiedWeight integer DEFAULT 0,
+            occupiedValue integer DEFAULT 0
+        );
+        `);
         
         //TODO ADD ALL TABLES
     }
 
-    async loadSKU() {// -> //: Map <String,SKU>
+    async loadSKU() {//: Map <String,SKU>
         if (this.SKUs.size == 0) { //first time
             let rows = await this.queryDBAll(`SELECT * FROM SKU;`);
 
@@ -86,10 +102,9 @@ class DatabaseHelper{
         return this.SKUs;
     } 
     
-    async loadSKUItem() { //-> Map<String,SKUItem>
+    async loadSKUItem() { //: Map<String,SKUItem>
         if (this.SKUItems.size == 0 ) { //first time
             let rows = await this.queryDBAll(`SELECT * FROM SKUItem;`);
-            this.SKUItems = new Map();
 
             rows.map(row => {
                 const skuItem = new SKUItem(row.RFID, row.SKUID, row.available, row.dateOfStock);
@@ -100,11 +115,24 @@ class DatabaseHelper{
         return this.SKUItems;
     }
 
+    async loadPosition() { //: Map<String, Position>
+        if (this.Positions.size == 0 ) { //first time
+            let rows = await this.queryDBAll(`SELECT * FROM Position;`);
+
+            rows.map(row => {
+                const pos = new Position(row.posID, row.aisleID, row.row, row.col, row.maxWeight, row.maxVolume, row.occupedWeight, row.occupedVolume);
+                this.Positions.set(row.posID, pos);
+                
+            })
+        }
+        return this.Positions;
+    }
+
     async storeSKU(newSKU /*: Object*/) {
         await this.queryDBRun(`
             INSERT INTO SKU(SKUID, description, weight, volume, price, notes, positionId, availableQuantity)
             VALUES(?, ?, ?, ?, ?, ?, ? , ?);
-        `,[newSKU.id, newSKU.description, newSKU.weight, newSKU.volume, newSKU.price, newSKU.notes, newSKU.positionId, newSKU.availableQuantity]);
+        `,[newSKU.getId(), newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity()]);
         this.SKUs.set(newSKU.id, newSKU);
     }
     
@@ -112,8 +140,17 @@ class DatabaseHelper{
         await this.queryDBRun(`
             INSERT INTO SKUItem(RFID, SKUID, available, dateOfStock)
             VALUES(?, ?, ?, ?);
-        `,[newSKUItem.RFID, newSKUItem.SKUID, newSKUItem.available, newSKUItem.dateOfStock]);
+        `,[newSKUItem.getRFID(), newSKUItem.getSKUId(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock()]);
         this.SKUItems.set(newSKUItem.RFID, newSKUItem);
+    }
+
+    async storePosition(newPosition /*: Object*/) {
+        await this.queryDBRun(`
+            INSERT INTO Position(posID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight, occupiedValue)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?);
+        `,[newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(), 
+            newPosition.getMaxWeight(), newPosition.getMaxVolume(), newPosition.getOccupiedWeight(), newPosition.getOccupiedVolume()]);
+        this.Positions.set(newPosition.getPositionID(), newPosition);
     }
 
     async updateSKU(newSKU /*: Object*/) {
@@ -121,8 +158,8 @@ class DatabaseHelper{
             UPDATE SKU
             SET description = ?, weight = ?, volume = ?, price = ?, notes = ?, positionId = ?, availableQuantity = ?
             WHERE SKUID=?;
-        `,[newSKU.description, newSKU.weight, newSKU.volume, newSKU.price, newSKU.notes, newSKU.position, newSKU.availableQuantity, newSKU.id]);
-        this.SKUs.set(newSKU.id, newSKU);
+        `,[newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity(), newSKU.getId()]);
+        this.SKUs.set(newSKU.getId(), newSKU);
 
     }
 
@@ -131,10 +168,21 @@ class DatabaseHelper{
             UPDATE SKUItem
             SET RFID = ?, available = ?, dateOfStock = ?
             WHERE RFID=?;
-        `,[newSKUItem.RFID, newSKUItem.available, newSKUItem.dateOfStock, rfid]);
+        `,[newSKUItem.getRFID(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock(), rfid]);
         this.SKUItems.delete(rfid);
         this.SKUItems.set(rfid, newSKUItem);
+    }
 
+    async updatePosition(oldPosID, newPosition /*: Object*/) {
+        await this.queryDBRun(`
+            UPDATE Position
+            SET posID = ?, aisleID = ?, row = ?, col = ?, maxWeight = ?, maxVolume = ?, occupiedWeight = ?, occupiedValue = ?
+            WHERE posID = ?;
+        `,[newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(), 
+            newPosition.getMaxWeight(), newPosition.getMaxVolume(), newPosition.getOccupiedWeight(), newPosition.getOccupiedVolume(),
+        oldPosID]);
+        this.Positions.delete(oldPosID);
+        this.Positions.set(newPosition.getPositionID(), newPosition);
     }
 
     async deleteSKU(SKUid) {
@@ -153,6 +201,15 @@ class DatabaseHelper{
             WHERE RFID=?;
         `, [RFID]);
         this.SKUItems.delete(RFID);
+    }
+
+    async deletePosition(posID) {
+        await this.queryDBRun(`
+            DELETE
+            FROM Position
+            WHERE posID=?;
+        `, [posID]);
+        this.Positions.delete(posID);
     }
 }
 

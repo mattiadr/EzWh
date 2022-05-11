@@ -7,7 +7,6 @@ const app = new express();
 const port = 3001;
 
 const wh = new Warehouse();
-wh.createTables();
 
 app.use(express.json());
 
@@ -18,6 +17,8 @@ app.get('/api/hello', (req, res) => {
   }
   return res.status(200).json(message);
 });
+
+/*----------------------------SKU-----------------------------------*/
 
 //GET /api/skus
 app.get('/api/skus', async (req, res) => {
@@ -57,6 +58,8 @@ app.delete('/api/sku/:id', async (req, res) => {
   return res.status(result.status).json(result.message);
 });
 
+/*--------------------------------SKUItem-----------------------------------*/
+
 //GET /api/skuitems
 app.get('/api/skuitems', async (req, res) => {
   let sku_items = await wh.getSKUItems();
@@ -92,6 +95,45 @@ app.put('/api/skuitems/:rfid', async (req, res) => {
 //DELETE /api/skuitems/:rfid
 app.delete('/api/skuitems/:rfid', async (req, res) => {
   let result = await wh.deleteSKUItems(req.params.rfid);
+  return res.status(result.status).json(result.message);
+});
+
+/*----------------------------Position------------------------------------*/
+
+//GET /api/positions
+app.get('/api/positions', async (req, res) => {
+  let positions = await wh.getPositions();
+  let array = [];
+  positions.body.forEach((value, key) => array.push(value))
+  return res.status(positions.status).json(array);
+});
+
+//POST /api/position
+app.post('/api/position', async (req, res) =>{
+  let result = await wh.createPosition(req.body.positionID, req.body.aisleID, req.body.row, req.body.col, req.body.maxWeight, req.body.maxVolume);
+  return res.status(result.status).json(result.message);
+});
+
+//PUT /api/position/:positionID
+app.put('/api/position/:positionID', async (req, res) =>{
+  let result = await wh.updatePosition(req.params.positionID, req.body.newAisleID, req.body.newRow, req.body.newCol, req.body.newMaxWeight, req.body.newMaxVolume, req.body.newOccupiedWeight, req.body.newOccupiedValue);
+  return res.status(result.status).json(result.message);
+});
+
+//PUT /api/position/:positionID/changeID
+app.put('/api/position/:positionID/changeID', async (req, res) =>{
+  const positionID = req.body.newPositionID;
+  if (positionID.length != 12) return req.status(422).json();
+  let newAisleID = positionID.slice(0, 4);
+  let newRow = positionID.slice(4, 8);
+  let newCol = positionID.slice(8, 12);
+  let result = await wh.updatePosition(req.params.positionID, newAisleID, newRow, newCol);
+  return res.status(result.status).json(result.message);
+});
+
+//DELETE /api/position/:positionID
+app.delete('/api/position/:positionID', async (req, res) => {
+  let result = await wh.deletePosition(req.params.positionID);
   return res.status(result.status).json(result.message);
 });
 
