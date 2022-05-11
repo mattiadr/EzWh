@@ -4,97 +4,88 @@ const {DatabaseHelper} = require("../database/DatabaseHelper");
 const {UserRole, User} = require("./User");
 
 class Warehouse {
-	constructor() {
-		this.db_help = new DatabaseHelper();
-		this.user_sessions = {};
+	constructor(dbFile="./database/ezwh.db") {
+		this.db_help = new DatabaseHelper(dbFile);
 	}
+
+	/** TEST DESCRIPTOR **/
 
 	/** USER **/
 	getCurrentUser() {
 		// TODO
-		return this.db_help.getUsers()[0];
-	}
-
-	currentUserMatchesRole(arg) {
-		const currentUser = this.getCurrentUser();
-		if (!currentUser) return false; // no user is logged in, deny
-		// TODO remove admin?
-		if (currentUser.role === UserRole.ADMINISTRATOR) return true; // administrator is always allowed
-
-		if (!arg) {
-			// no specific role needed, allow
-			return true;
-		} else if (Array.isArray(arg)) {
-			// multiple roles specified, check if current user is in array
-			return arg.includes(currentUser.role);
-		} else {
-			// single role specified, check if current user matches
-			return currentUser.role === arg;
-		}
+		return {};
 	}
 
 	getSuppliers() {
-		const users = this.db_help.getUsers();
-		return users.filter((u) => u.role === UserRole.SUPPLIER);
+		return this.db_help.selectUsers().then((users) => users.filter((u) => u.role === UserRole.SUPPLIER));
 	}
 
 	getUsers() {
-		const users = this.db_help.getUsers();
-		return users.filter((u) => u.role !== UserRole.MANAGER);
+		return this.db_help.selectUsers().then((users) => users.filter((u) => u.role !== UserRole.MANAGER));
 	}
 
-	newUser(username, name, surname, password, type) {
-		const users = this.db_help.getUsers();
-		if (users.find((u) => u.email === username)) return {status: 409, body: "username already exists"};
+	async newUser(email, name, surname, password, type) {
 		if (!Object.values(UserRole).includes(type)) return {status: 422, body: "type does not exist"};
 
-		const nextID = users.length;
-		const passwordSalt = "test123"; // TODO
-		const passwordHash = crypto.createHash("sha256")
-			.update(password, "utf8")
-			.update(passwordSalt)
-			.digest("base64");
+		try {
+			const user = await this.db_help.selectUserByEmail(email);
+			if (user && user.role === type) return {status: 409, body: "username already exists"};
 
-		this.db_help.addUser(nextID, new User(nextID, name, surname, username, passwordHash, passwordSalt, type));
-		return {status: 201, body: ""};
-	}
+			const passwordSalt = crypto.randomBytes(256).toString("base64");
+			const passwordHash = crypto.createHash("sha256")
+				.update(password, "utf8")
+				.update(passwordSalt)
+				.digest("base64");
 
-	session(email, password, role) {
-		const users = this.db_help.getUsers();
-		const user = users.find((u) => u.email === email);
-
-		if (user && user.role === role && user.checkPassword(password)) {
-			// TODO create session
-			return user;
-		} else {
-			// login fails if the user is not present, the role is wrong or the password is wrong
-			return false;
+			await this.db_help.insertUser(new User(null, name, surname, email, passwordHash, passwordSalt, type));
+			return {status: 201, body: ""};
+		} catch (e) {
+			console.log("exception", e);
+			return {status: 503, body: e};
 		}
 	}
 
-	modifyUserRights(username, oldType, newType) {
+	async session(email, password, role) {
+		try {
+			const user = await this.db_help.selectUserByEmail(email);
+			if (user && user.role === role && user.checkPassword(password)) {
+				return {status: 200, body: {id: user.id, username: user.email, name: user.name, surname: user.surname}};
+			} else {
+				// login fails if the user is not present, the role is wrong or the password is wrong
+				return {status: 401, body: "wrong username password or role"};
+			}
+		} catch (e) {
+			return {status: 500, body: e};
+		}
+	}
+
+	async modifyUserRights(email, oldType, newType) {
 		const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
 		if (!allowedTypes.includes(oldType) || !allowedTypes.includes(newType)) return {status: 422, body: "invalid type"};
 
-		const users = this.db_help.getUsers();
-		const user = users.find((u) => u.email === username);
-		if (!user || user.role !== oldType) return {status: 404, body: "wrong user or type"};
-
-		user.role = newType;
-		this.db_help.updateUser(user.id);
-		return {status: 200, body: ""};
+		try {
+			const user = await this.db_help.selectUserByEmail(email);
+			if (!user || user.role !== oldType) return {status: 404, body: "wrong user or type"};
+			user.role = newType;
+			await this.db_help.updateUser(user);
+			return {status: 200, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
 	}
 
-	deleteUser(username, type) {
+	async deleteUser(email, type) {
 		const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
 		if (!allowedTypes.includes(type)) return {status: 422, body: "invalid type"};
 
-		const users = this.db_help.getUsers();
-		const user = users.find((u) => u.email === username);
-		if (!user.role === type) return {status: 422, body: "wrong type"};
-
-		this.db_help.deleteUser(user.id);
-		return {status: 200, body: ""};
+		try {
+			const user = await this.db_help.selectUserByEmail(email);
+			if (!user.role === type) return {status: 422, body: "wrong type"};
+			await this.db_help.deleteUserByID(user.id);
+			return {status: 200, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
 	}
 }
 

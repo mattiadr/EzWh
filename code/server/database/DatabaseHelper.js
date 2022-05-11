@@ -1,40 +1,98 @@
-const {User, UserRole} = require("../components/User");
+const sqlite3 = require("sqlite3");
+
+const {User} = require("../components/User");
 
 class DatabaseHelper {
-	constructor() {
-		this.users = null;
-		this.loadUsers();
+	constructor(dbFile) {
+		this.dbFile = dbFile;
+		this.db = new sqlite3.Database(this.dbFile, (err) => err && console.log(err));
+		this.createTables();
 	}
 
-	loadUsers() {
-		// TODO the first time the SKUs are requested we pull from the DB
-		// get from DB
-		// call SKU constructor for each row in the table and add to the map
-		this.users = [];
-		// password is "password"
-		// TODO change passwords
-		this.users[0] = new User(0, "Super", "Admin", "super.admin@ezwh.com", "NQzIIM1qR4oF+f3a3k0cvcJMSaO7/7OykM/U70g1pFk=", "test123", UserRole.ADMINISTRATOR);
-		this.users[1] = new User(1, "John", "Snow", "john.snow@ezwh.com", "NQzIIM1qR4oF+f3a3k0cvcJMSaO7/7OykM/U70g1pFk=", "test123", UserRole.SUPPLIER);
-		this.users[2] = new User(2, "Michael", "Jordan", "michael.jordan@ezwh.com", "NQzIIM1qR4oF+f3a3k0cvcJMSaO7/7OykM/U70g1pFk=", "test123", UserRole.SUPPLIER);
-		this.users[3] = new User(3, "Michael", "Scott", "michael.scott@ezwh.com", "NQzIIM1qR4oF+f3a3k0cvcJMSaO7/7OykM/U70g1pFk=", "test123", UserRole.MANAGER);
+	createTables() {
+		const createTableUser = `CREATE TABLE IF NOT EXISTS User (
+			id INTEGER NOT NULL,
+			name VARCHAR(64) NOT NULL,
+			surname VARCHAR(64) NOT NULL,
+			email VARCHAR(128) NOT NULL,
+			passwordHash VARCHAR(128) NOT NULL,
+			passwordSalt VARCHAR(128) NOT NULL,
+			type VARCHAR(32) NOT NULL,
+			PRIMARY KEY (id)
+		);`;
+		this.db.run(createTableUser, (err) => err && console.log(err));
 	}
 
-	updateUser(id) {
-		// push this.SKUs[id] to the DB
+	/** USER **/
+	selectUsers() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM User;`;
+			this.db.all(sql, [], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new User(r.id, r.name, r.surname, r.email, r.passwordHash, r.passwordSalt, r.type)));
+				}
+			});
+		});
 	}
 
-	getUsers() {
-		return this.users;
+	selectUserByEmail(email) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM User WHERE email = ?;`;
+			this.db.get(sql, [email], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new User(row.id, row.name, row.surname, row.email, row.passwordHash, row.passwordSalt, row.type));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
 	}
 
-	addUser(id, user) {
-		// TODO database
-		this.users[id] = user;
+	insertUser(user) {
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO User(name, surname, email, passwordHash, passwordSalt, type) VALUES (?, ?, ?, ?, ?, ?);`;
+			this.db.run(sql, [user.name, user.surname, user.email, user.passwordHash, user.passwordSalt, user.role], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
-	deleteUser(id) {
-		// TODO database
-		delete this.users[id];
+	updateUser(user) {
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE User SET
+				name = ?, surname = ?, email = ?, passwordHash = ?, passwordSalt = ?, type = ?
+				WHERE id = ?`;
+			this.db.run(sql, [user.name, user.surname, user.email, user.passwordHash, user.passwordSalt, user.role, user.id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+
+	deleteUserByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM User WHERE id = ?`;
+			this.db.run(sql, [id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 }
 
