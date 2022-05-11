@@ -1,6 +1,7 @@
 const sqlite3 = require("sqlite3");
 
 const {User} = require("../components/User");
+const {TestDescriptor} = require("../components/TestDescriptor");
 
 class DatabaseHelper {
 	constructor(dbFile) {
@@ -10,6 +11,18 @@ class DatabaseHelper {
 	}
 
 	createTables() {
+		/** TEST DESCRIPTOR **/
+		// TODO check if idSKU is needed
+		const createTableTestDescriptor = `CREATE TABLE IF NOT EXISTS TestDescriptor (
+			id INTEGER NOT NULL,
+			name VARCHAR(64) NOT NULL,
+			procedureDescription VARCHAR(512) NOT NULL,
+			idSKU INTEGER NOT NULL,
+			PRIMARY KEY (id)
+		);`;
+		this.db.run(createTableTestDescriptor, (err) => err && console.log(err));
+
+		/** USER **/
 		const createTableUser = `CREATE TABLE IF NOT EXISTS User (
 			id INTEGER NOT NULL,
 			name VARCHAR(64) NOT NULL,
@@ -21,6 +34,76 @@ class DatabaseHelper {
 			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableUser, (err) => err && console.log(err));
+	}
+
+	/** TEST DESCRIPTOR **/
+	selectTestDescriptors() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM TestDescriptor;`;
+			this.db.all(sql, [], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new TestDescriptor(r.id, r.name, r.procedureDescription, r.idSKU)));
+				}
+			});
+		});
+	}
+
+	selectTestDescriptorByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM TestDescriptor WHERE id = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new TestDescriptor(row.id, row.name, row.procedureDescription, row.idSKU));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
+
+	insertTestDescriptor(testDescriptor) {
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO TestDescriptor(name, procedureDescription, idSKU) VALUES (?, ?, ?);`;
+			this.db.run(sql, [testDescriptor.name, testDescriptor.procedureDescription, testDescriptor.idSKU], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			})
+		});
+	}
+
+	updateTestDescriptor(testDescriptor) {
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE TestDescriptor SET name = ?, procedureDescription = ?, idSKU = ? WHERE id = ?`;
+			this.db.run(sql, [testDescriptor.name, testDescriptor.procedureDescription, testDescriptor.idSKU, testDescriptor.id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+
+	deleteTestDescriptorByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM TestDescriptor WHERE id = ?`;
+			this.db.run(sql, [id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	/** USER **/

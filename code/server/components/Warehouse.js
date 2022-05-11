@@ -2,13 +2,61 @@ const crypto = require("crypto");
 
 const {DatabaseHelper} = require("../database/DatabaseHelper");
 const {UserRole, User} = require("./User");
+const {TestDescriptor} = require("./TestDescriptor");
 
 class Warehouse {
 	constructor(dbFile="./database/ezwh.db") {
 		this.db_help = new DatabaseHelper(dbFile);
 	}
 
+	/** TO MERGE **/
+	// TODO merge
+	getSKUbyID(idSKU) {
+		return new Promise((resolve) => {
+			resolve(true);
+		});
+	}
+
 	/** TEST DESCRIPTOR **/
+	getTestDescriptors() {
+		return this.db_help.selectTestDescriptors();
+	}
+
+	getTestDescriptorByID(id) {
+		return this.db_help.selectTestDescriptorByID(id);
+	}
+
+	async newTestDescriptor(name, procedureDescription, idSKU) {
+		try {
+			const SKU = await this.getSKUbyID(idSKU); // TODO merge
+			if (!SKU) return {status: 404, body: "sku not found"};
+			await this.db_help.insertTestDescriptor(new TestDescriptor(null, name, procedureDescription, idSKU));
+			return {status: 201, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
+	}
+
+	async modifyTestDescriptor(id, newName, newProcedureDescription, newIdSKU) {
+		try {
+			const testDescriptor = await this.db_help.selectTestDescriptorByID(id);
+			if (!testDescriptor) return {status: 404, body: "id not found"};
+			const SKU = await this.getSKUbyID(newIdSKU); // TODO merge
+			if (!SKU) return {status: 404, body: "sku not found"};
+
+			testDescriptor.name = newName;
+			testDescriptor.procedureDescription = newProcedureDescription;
+			testDescriptor.idSKU = newIdSKU;
+			await this.db_help.updateTestDescriptor(testDescriptor);
+			return {status: 200, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
+	}
+
+	deleteTestDescriptor(id) {
+		return this.db_help.deleteTestDescriptorByID(id);
+	}
 
 	/** USER **/
 	getCurrentUser() {

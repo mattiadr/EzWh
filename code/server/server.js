@@ -21,6 +21,87 @@ const stripColonFromParam = (param) => {
 app.use(express.json());
 
 
+/** TEST DESCRIPTOR **/
+
+/* GET */
+app.get("/api/testDescriptors",
+	(req, res) => {
+		wh.getTestDescriptors().then((testDescriptors) => {
+			res.status(200).json(testDescriptors.map((td) => ({id: td.id, name: td.name, procedureDescription: td.procedureDescription, idSKU: td.idSKU})));
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+app.get("/api/testDescriptors/:id",
+	stripColonFromParam("id"),
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.getTestDescriptorByID(req.params.id).then((td) => {
+			if (td) {
+				res.status(200).json({id: td.id, name: td.name, procedureDescription: td.procedureDescription, idSKU: td.idSKU});
+			} else {
+				res.status(404).end();
+			}
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+
+/* POST */
+app.post("/api/testDescriptor",
+	body("name").exists(),
+	body("procedureDescription").exists(),
+	body("idSKU").isInt(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		const result = await wh.newTestDescriptor(req.body.name, req.body.procedureDescription, req.body.idSKU);
+		return res.status(result.status).send(result.body);
+});
+
+/* PUT */
+app.put("/api/testDescriptor/:id",
+	stripColonFromParam("id"),
+	param("id").isInt(),
+	body("newName").exists(),
+	body("newProcedureDescription").exists(),
+	body("newIdSKU").isInt(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		const result = await wh.modifyTestDescriptor(req.params.id, req.body["newName"], req.body["newProcedureDescription"], req.body["newIdSKU"]);
+		return res.status(result.status).send(result.body);
+});
+
+/* DELETE */
+app.delete("/api/testDescriptor/:id",
+	stripColonFromParam("id"),
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		wh.deleteTestDescriptor(req.params.id).then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+
+
+/** TEST RESULTS **/
+
+/* GET */
+app.get("/api/skuitems/:rfid/testResults");
+app.get("/api/skuitems/:rfid/testResults/:id");
+
+/* POST */
+app.post("/api/skuitems/testResult");
+
+/* PUT */
+app.put("/api/skuitems/:rfid/testResult/:id");
+
+/* DELETE */
+app.delete("/api/skuitems/:rfid/testResult/:id");
+
+
 /** USER **/
 
 /* GET */
