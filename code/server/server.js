@@ -67,7 +67,7 @@ app.put("/api/testDescriptor/:id",
 	body("newProcedureDescription").exists(),
 	body("newIdSKU").isInt(),
 	async (req, res) => {
-		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
 		const result = await wh.modifyTestDescriptor(req.params.id, req.body["newName"], req.body["newProcedureDescription"], req.body["newIdSKU"]);
 		return res.status(result.status).send(result.body);
 });
@@ -77,7 +77,7 @@ app.delete("/api/testDescriptor/:id",
 	stripColonFromParam("id"),
 	param("id").isInt(),
 	(req, res) => {
-		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		wh.deleteTestDescriptor(req.params.id).then(() => {
 			res.status(204).end();
 		}).catch((err) => {
@@ -89,17 +89,66 @@ app.delete("/api/testDescriptor/:id",
 /** TEST RESULTS **/
 
 /* GET */
-app.get("/api/skuitems/:rfid/testResults");
-app.get("/api/skuitems/:rfid/testResults/:id");
+app.get("/api/skuitems/:rfid/testResults",
+	stripColonFromParam("rfid"),
+	param("rfid").exists(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid rfid");
+		const result = await wh.getTestResults(req.params.rfid);
+		return res.status(result.status).json(result.body);
+});
+app.get("/api/skuitems/:rfid/testResults/:id",
+	stripColonFromParam("rfid"),
+	stripColonFromParam("id"),
+	param("rfid").exists(),
+	param("id").isInt(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params");
+		const result = await wh.getTestResultByID(req.params.rfid, req.params.id);
+		return res.status(result.status).json(result.body);
+});
 
 /* POST */
-app.post("/api/skuitems/testResult");
+app.post("/api/skuitems/testResult",
+	body("rfid").exists(),
+	body("idTestDescriptor").isInt(),
+	body("Date").isDate(),
+	body("Result").isBoolean(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		const result = await wh.newTestResult(req.body.rfid, req.body.idTestDescriptor, req.body.Date, req.body.Result);
+		return res.status(result.status).send(result.body);
+});
 
 /* PUT */
-app.put("/api/skuitems/:rfid/testResult/:id");
+app.put("/api/skuitems/:rfid/testResult/:id",
+	stripColonFromParam("rfid"),
+	stripColonFromParam("id"),
+	param("rfid").exists(),
+	param("id").isInt(),
+	body("newIdTestDescriptor").isInt(),
+	body("newDate").isDate(),
+	body("newResult").isBoolean(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params or body");
+		const result = await wh.modifyTestResult(req.params.rfid, req.params.id, req.body["newIdTestDescriptor"], req.body["newDate"], req.body["newResult"]);
+		return res.status(result.status).send(result.body);
+});
 
 /* DELETE */
-app.delete("/api/skuitems/:rfid/testResult/:id");
+app.delete("/api/skuitems/:rfid/testResult/:id",
+	stripColonFromParam("rfid"),
+	stripColonFromParam("id"),
+	param("rfid").exists(),
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params");
+		wh.deleteTestResult(req.params.rfid, req.params.id).then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(503).send(err);
+		});
+});
 
 
 /** USER **/

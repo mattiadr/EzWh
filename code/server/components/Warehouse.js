@@ -3,18 +3,11 @@ const crypto = require("crypto");
 const {DatabaseHelper} = require("../database/DatabaseHelper");
 const {UserRole, User} = require("./User");
 const {TestDescriptor} = require("./TestDescriptor");
+const {TestResult} = require("./TestResult");
 
 class Warehouse {
 	constructor(dbFile="./database/ezwh.db") {
 		this.db_help = new DatabaseHelper(dbFile);
-	}
-
-	/** TO MERGE **/
-	// TODO merge
-	getSKUbyID(idSKU) {
-		return new Promise((resolve) => {
-			resolve(true);
-		});
 	}
 
 	/** TEST DESCRIPTOR **/
@@ -28,7 +21,7 @@ class Warehouse {
 
 	async newTestDescriptor(name, procedureDescription, idSKU) {
 		try {
-			const SKU = await this.getSKUbyID(idSKU); // TODO merge
+			const SKU = await this.db_help.selectSKUbyID(idSKU); // TODO merge
 			if (!SKU) return {status: 404, body: "sku not found"};
 			await this.db_help.insertTestDescriptor(new TestDescriptor(null, name, procedureDescription, idSKU));
 			return {status: 201, body: ""};
@@ -41,7 +34,7 @@ class Warehouse {
 		try {
 			const testDescriptor = await this.db_help.selectTestDescriptorByID(id);
 			if (!testDescriptor) return {status: 404, body: "id not found"};
-			const SKU = await this.getSKUbyID(newIdSKU); // TODO merge
+			const SKU = await this.db_help.selectSKUbyID(newIdSKU); // TODO merge
 			if (!SKU) return {status: 404, body: "sku not found"};
 
 			testDescriptor.name = newName;
@@ -56,6 +49,69 @@ class Warehouse {
 
 	deleteTestDescriptor(id) {
 		return this.db_help.deleteTestDescriptorByID(id);
+	}
+
+	/** TEST RESULT **/
+	async getTestResults(rfid) {
+		try {
+			const SKUItem = await this.db_help.selectSKUItemByRFID(rfid); // TODO merge
+			if (!SKUItem) return {status: 404, body: "skuitem not found"};
+			const testResults = await this.db_help.selectTestResults(rfid);
+			return {status: 200, body: testResults.map((tr) => ({id: tr.id, idTestDescriptor: tr.idTestDescriptor, Date: tr.date, Result: tr.result}))};
+		} catch (e) {
+			return {status: 500, body: e};
+		}
+	}
+
+	async getTestResultByID(rfid, id) {
+		try {
+			const SKUItem = await this.db_help.selectSKUItemByRFID(rfid); // TODO merge
+			if (!SKUItem) return {status: 404, body: "skuitem not found"};
+			const testResult = await this.db_help.selectTestResultByID(rfid, id);
+			if (testResult) {
+				return {status:200, body: {id: testResult.id, idTestDescriptor: testResult.idTestDescriptor, Date: testResult.date, Result: testResult.result}}
+			} else {
+				return {status: 404, body: "test result not found"};
+			}
+		} catch (e) {
+			return {status: 500, body: e};
+		}
+	}
+
+	async newTestResult(rfid, idTestDescriptor, date, result) {
+		try {
+			const SKUItem = await this.db_help.selectSKUItemByRFID(rfid); // TODO merge
+			if (!SKUItem) return {status: 404, body: "skuitem not found"};
+			const testDescriptor = await this.db_help.selectTestDescriptorByID(idTestDescriptor);
+			if (!testDescriptor) return {status: 404, body: "test descriptor not found"};
+			await this.db_help.insertTestResult(new TestResult(null, idTestDescriptor, date, result, rfid));
+			return {status: 201, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
+	}
+
+	async modifyTestResult(rfid, id, newIdTestDescriptor, newDate, newResult) {
+		try {
+			const SKUItem = await this.db_help.selectSKUItemByRFID(rfid); // TODO merge
+			if (!SKUItem) return {status: 404, body: "skuitem not found"};
+			const testResult = await this.db_help.selectTestResultByID(rfid, id);
+			if (!testResult) return {status: 404, body: "test result not found"};
+			const testDescriptor = await this.db_help.selectTestDescriptorByID(newIdTestDescriptor);
+			if (!testDescriptor) return {status: 404, body: "test descriptor not found"};
+
+			testResult.idTestDescriptor = newIdTestDescriptor;
+			testResult.date = newDate;
+			testResult.result = newResult;
+			await this.db_help.updateTestResult(testResult);
+			return {status: 200, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
+	}
+
+	deleteTestResult(rfid, id) {
+		return this.db_help.deleteTestResultByID(rfid, id);
 	}
 
 	/** USER **/

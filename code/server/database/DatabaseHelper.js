@@ -2,6 +2,7 @@ const sqlite3 = require("sqlite3");
 
 const {User} = require("../components/User");
 const {TestDescriptor} = require("../components/TestDescriptor");
+const {TestResult} = require("../components/TestResult");
 
 class DatabaseHelper {
 	constructor(dbFile) {
@@ -12,7 +13,6 @@ class DatabaseHelper {
 
 	createTables() {
 		/** TEST DESCRIPTOR **/
-		// TODO check if idSKU is needed
 		const createTableTestDescriptor = `CREATE TABLE IF NOT EXISTS TestDescriptor (
 			id INTEGER NOT NULL,
 			name VARCHAR(64) NOT NULL,
@@ -21,6 +21,17 @@ class DatabaseHelper {
 			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableTestDescriptor, (err) => err && console.log(err));
+
+		/** TEST RESULT **/
+		const createTableTestResult = `CREATE TABLE IF NOT EXISTS TestResult (
+			id INTEGER NOT NULL,
+			idTestDescriptor INTEGER NOT NULL,
+			date VARCHAR(16) NOT NULL,
+			result INTEGER NOT NULL,
+    		rfid VARCHAR(32) NOT NULL,
+    		PRIMARY KEY (id)
+		)`;
+		this.db.run(createTableTestResult, (err) => err && console.log(err));
 
 		/** USER **/
 		const createTableUser = `CREATE TABLE IF NOT EXISTS User (
@@ -34,6 +45,20 @@ class DatabaseHelper {
 			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableUser, (err) => err && console.log(err));
+	}
+
+	/** TO MERGE **/
+	// TODO merge
+	selectSKUbyID(id) {
+		return new Promise((resolve) => {
+			resolve(true);
+		});
+	}
+
+	selectSKUItemByRFID(rfid) {
+		return new Promise((resolve) => {
+			resolve(true);
+		});
 	}
 
 	/** TEST DESCRIPTOR **/
@@ -97,6 +122,76 @@ class DatabaseHelper {
 		return new Promise((resolve, reject) => {
 			const sql = `DELETE FROM TestDescriptor WHERE id = ?`;
 			this.db.run(sql, [id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+
+	/** TEST RESULT **/
+	selectTestResults(rfid) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM TestResult WHERE rfid = ?;`;
+			this.db.all(sql, [rfid], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new TestResult(r.id, r.idTestDescriptor, r.date, r.result, r.rfid)));
+				}
+			});
+		});
+	}
+
+	selectTestResultByID(rfid, id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM TestResult WHERE rfid = ? AND id = ?;`;
+			this.db.get(sql, [rfid, id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new TestResult(row.id, row.idTestDescriptor, row.date, row.result, row.rfid));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
+
+	insertTestResult(testResult) {
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO TestResult(idTestDescriptor, date, result, rfid) VALUES (?, ?, ?, ?);`;
+			this.db.run(sql, [testResult.idTestDescriptor, testResult.date, testResult.result, testResult.rfid], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			})
+		});
+	}
+
+	updateTestResult(testResult) {
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE TestResult SET idTestDescriptor = ?, date = ?, result = ? WHERE rfid = ? AND id = ?`;
+			this.db.run(sql, [testResult.idTestDescriptor, testResult.date, testResult.result, testResult.rfid, testResult.id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+
+	deleteTestResultByID(rfid, id) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM TestResult WHERE rfid = ? AND id = ?`;
+			this.db.run(sql, [rfid, id], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
