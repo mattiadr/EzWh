@@ -45,9 +45,9 @@ class DatabaseHelper {
 		})
 	}
 
-	async createTables() {
-		await this.queryDBRun(`
-		CREATE TABLE IF NOT EXISTS SKU (
+	createTables() {
+		/** SKU **/
+		const createTableSKU = `CREATE TABLE IF NOT EXISTS SKU (
 			SKUID varchar(12) PRIMARY KEY,
 			description varchar(100) NOT NULL,
 			weight double NOT NULL,
@@ -56,22 +56,20 @@ class DatabaseHelper {
 			notes varchar(50) NOT NULL,
 			positionId varchar(12),
 			availableQuantity integer NOT NULL
-		);
-		`);
+		);`;
+		this.db.run(createTableSKU, (err) => err && console.log(err));
 
-		// Create the table of SKUItem in the db if it not exist (just first time)
-		await this.queryDBRun(`
-		CREATE TABLE IF NOT EXISTS SKUItem (
+		/** SKU Item **/
+		const createTableSKUItem = `CREATE TABLE IF NOT EXISTS SKUItem (
 			RFID varchar(50) PRIMARY KEY,
 			SKUID varchar(12) NOT NULL,
 			available boolean DEFAULT 0,
 			dateOfStock DATETIME
-		);
-		`);
+		);`;
+		this.db.run(createTableSKUItem, (err) => err && console.log(err));
 
-		// Create the table of SKUItem in the db if it not exist (just first time)
-		await this.queryDBRun(`
-		CREATE TABLE IF NOT EXISTS Position (
+		/** Position **/
+		const createTablePosition = `CREATE TABLE IF NOT EXISTS Position (
 			posID varchar(12) PRIMARY KEY,
 			aisleID varchar(4) NOT NULL,
 			row varchar(4) NOT NULL,
@@ -80,10 +78,10 @@ class DatabaseHelper {
 			maxVolume integer NOT NULL,
 			occupiedWeight integer DEFAULT 0,
 			occupiedValue integer DEFAULT 0
-		);
-		`);
+		);`;
+		this.db.run(createTablePosition, (err) => err && console.log(err));
 
-		/** TEST DESCRIPTOR **/
+		/** Test Descriptor **/
 		const createTableTestDescriptor = `CREATE TABLE IF NOT EXISTS TestDescriptor (
 			id INTEGER NOT NULL,
 			name VARCHAR(64) NOT NULL,
@@ -93,7 +91,7 @@ class DatabaseHelper {
 		);`;
 		this.db.run(createTableTestDescriptor, (err) => err && console.log(err));
 
-		/** TEST RESULT **/
+		/** Test Result **/
 		const createTableTestResult = `CREATE TABLE IF NOT EXISTS TestResult (
 			id INTEGER NOT NULL,
 			idTestDescriptor INTEGER NOT NULL,
@@ -104,7 +102,7 @@ class DatabaseHelper {
 		)`;
 		this.db.run(createTableTestResult, (err) => err && console.log(err));
 
-		/** USER **/
+		/** User **/
 		const createTableUser = `CREATE TABLE IF NOT EXISTS User (
 			id INTEGER NOT NULL,
 			name VARCHAR(64) NOT NULL,
@@ -118,22 +116,9 @@ class DatabaseHelper {
 		this.db.run(createTableUser, (err) => err && console.log(err));
 	}
 
-	/** TO MERGE **/
-	// TODO merge
-	selectSKUbyID(id) {
-		return new Promise((resolve) => {
-			resolve(true);
-		});
-	}
-
-	selectSKUItemByRFID(rfid) {
-		return new Promise((resolve) => {
-			resolve(true);
-		});
-	}
-
+	/** SKU **/
 	async loadSKU() {//: Map <String,SKU>
-		if (this.SKUs.size == 0) { //first time
+		if (this.SKUs.size === 0) { //first time
 			let rows = await this.queryDBAll(`SELECT * FROM SKU;`);
 
 			rows.map(row => {
@@ -144,8 +129,52 @@ class DatabaseHelper {
 		return this.SKUs;
 	}
 
+	selectSKUbyID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM SKU WHERE SKUID = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new SKU(row.SKUID, row.description, row.weight, row.volume, row.price, row.notes, row.availableQuantity, row.positionId));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
+
+	async storeSKU(newSKU /*: Object*/) {
+		await this.queryDBRun(`
+			INSERT INTO SKU(SKUID, description, weight, volume, price, notes, positionId, availableQuantity)
+			VALUES(?, ?, ?, ?, ?, ?, ? , ?);
+		`,[newSKU.getId(), newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity()]);
+		this.SKUs.set(newSKU.id, newSKU);
+	}
+
+	async updateSKU(newSKU /*: Object*/) {
+		await this.queryDBRun(`
+			UPDATE SKU
+			SET description = ?, weight = ?, volume = ?, price = ?, notes = ?, positionId = ?, availableQuantity = ?
+			WHERE SKUID=?;
+		`,[newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity(), newSKU.getId()]);
+		this.SKUs.set(newSKU.getId(), newSKU);
+	}
+
+	async deleteSKU(SKUid) {
+		await this.queryDBRun(`
+			DELETE
+			FROM SKU
+			WHERE SKUID=?;
+		`, [SKUid]);
+		this.SKUs.delete(SKUid);
+	}
+
+	/** SKU Item **/
 	async loadSKUItem() { //: Map<String,SKUItem>
-		if (this.SKUItems.size == 0 ) { //first time
+		if (this.SKUItems.size === 0 ) { //first time
 			let rows = await this.queryDBAll(`SELECT * FROM SKUItem;`);
 
 			rows.map(row => {
@@ -157,8 +186,53 @@ class DatabaseHelper {
 		return this.SKUItems;
 	}
 
+	selectSKUItemByRFID(rfid) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM SKU WHERE RFID = ?;`;
+			this.db.get(sql, [rfid], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new SKUItem(row.RFID, row.SKUID, row.available, row.dateOfStock));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
+
+	async storeSKUItem(newSKUItem /*: Object*/) {
+		await this.queryDBRun(`
+			INSERT INTO SKUItem(RFID, SKUID, available, dateOfStock)
+			VALUES(?, ?, ?, ?);
+		`,[newSKUItem.getRFID(), newSKUItem.getSKUId(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock()]);
+		this.SKUItems.set(newSKUItem.RFID, newSKUItem);
+	}
+
+	async updateSKUItem(rfid, newSKUItem /*: Object*/) {
+		await this.queryDBRun(`
+			UPDATE SKUItem
+			SET RFID = ?, available = ?, dateOfStock = ?
+			WHERE RFID=?;
+		`,[newSKUItem.getRFID(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock(), rfid]);
+		this.SKUItems.delete(rfid);
+		this.SKUItems.set(rfid, newSKUItem);
+	}
+
+	async deleteSKUItem(RFID) {
+		await this.queryDBRun(`
+			DELETE
+			FROM SKUItem
+			WHERE RFID=?;
+		`, [RFID]);
+		this.SKUItems.delete(RFID);
+	}
+
+	/** Position **/
 	async loadPosition() { //: Map<String, Position>
-		if (this.Positions.size == 0 ) { //first time
+		if (this.Positions.size === 0 ) { //first time
 			let rows = await this.queryDBAll(`SELECT * FROM Position;`);
 
 			rows.map(row => {
@@ -170,22 +244,6 @@ class DatabaseHelper {
 		return this.Positions;
 	}
 
-	async storeSKU(newSKU /*: Object*/) {
-		await this.queryDBRun(`
-			INSERT INTO SKU(SKUID, description, weight, volume, price, notes, positionId, availableQuantity)
-			VALUES(?, ?, ?, ?, ?, ?, ? , ?);
-		`,[newSKU.getId(), newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity()]);
-		this.SKUs.set(newSKU.id, newSKU);
-	}
-
-	async storeSKUItem(newSKUItem /*: Object*/) {
-		await this.queryDBRun(`
-			INSERT INTO SKUItem(RFID, SKUID, available, dateOfStock)
-			VALUES(?, ?, ?, ?);
-		`,[newSKUItem.getRFID(), newSKUItem.getSKUId(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock()]);
-		this.SKUItems.set(newSKUItem.RFID, newSKUItem);
-	}
-
 	async storePosition(newPosition /*: Object*/) {
 		await this.queryDBRun(`
 			INSERT INTO Position(posID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight, occupiedValue)
@@ -193,26 +251,6 @@ class DatabaseHelper {
 		`,[newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(),
 			newPosition.getMaxWeight(), newPosition.getMaxVolume(), newPosition.getOccupiedWeight(), newPosition.getOccupiedVolume()]);
 		this.Positions.set(newPosition.getPositionID(), newPosition);
-	}
-
-	async updateSKU(newSKU /*: Object*/) {
-		await this.queryDBRun(`
-			UPDATE SKU
-			SET description = ?, weight = ?, volume = ?, price = ?, notes = ?, positionId = ?, availableQuantity = ?
-			WHERE SKUID=?;
-		`,[newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity(), newSKU.getId()]);
-		this.SKUs.set(newSKU.getId(), newSKU);
-
-	}
-
-	async updateSKUItem(rfid, newSKUItem /*: Object*/) {
-		await this.queryDBRun(`
-			UPDATE SKUItem
-			SET RFID = ?, available = ?, dateOfStock = ?
-			WHERE RFID=?;
-		`,[newSKUItem.getRFID(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock(), rfid]);
-		this.SKUItems.delete(rfid);
-		this.SKUItems.set(rfid, newSKUItem);
 	}
 
 	async updatePosition(oldPosID, newPosition /*: Object*/) {
@@ -227,24 +265,6 @@ class DatabaseHelper {
 		this.Positions.set(newPosition.getPositionID(), newPosition);
 	}
 
-	async deleteSKU(SKUid) {
-		await this.queryDBRun(`
-			DELETE
-			FROM SKU
-			WHERE SKUID=?;
-		`, [SKUid]);
-		this.SKUs.delete(SKUid);
-	}
-
-	async deleteSKUItem(RFID) {
-		await this.queryDBRun(`
-			DELETE
-			FROM SKUItem
-			WHERE RFID=?;
-		`, [RFID]);
-		this.SKUItems.delete(RFID);
-	}
-
 	async deletePosition(posID) {
 		await this.queryDBRun(`
 			DELETE
@@ -254,7 +274,7 @@ class DatabaseHelper {
 		this.Positions.delete(posID);
 	}
 
-	/** TEST DESCRIPTOR **/
+	/** Test Descriptor **/
 	selectTestDescriptors() {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM TestDescriptor;`;
@@ -324,7 +344,7 @@ class DatabaseHelper {
 		});
 	}
 
-	/** TEST RESULT **/
+	/** Test Result **/
 	selectTestResults(rfid) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM TestResult WHERE rfid = ?;`;
@@ -394,7 +414,7 @@ class DatabaseHelper {
 		});
 	}
 
-	/** USER **/
+	/** User **/
 	selectUsers() {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM User;`;
