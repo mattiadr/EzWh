@@ -554,6 +554,24 @@ class DatabaseHelper {
         `, [ITEMID]);
         this.Items.delete(ITEMID);
     }
+
+	selectItemByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM Item WHERE id = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
+
     async loadRO() {
         if (this.RestockOrders.size == 0) { //first time
             let rows = await this.queryDBAll(`SELECT * FROM RestockOrder;`);
@@ -593,6 +611,24 @@ class DatabaseHelper {
         `, [ROID]);
         this.RestockOrders.delete(ROID);
     }
+
+	selectROByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM RestockOrder WHERE id = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote, row.skuItems));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
+	
 }
 
 exports.DatabaseHelper = DatabaseHelper;
