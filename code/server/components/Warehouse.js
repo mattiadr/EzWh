@@ -14,15 +14,6 @@ class Warehouse {
 		this.db_help = new DatabaseHelper(dbFile);
 	}
 
-	makeid(length) {
-		let result = '';
-		let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-		let charactersLength = characters.length;
-		for (let i = 0; i < length; i++) {
-			result += characters.charAt(Math.floor(Math.random() * charactersLength));
-		}
-		return result;
-	}
 
 	/** SKU **/
 	async getSKUs() {
@@ -58,12 +49,7 @@ class Warehouse {
 			return { status: 422, body: {}, message: {} };
 
 		try {
-			let newSKUid = this.makeid(12);
-			let skus = await this.db_help.loadSKU();
-			if (skus.size !== 0)
-				while (skus.has(newSKUid))
-					newSKUid = this.makeid(12);
-			let newSKU = new SKU(newSKUid, description, weight, volume, price, notes, quantity);
+			let newSKU = new SKU(null, description, weight, volume, price, notes, quantity);
 			await this.db_help.storeSKU(newSKU);
 		} catch (e) {
 			return { status: 503, body: {}, message: e };
