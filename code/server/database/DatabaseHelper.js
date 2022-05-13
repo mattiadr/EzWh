@@ -21,6 +21,7 @@ class DatabaseHelper {
 		this.Positions = new Map();
 		this.Items = new Map();
         this.RestockOrders = new Map();
+		this.ROProducts = new Map();
 	}
 
 	queryDBAll(sql, params=[]){
@@ -134,7 +135,7 @@ class DatabaseHelper {
 		
 		/** Restock Order */
 		const createTableRO = `CREATE TABLE IF NOT EXISTS RestockOrder (
-			ITEMID ROID(12) NOT NULL,
+			ROID INTEGER NOT NULL,
 			issueDate DATETIME NOT NULL,
 			state varchar(10) NOT NULL,
 			supplierID INTEGER NOT NULL,
@@ -143,6 +144,15 @@ class DatabaseHelper {
     		PRIMARY KEY (ROID)
 		);`;
 		this.db.run(createTableRO, (err) => err && console.log(err));
+
+		/** Restock Order & Item */
+		const createTableROProducts = `CREATE TABLE IF NOT EXISTS ROProducts (
+			ROID integer NOT NULL,
+			ITEMID varchar(12) NOT NULL,
+			quantity integer NOT NULL,
+    		PRIMARY KEY (ROID, ITEMID)
+		);`;
+		this.db.run(createTableROProducts, (err) => err && console.log(err));
 	}
 
 	/** SKU **/
@@ -578,7 +588,7 @@ class DatabaseHelper {
             this.RestockOrders = new Map();
             
             rows.map(row => {
-                const restockorder = new Item(row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote, row.skuItems);
+                const restockorder = new Item(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems);
                 this.RestockOrders.set(row.ROID, restockorder);
             })
         } 
@@ -587,18 +597,18 @@ class DatabaseHelper {
 
     async storeRO(newRO /*: Object*/) {
         await this.queryDBRun(`
-            INSERT INTO RestockOrder(row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote, row.skuItems)
+            INSERT INTO RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems)
             VALUES(?, ?, ?, ?, ?, ?, ?);
-        `,[row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote, row.skuItems]);
+        `,[row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems]);
         this.RestockOrders.set(newRO.ROID, newRO);
     }
 
     async updateRO(newRO /*: Object*/) {
         await this.queryDBRun(`
             UPDATE RestockOrder
-            SET issueDate = ?, state = ?, products = ?, supplierId = ?, transportNote = ?, skuItems = ?
+            SET issueDate = ?, state = ?, supplierId = ?, transportNote = ?, skuItems = ?
             WHERE ROID=?;
-        `,[newRO.issueDate, newRO.state, newRO.products, newRO.supplierId, newRO.transportNote, newRO.skuItems]);
+        `,[newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote, newRO.skuItems]);
         this.RestockOrders.set(newRO.ROID, newRO);
 
     }
@@ -620,7 +630,7 @@ class DatabaseHelper {
 					reject(err.toString());
 				} else {
 					if (row) {
-						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote, row.skuItems));
+						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems));
 					} else {
 						resolve(null);
 					}
@@ -628,7 +638,45 @@ class DatabaseHelper {
 			});
 		});
 	}
+
+	async loadROProducts() {
+		if (this.ROProducts.size === 0) { //first time
+			let rows = await this.queryDBAll(`SELECT * FROM ROProduct;`);
+
+			rows.map(row => {
+				const roproduct = new SKU(row.ROID, row.ITEMID, row.quantity);
+				this.ROProducts.set(row.ROID, row.ITEMID, roproduct);
+			})
+		}
+		return this.ROProducts;
+	}
 	
+	async addProductRO(newROproduct) {
+        await this.queryDBRun(`
+            INSERT INTO ROProduct(row.ROID = ?, row.ITEMID = ?, row.quantity = ?)
+            VALUES(?, ?, ?);
+        `,[newROproduct.ROID, newROproduct.ITEMID, newROproduct.quantity]);
+        this.ROProducts.set(newROproduct.ROID, newROproduct.ITEMID, newROproduct);
+    }
+
+	async deleteProductRO(ROID, ITEMID) {
+        await this.queryDBRun(`
+            DELETE
+            FROM ROProduct
+            WHERE ROID=?, ITEMID=?;
+        `, [ROID, ITEMID]);
+        this.ROProducts.delete(ROID, ITEMID);
+    }
+
+	async updateRO(newROproduct) {
+        await this.queryDBRun(`
+            UPDATE ROProduct
+            SET quantity = ?
+            WHERE ROID=?, ITEMID=?;
+        `,[newROproduct.quantity, newROproduct.ROID, newROproduct.ITEMID]);
+        this.RestockOrders.set(newROproduct.ROID, newROproduct.ITEMID, newROproduct);
+
+    }
 }
 
 exports.DatabaseHelper = DatabaseHelper;
