@@ -3,6 +3,8 @@ const sqlite3 = require("sqlite3");
 const SKU = require("../components/SKU");
 const SKUItem = require("../components/SKUItem");
 const Position = require("../components/Position");
+const Item = require("../components/Item");
+const RestockOrder = require("../components/RestockOrder");
 const {User} = require("../components/User");
 const {TestDescriptor} = require("../components/TestDescriptor");
 const {TestResult} = require("../components/TestResult");
@@ -17,6 +19,8 @@ class DatabaseHelper {
 		this.SKUs = new Map();
 		this.SKUItems = new Map();
 		this.Positions = new Map();
+		this.Items = new Map();
+        this.RestockOrders = new Map();
 	}
 
 	queryDBAll(sql, params=[]){
@@ -488,6 +492,85 @@ class DatabaseHelper {
 			});
 		});
 	}
+
+	async loadItem() {
+        if (this.Items.size == 0) { //first time
+            let rows = await this.queryDBAll(`SELECT * FROM Item;`);
+            this.Items = new Map();
+
+            rows.map(row => {
+                const item = new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId);
+                this.Items.set(row.ITEMID, item);
+            })
+        } 
+        return this.Items;
+    }
+
+    async storeItem(newItem /*: Object*/) {
+        await this.queryDBRun(`
+            INSERT INTO Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId)
+            VALUES(?, ?, ?, ?, ?);
+        `,[row.ITEMID, row.description, row.price, row.SKUID, row.supplierId]);
+        this.Items.set(newItem.ITEMID, newItem);
+    }
+
+    async updateItem(newItem /*: Object*/) {
+        await this.queryDBRun(`
+            UPDATE Item
+            SET description = ?, price = ?, SKUID = ?, supplierId = ?
+            WHERE ITEMID=?;
+        `,[newItem.description, newItem.price, newItem.SKUID, newItem.supplierId]);
+        this.Items.set(newItem.ITEMID, newItem);
+
+    }
+
+    async deleteItem(ITEMID) {
+        await this.queryDBRun(`
+            DELETE
+            FROM Item
+            WHERE ITEMID=?;
+        `, [ITEMID]);
+        this.Items.delete(ITEMID);
+    }
+    async loadRO() {
+        if (this.RestockOrders.size == 0) { //first time
+            let rows = await this.queryDBAll(`SELECT * FROM RestockOrder;`);
+            this.RestockOrders = new Map();
+            
+            rows.map(row => {
+                const restockorder = new Item(row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote, row.skuItems);
+                this.RestockOrders.set(row.ROID, restockorder);
+            })
+        } 
+        return this.RestockOrders;
+    }
+
+    async storeRO(newRO /*: Object*/) {
+        await this.queryDBRun(`
+            INSERT INTO RestockOrder(row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote, row.skuItems)
+            VALUES(?, ?, ?, ?, ?, ?, ?);
+        `,[row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote, row.skuItems]);
+        this.RestockOrders.set(newRO.ROID, newRO);
+    }
+
+    async updateRO(newRO /*: Object*/) {
+        await this.queryDBRun(`
+            UPDATE RestockOrder
+            SET issueDate = ?, state = ?, products = ?, supplierId = ?, transportNote = ?, skuItems = ?
+            WHERE ROID=?;
+        `,[newRO.issueDate, newRO.state, newRO.products, newRO.supplierId, newRO.transportNote, newRO.skuItems]);
+        this.RestockOrders.set(newRO.ROID, newRO);
+
+    }
+
+    async deleteRO(ROID) {
+        await this.queryDBRun(`
+            DELETE
+            FROM RestockOrder
+            WHERE ROID=?;
+        `, [ROID]);
+        this.RestockOrders.delete(ROID);
+    }
 }
 
 exports.DatabaseHelper = DatabaseHelper;
