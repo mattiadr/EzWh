@@ -11,13 +11,6 @@ const port = 3001;
 
 const wh = new Warehouse();
 
-const stripColonFromParam = (param) => {
-	return (req, res, next) => {
-		req.params[param] = req.params[param].substring(1);
-		next();
-	}
-}
-
 app.use(express.json());
 
 
@@ -162,7 +155,6 @@ app.get("/api/testDescriptors",
 		});
 });
 app.get("/api/testDescriptors/:id",
-	stripColonFromParam("id"),
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -190,7 +182,6 @@ app.post("/api/testDescriptor",
 
 /* PUT */
 app.put("/api/testDescriptor/:id",
-	stripColonFromParam("id"),
 	param("id").isInt(),
 	body("newName").exists(),
 	body("newProcedureDescription").exists(),
@@ -203,7 +194,6 @@ app.put("/api/testDescriptor/:id",
 
 /* DELETE */
 app.delete("/api/testDescriptor/:id",
-	stripColonFromParam("id"),
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -219,7 +209,6 @@ app.delete("/api/testDescriptor/:id",
 
 /* GET */
 app.get("/api/skuitems/:rfid/testResults",
-	stripColonFromParam("rfid"),
 	param("rfid").exists(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid rfid");
@@ -227,8 +216,6 @@ app.get("/api/skuitems/:rfid/testResults",
 		return res.status(result.status).json(result.body);
 });
 app.get("/api/skuitems/:rfid/testResults/:id",
-	stripColonFromParam("rfid"),
-	stripColonFromParam("id"),
 	param("rfid").exists(),
 	param("id").isInt(),
 	async (req, res) => {
@@ -251,8 +238,6 @@ app.post("/api/skuitems/testResult",
 
 /* PUT */
 app.put("/api/skuitems/:rfid/testResult/:id",
-	stripColonFromParam("rfid"),
-	stripColonFromParam("id"),
 	param("rfid").exists(),
 	param("id").isInt(),
 	body("newIdTestDescriptor").isInt(),
@@ -266,8 +251,6 @@ app.put("/api/skuitems/:rfid/testResult/:id",
 
 /* DELETE */
 app.delete("/api/skuitems/:rfid/testResult/:id",
-	stripColonFromParam("rfid"),
-	stripColonFromParam("id"),
 	param("rfid").exists(),
 	param("id").isInt(),
 	(req, res) => {
@@ -362,7 +345,6 @@ app.post("/api/logout",
 
 /* PUT */
 app.put("/api/users/:username",
-	stripColonFromParam("username"),
 	param("username").isEmail(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
@@ -373,8 +355,6 @@ app.put("/api/users/:username",
 
 /* DELETE */
 app.delete("/api/users/:username/:type",
-	stripColonFromParam("username"),
-	stripColonFromParam("type"),
 	param("username").isEmail(),
 	param("type").exists(),
 	async (req, res) => {
