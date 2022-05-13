@@ -121,6 +121,28 @@ class DatabaseHelper {
 			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableUser, (err) => err && console.log(err));
+		
+		/** Item **/
+		const createTableItem = `CREATE TABLE IF NOT EXISTS Item (
+			ITEMID varchar(12) NOT NULL,
+			description varchar(100) NOT NULL,
+			SKUID varchar(12) NOT NULL,
+			supplierID varchar(12) NOT NULL,
+    		PRIMARY KEY (ITEMID)
+		);`;
+		this.db.run(createTableItem, (err) => err && console.log(err));
+		
+		/** Restock Order */
+		const createTableRO = `CREATE TABLE IF NOT EXISTS RestockOrder (
+			ITEMID ROID(12) NOT NULL,
+			issueDate DATETIME NOT NULL,
+			state varchar(10) NOT NULL,
+			supplierID INTEGER NOT NULL,
+			transportNote varchar(12) NOT NULL,
+			skuItems varchar(50) NOT NULL,
+    		PRIMARY KEY (ROID)
+		);`;
+		this.db.run(createTableRO, (err) => err && console.log(err));
 	}
 
 	/** SKU **/
