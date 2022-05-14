@@ -14,7 +14,6 @@ class SKU{
         this.position = position;
         this.testDescriptors = [];
         this.itemsID = [];
-        this.sku_itemsID = [];
     }
 
     getId() { return this.id; }
@@ -27,7 +26,6 @@ class SKU{
     getAvailableQuantity() { return this.availableQuantity; }
     getTestDescriptors() { return this.testDescriptors; }
     getItemsID() { return this.itemsID; }
-    getSkuItemsID() { return this.sku_itemsID; }
 
     setDescription(newDescription) { this.description = newDescription; }
     setWeight(newWeight) { this.weight = newWeight; }
@@ -36,6 +34,7 @@ class SKU{
     setNotes(newNotes) { this.notes = newNotes; }
     setPosition(newPosition) { this.position = newPosition; }
     setAvailableQuantity(newAvailableQuantity) { this.availableQuantity = newAvailableQuantity; }
+    setTestDescriptors(testDescriptors) { this.testDescriptors = testDescriptors; }
 
     addQuantity(sumQuantity) { this.addQuantity+=sumQuantity; }
     subQuantity(subQuantity) { this.addQuantity-=subQuantity; }

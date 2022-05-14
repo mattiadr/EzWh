@@ -19,41 +19,68 @@ app.use(express.json());
 /* GET */
 app.get('/api/skus',
 	async (req, res) => {
-		let skus = await wh.getSKUs();
-		let array = [];
-		skus.body.forEach((value) => array.push(value))
-		return res.status(skus.status).json(array);
+		let result = await wh.getSKUs();
+		if (result.status == 200)
+			return res.status(result.status).json(result.body.map((s) => ({id: s.id, description: s.description, weight: s.weight, volume: s.volume, notes: s.notes, position: s.position, availableQuantity: s.availableQuantity, price:  s.price, testDescriptors: s.testDescriptors})));
+		return res.status(result.status).send(result.body);
 });
 app.get('/api/skus/:id',
+	param("id").isInt(),
 	async (req, res) => {
-		let sku = await wh.getSKUbyId(req.params.id);
-		return res.status(sku.status).json(sku.body);
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		let result = await wh.getSKUbyId(req.params.id);
+		if (result.status == 200)
+			return res.status(result.status).json({id: result.body.id, description: result.body.description, weight: result.body.weight, volume: result.body.volume, notes: result.body.notes, position: result.body.position, availableQuantity: result.body.availableQuantity, price:  result.body.price, testDescriptors: result.body.testDescriptors});
+		return res.status(result.status).send(result.body);
 });
 
 /* POST */
 app.post('/api/sku',
+	body("description").exists(),
+	body("weight").isInt(),
+	body("volume").isInt(),
+	body("notes").exists(),
+	body("price").isFloat(),
+	body("availableQuantity").isInt(),
 	async (req, res) => {
+		if(!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
 		let result = await wh.createSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
-		return res.status(result.status).json(result.message);
+		return res.status(result.status).json(result.body);
 });
 
 /* PUT */
 app.put('/api/sku/:id',
+	param("id").isInt(),
+	body("newDescription").exists(),
+	body("newWeight").isInt(),
+	body("newVolume").isInt(),
+	body("newNotes").exists(),
+	body("newPrice").isFloat(),
+	body("newAvailableQuantity").isInt(),
 	async (req, res) => {
-		let result = await wh.updateSKU(req.params.id, undefined, req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
+		let result = await wh.updateSKU(req.params.id, undefined, req.body.newDescription, req.body.newWeight, req.body.newVolume, req.body.newNotes, req.body.newPrice, req.body.newAvailableQuantity);
 		return res.status(result.status).json(result.message);
 });
 app.put('/api/sku/:id/position',
+	param("id").isInt(),
+	body("position").exists(),
 	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
 		let result = await wh.updateSKU(req.params.id, req.body.position);
 		return res.status(result.status).json(result.message);
 });
 
 /* DELETE */
-app.delete('/api/sku/:id',
+app.delete('/api/skus/:id',
+	param("id").isInt(),
 	async (req, res) => {
-		let result = await wh.deleteSKU(req.params.id);
-		return res.status(result.status).json(result.message);
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.deleteSKU(req.params.id).then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
 });
 
 
@@ -61,42 +88,69 @@ app.delete('/api/sku/:id',
 
 /* GET */
 app.get('/api/skuitems',
-	async (req, res) => {
-		let sku_items = await wh.getSKUItems();
-		let array = [];
-		sku_items.body.forEach((value) => array.push(value))
-		return res.status(sku_items.status).json(array);
+	(req, res) => {
+		wh.getSKUItems().then((skuitems) => {
+			res.status(200).json(skuitems.map((si) => ({RFID: si.RFID, SKUId: si.SKUID, Available: si.available, DateOfStock: si.dateOfStock})));
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
 });
 app.get('/api/skuitems/sku/:id',
-	async (req, res) => {
-		let skuitems = await wh.getSKUItemsBySKU(req.params.id);
-		return res.status(skuitems.status).json(skuitems.body);
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid skuID");
+		wh.getSKUItemsBySKUID(req.params.id).then((si) => {
+			if (si) res.status(200).json({RFID: si.RFID, SKUId: si.SKUID, DateOfStock: si.dateOfStock});
+			else res.status(404).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
 });
 app.get('/api/skuitems/:rfid',
-	async (req, res) => {
-		let skuitems = await wh.getSKUItemByRFID(req.params.rfid);
-		return res.status(skuitems.status).json(skuitems.body);
+	param("rfid").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid rfid");
+		wh.getSKUItemByRFID(req.params.rfid).then((si) => {
+			if (si) res.status(200).json({RFID: si.RFID, SKUId: si.SKUID, Available: si.available, DateOfStock: si.dateOfStock});
+			else res.status(404).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
 });
 
 /* POST */
 app.post('/api/skuitem',
+	body("RFID").exists(),
+	body("SKUId").isInt(),
+	body("DateOfStock").exists(),
 	async (req, res) => {
-		let result = await wh.createSKUItem(req.body.RFID, req.body.SKUId.toString(), req.body.DateOfStock);
-		return res.status(result.status).json(result.message);
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		let result = await wh.createSKUItem(req.body.RFID, req.body.SKUId, req.body.DateOfStock);
+		return res.status(result.status).json(result.body);
 });
 
 /* PUT */
 app.put('/api/skuitems/:rfid',
+	param("rfid").exists(),
+	body("newRFID").exists(),
+	body("newAvailable").isInt(),
+	body("newDateOfStock").exists(),
 	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
 		let result = await wh.updateSKUItem(req.params.rfid, req.body.newRFID, req.body.newAvailable, req.body.newDateOfStock);
 		return res.status(result.status).json(result.message);
 });
 
-//DELETE /api/skuitems/:rfid
+/* DELETE */
 app.delete('/api/skuitems/:rfid',
+	param("rfid").exists(),
 	async (req, res) => {
-		let result = await wh.deleteSKUItems(req.params.rfid);
-		return res.status(result.status).json(result.message);
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.deleteSKUItem(req.params.rfid).then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
 });
 
 
@@ -104,42 +158,62 @@ app.delete('/api/skuitems/:rfid',
 
 /* GET */
 app.get('/api/positions',
-	async (req, res) => {
-		let positions = await wh.getPositions();
-		let array = [];
-		positions.body.forEach((value) => array.push(value))
-		return res.status(positions.status).json(array);
+	(req, res) => {
+		wh.getPositions().then((positions) => {
+			res.status(200).json(positions.map((p) => ({positionID: p.positionID, aisleID: p.aisleID, row: p.row, col: p.idSKU, maxWeight: p.maxWeight, maxVolume: p.maxVolume, occupiedWeight: p.occupiedWeight, occupiedVolume: p.occupiedVolume})));
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
 });
 
 /* POST */
 app.post('/api/position',
+	body("positionID").exists(),
+	body("aisleID").exists(),
+	body("row").exists(),
+	body("col").exists(),
+	body("maxWeight").isInt(),
+	body("maxVolume").isInt(),
 	async (req, res) =>{
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
 		let result = await wh.createPosition(req.body.positionID, req.body.aisleID, req.body.row, req.body.col, req.body.maxWeight, req.body.maxVolume);
 		return res.status(result.status).json(result.message);
 });
 
 /* PUT */
 app.put('/api/position/:positionID',
+	param("positionID").exists(),
+	body("newAisleID").exists(),
+	body("newRow").exists(),
+	body("newCol").exists(),
+	body("newMaxWeight").isInt(),
+	body("newMaxVolume").isInt(),
+	body("newOccupiedWeight").isInt(),
+	body("newOccupiedVolume").isInt(),
 	async (req, res) =>{
-		let result = await wh.updatePosition(req.params.positionID, req.body.newAisleID, req.body.newRow, req.body.newCol, req.body.newMaxWeight, req.body.newMaxVolume, req.body.newOccupiedWeight, req.body.newOccupiedValue);
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
+		let result = await wh.updatePosition(req.params.positionID, undefined, req.body.newAisleID, req.body.newRow, req.body.newCol, req.body.newMaxWeight, req.body.newMaxVolume, req.body.newOccupiedWeight, req.body.newOccupiedVolume);
 		return res.status(result.status).json(result.message);
 });
 app.put('/api/position/:positionID/changeID',
+	param("positionID").exists(),
+	body("newPositionID").exists(),
 	async (req, res) =>{
-		const positionID = req.body.newPositionID;
-		if (positionID.length !== 12) return req.status(422).json();
-		let newAisleID = positionID.slice(0, 4);
-		let newRow = positionID.slice(4, 8);
-		let newCol = positionID.slice(8, 12);
-		let result = await wh.updatePosition(req.params.positionID, newAisleID, newRow, newCol);
+		if (!validationResult(req).isEmpty() || req.body.newPositionID.length !== 12) return res.status(422).send("invalid param or body");
+		let result = await wh.updatePosition(req.params.positionID, req.body.newPositionID);
 		return res.status(result.status).json(result.message);
 });
 
 /* DELETE */
 app.delete('/api/position/:positionID',
-	async (req, res) => {
-		let result = await wh.deletePosition(req.params.positionID);
-		return res.status(result.status).json(result.message);
+	param("positionID").exists(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid positionID");
+		wh.deletePosition(req.params.positionID).then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
 });
 
 

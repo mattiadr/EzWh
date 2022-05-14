@@ -156,19 +156,20 @@ class DatabaseHelper {
 	}
 
 	/** SKU **/
-	async loadSKU() {//: Map <String,SKU>
-		if (this.SKUs.size === 0) { //first time
-			let rows = await this.queryDBAll(`SELECT * FROM SKU;`);
-
-			rows.map(row => {
-				const sku = new SKU(row.SKUID, row.description, row.weight, row.volume, row.price, row.notes, row.availableQuantity, row.positionId);
-				this.SKUs.set(row.SKUID, sku);
-			})
-		}
-		return this.SKUs;
+	loadSKUs() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM SKU;`;
+			this.db.all(sql, [], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((row) => new SKU(row.SKUID, row.description, row.weight, row.volume, row.price, row.notes, row.availableQuantity, row.positionId)));
+				}
+			});
+		});
 	}
 
-	selectSKUbyID(id) {
+	loadSKUbyID(id) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM SKU WHERE SKUID = ?;`;
 			this.db.get(sql, [id], (err, row) => {
@@ -185,49 +186,65 @@ class DatabaseHelper {
 		});
 	}
 
-	async storeSKU(newSKU /*: Object*/) {
-		await this.queryDBRun(`
-			INSERT INTO SKU(description, weight, volume, price, notes, positionId, availableQuantity)
-			VALUES(?, ?, ?, ?, ?, ? , ?);
-		`,[newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity()]);
-		this.SKUs.set(newSKU.id, newSKU);
+	storeSKU(newSKU) {
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO SKU(description, weight, volume, price, notes, positionId, availableQuantity)
+						 VALUES(?, ?, ?, ?, ?, ? , ?);`;
+			this.db.run(sql, [newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity()], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
-	async updateSKU(newSKU /*: Object*/) {
-		await this.queryDBRun(`
-			UPDATE SKU
-			SET description = ?, weight = ?, volume = ?, price = ?, notes = ?, positionId = ?, availableQuantity = ?
-			WHERE SKUID=?;
-		`,[newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity(), newSKU.getId()]);
-		this.SKUs.set(newSKU.getId(), newSKU);
+	updateSKU(newSKU) {
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE SKU
+						 SET description = ?, weight = ?, volume = ?, price = ?, notes = ?, positionId = ?, availableQuantity = ?
+						 WHERE SKUID=?;`;
+			this.db.run(sql, [newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity(), newSKU.getId()], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
-	async deleteSKU(SKUid) {
-		await this.queryDBRun(`
-			DELETE
-			FROM SKU
-			WHERE SKUID=?;
-		`, [SKUid]);
-		this.SKUs.delete(SKUid);
+	deleteSKU(SKUid) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM SKU WHERE SKUID = ?;`;
+			this.db.run(sql, [SKUid], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	/** SKU Item **/
-	async loadSKUItem() { //: Map<String,SKUItem>
-		if (this.SKUItems.size === 0 ) { //first time
-			let rows = await this.queryDBAll(`SELECT * FROM SKUItem;`);
-
-			rows.map(row => {
-				const skuItem = new SKUItem(row.RFID, row.SKUID, row.available, row.dateOfStock);
-				this.SKUItems.set(row.RFID, skuItem);
-
-			})
-		}
-		return this.SKUItems;
+	loadSKUItems() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM SKUItem;`;
+			this.db.all(sql, [], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((row) => new SKUItem(row.RFID, row.SKUID, row.available, row.dateOfStock)));
+				}
+			});
+		});
 	}
 
-	selectSKUItemByRFID(rfid) {
+	loadSKUItemByRFID(rfid) {
 		return new Promise((resolve, reject) => {
-			const sql = `SELECT * FROM SKU WHERE RFID = ?;`;
+			const sql = `SELECT * FROM SKUItem WHERE RFID = ?;`;
 			this.db.get(sql, [rfid], (err, row) => {
 				if (err) {
 					reject(err.toString());
@@ -242,77 +259,140 @@ class DatabaseHelper {
 		});
 	}
 
-	async storeSKUItem(newSKUItem /*: Object*/) {
-		await this.queryDBRun(`
-			INSERT INTO SKUItem(RFID, SKUID, available, dateOfStock)
-			VALUES(?, ?, ?, ?);
-		`,[newSKUItem.getRFID(), newSKUItem.getSKUId(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock()]);
-		this.SKUItems.set(newSKUItem.RFID, newSKUItem);
+	loadSKUItemBySKUID(skuid) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM SKUItem WHERE SKUID = ? AND available = 1;`;
+			this.db.get(sql, [skuid], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new SKUItem(row.RFID, row.SKUID, row.available, row.dateOfStock));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
 	}
 
-	async updateSKUItem(rfid, newSKUItem /*: Object*/) {
-		await this.queryDBRun(`
-			UPDATE SKUItem
-			SET RFID = ?, available = ?, dateOfStock = ?
-			WHERE RFID=?;
-		`,[newSKUItem.getRFID(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock(), rfid]);
-		this.SKUItems.delete(rfid);
-		this.SKUItems.set(rfid, newSKUItem);
+	storeSKUItem(newSKUItem) {
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO SKUItem(RFID, SKUID, available, dateOfStock)
+						 VALUES(?, ?, ?, ?);`;
+			this.db.run(sql, [newSKUItem.getRFID(), newSKUItem.getSKUId(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock()], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			})
+		});
 	}
 
-	async deleteSKUItem(RFID) {
-		await this.queryDBRun(`
-			DELETE
-			FROM SKUItem
-			WHERE RFID=?;
-		`, [RFID]);
-		this.SKUItems.delete(RFID);
+	updateSKUItem(rfid, newSKUItem) {
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE SKUItem
+						 SET RFID = ?, available = ?, dateOfStock = ?
+						 WHERE RFID=?;`;
+			this.db.run(sql, [newSKUItem.getRFID(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock(), rfid], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+
+	deleteSKUItem(RFID) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM SKUItem WHERE RFID=?;`;
+			this.db.run(sql, [RFID], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	/** Position **/
-	async loadPosition() { //: Map<String, Position>
-		if (this.Positions.size === 0 ) { //first time
-			let rows = await this.queryDBAll(`SELECT * FROM Position;`);
+	loadPositions() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM Position;`;
+			this.db.all(sql, [], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((row) => new Position(row.posID, row.aisleID, row.row, row.col, row.maxWeight, row.maxVolume, row.occupiedWeight, row.occupiedVolume)));
+				}
+			});
+		});
+	}
 
-			rows.map(row => {
-				const pos = new Position(row.posID, row.aisleID, row.row, row.col, row.maxWeight, row.maxVolume, row.occupedWeight, row.occupedVolume);
-				this.Positions.set(row.posID, pos);
+	loadPositionByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM Position WHERE posID = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new Position(row.posID, row.aisleID, row.row, row.col, row.maxWeight, row.maxVolume, row.occupiedWeight, row.occupiedVolume));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
 
+	storePosition(newPosition) {
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO Position(posID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume)
+						 VALUES(?, ?, ?, ?, ?, ?, ?, ?);`;
+			this.db.run(sql, [newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(),
+				newPosition.getMaxWeight(), newPosition.getMaxVolume(), newPosition.getOccupiedWeight(), newPosition.getOccupiedVolume()], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
 			})
-		}
-		return this.Positions;
+		});
 	}
 
-	async storePosition(newPosition /*: Object*/) {
-		await this.queryDBRun(`
-			INSERT INTO Position(posID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight, occupiedValue)
-			VALUES(?, ?, ?, ?, ?, ?, ?, ?);
-		`,[newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(),
-			newPosition.getMaxWeight(), newPosition.getMaxVolume(), newPosition.getOccupiedWeight(), newPosition.getOccupiedVolume()]);
-		this.Positions.set(newPosition.getPositionID(), newPosition);
+	updatePosition(oldPosID, newPosition) {
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE Position
+						 SET posID = ?, aisleID = ?, row = ?, col = ?, maxWeight = ?, maxVolume = ?, occupiedWeight = ?, occupiedVolume = ?
+						 WHERE posID = ?;`;
+			this.db.run(sql, [newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(),
+							  newPosition.getMaxWeight(), newPosition.getMaxVolume(), newPosition.getOccupiedWeight(), newPosition.getOccupiedVolume(),
+							  oldPosID], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
-	async updatePosition(oldPosID, newPosition /*: Object*/) {
-		await this.queryDBRun(`
-			UPDATE Position
-			SET posID = ?, aisleID = ?, row = ?, col = ?, maxWeight = ?, maxVolume = ?, occupiedWeight = ?, occupiedValue = ?
-			WHERE posID = ?;
-		`,[newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(),
-			newPosition.getMaxWeight(), newPosition.getMaxVolume(), newPosition.getOccupiedWeight(), newPosition.getOccupiedVolume(),
-		oldPosID]);
-		this.Positions.delete(oldPosID);
-		this.Positions.set(newPosition.getPositionID(), newPosition);
+	deletePosition(posID) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM Position WHERE posID = ?;`;
+			this.db.run(sql, [posID], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
-
-	async deletePosition(posID) {
-		await this.queryDBRun(`
-			DELETE
-			FROM Position
-			WHERE posID=?;
-		`, [posID]);
-		this.Positions.delete(posID);
-	}
-
 	/** Test Descriptor **/
 	selectTestDescriptors() {
 		return new Promise((resolve, reject) => {
@@ -339,6 +419,19 @@ class DatabaseHelper {
 					} else {
 						resolve(null);
 					}
+				}
+			});
+		});
+	}
+
+	selectTestDescriptorsIDBySKUID(skuid) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT id FROM TestDescriptor WHERE idSKU = ?;`;
+			this.db.all(sql, [skuid], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows);
 				}
 			});
 		});

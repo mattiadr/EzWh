@@ -17,86 +17,80 @@ class Warehouse {
 
 	/** SKU **/
 	async getSKUs() {
-		//TODO: USER PERMISSIONS
-		let SKUs;
 		try {
-			SKUs = await this.db_help.loadSKU();
+			let skus = await this.db_help.loadSKUs();
+			for (let sku of skus) {
+				const testIDs = await this.db_help.selectTestDescriptorsIDBySKUID(sku.getId());
+				sku.setTestDescriptors(testIDs);
+			}
+			return {status: 200, body: skus};
 		} catch (e) {
-			return { status: 500, body: {}, message: e };
+			return {status: 500, body: e};
 		}
+	}
 
-		return { status: 200, body: SKUs };
-	} //: List<SKU>
-
-	async getSKUbyId(id /*: String*/) {
-		if (typeof id !== 'string')
-			return { status: 422, body: {}, message: {} };
-		let skus;
+	async getSKUbyId(id) {
 		try {
-			skus = await this.getSKUs();
-			if (skus.body.size === 0 || skus.body.get(id) == undefined)
-				return { status: 404, body: {}, message: {} };
-
+			let sku = await this.db_help.loadSKUbyID(id);
+			if (!sku) return {status: 404, body: "sku not found"};
+			const testIDs = await this.db_help.selectTestDescriptorsIDBySKUID(sku.getId());
+			sku.setTestDescriptors(testIDs);
+			return {status: 200, body: sku};
 		} catch (e) {
-			return { status: 500, body: {}, message: {} };
+			return {status: 500, body: e};
 		}
-		return { status: 200, body: skus.body.get(id), message: {} };
-	} //: SKU
+	}
 
-	async createSKU(description /*: String*/, weight /*: double*/, volume /*: double*/, notes /*: string*/, price /*: double*/, quantity /*: Integer*/) {
-		if (typeof description !== 'string' || typeof weight !== 'number' || typeof volume !== 'number' ||
-			typeof notes !== 'string' || typeof price !== 'number' || typeof quantity != 'number')
-			return { status: 422, body: {}, message: {} };
-
+	async createSKU(description, weight, volume, notes, price, quantity) {
 		try {
 			let newSKU = new SKU(null, description, weight, volume, price, notes, quantity);
 			await this.db_help.storeSKU(newSKU);
+			return { status: 201, body: {} };
 		} catch (e) {
 			return { status: 503, body: {}, message: e };
 		}
-		return { status: 201, body: {} };
 	}
 
-	async deleteSKU(id /*: String*/) {
-		if (typeof id !== 'string')
-			return { status: 422, body: {}, message: typeof id };
+	async updateSKU(id, positionId , newDescription = undefined, newWeight = undefined, newVolume = undefined, newNotes = undefined, newPrice = undefined, newAvailableQuantity = undefined) {
 		try {
-			let sku = await this.getSKUbyId(id);
-			if (sku.status === 404) return { status: 404, body: {}, message: {} };
-			await this.db_help.deleteSKU(id);
-		} catch (e) {
-			return { status: 503, body: {}, message: e };
-		}
-		return { status: 204, body: {}, message: {} };
-	}//: void
-
-	async updateSKU(id /*:String*/, positionId /*String*/, description = "" /*: String*/, weight=-1 /*: double*/, volume=-1 /*: double*/, notes = "" /*: string*/, price = -1 /*: double*/, quantity = -1 /*: Integer*/) {
-		//TODO: UPDATE POSITION FIELDS!!!
-		if (typeof id !== 'string' || typeof description !== 'string' || typeof weight !== 'number' || typeof volume !== 'number' ||
-			typeof notes !== 'string' || typeof price !== 'number' || typeof quantity != 'number')
-			return { status: 422, body: {}, message: {} };
-		try {
-			let sku = await this.getSKUbyId(id);
-			if (sku.status === 404) return { status: 404, body: {}, message: {} };
-			if (positionId === undefined) {
-				let position = sku.body.getPosition();
-				if ( position != null)
-					this.updatePosition(position.getPositionID(), position.getAisleID(), position.getRow(), position.getCol(), position.getMaxWeight(), position.getMaxVolume(), position.getOccupiedWeight()+weight, position.getOccupiedVolume()+volume);
-				await this.db_help.updateSKU(new SKU(id, description, weight, volume, price, notes, quantity));
+			const sku = await this.db_help.loadSKUbyID(id);
+			if (!sku) return {status: 404, body: "sku not found"};
+			let oldPosition = undefined;
+			if(sku.getPosition() != null)
+				oldPosition =  await this.db_help.loadPositionByID(sku.getPosition());
+			if (positionId !== undefined) { //ONLY POSITION
+				const newPosition = await this.db_help.loadPositionByID(positionId);
+				if(!newPosition) return {status: 404, body: "position not found"};
+				if (newPosition.getOccupiedWeight() + sku.getWeight() >  newPosition.getMaxWeight() ||
+					newPosition.getOccupiedVolume() + sku.getVolume() > newPosition.getMaxVolume())
+						return {status: 422, body: "Can't move sku in that position"};
+				sku.setPosition(positionId);
+				newPosition.addOccupiedWeight(sku.getWeight());
+				newPosition.addOccupiedVolume(sku.getVolume());
+				this.db_help.updatePosition(newPosition.getPositionID(), newPosition);
 			} else {
-				let position = await this.getPositionById(positionId);
-				if (position.status === 404) return { status: 404, body: {}, message: {} };
-				this.updatePosition(position.body.getPositionID(), position.body.getAisleID(), position.body.getRow(), position.body.getCol(), position.body.getMaxWeight(), position.body.getMaxVolume(), position.body.getOccupiedWeight()+sku.body.getWeight(), position.body.getOccupiedVolume()+sku.body.getVolume());
-				let oldPosition = sku.body.getPosition();
-				if ( oldPosition != null)
-					this.updatePosition(oldPosition.getPositionID(), oldPosition.getAisleID(), oldPosition.getRow(), oldPosition.getCol(), oldPosition.getMaxWeight(), oldPosition.getMaxVolume(), oldPosition.getOccupiedWeight()-sku.body.getWeight(), oldPosition.getOccupiedVolume()-sku.body.getVolume());
-				await this.db_help.updateSKU(new SKU(id, sku.body.getDescription(), sku.body.getWeight(), sku.body.getVolume(), sku.body.getPrice(), sku.body.getNotes(), sku.body.getAvailableQuantity(), positionId));
+				sku.setDescription(newDescription);
+				sku.setWeight(newWeight);
+				sku.setVolume(newVolume);
+				sku.setPrice(newPrice);
+				sku.setNotes(newNotes);
+				sku.setAvailableQuantity(newAvailableQuantity);
 			}
+			if (oldPosition != undefined) {
+				oldPosition.subOccupiedWeight(sku.getWeight());
+				oldPosition.subOccupiedVolume(sku.getVolume());
+				this.db_help.updatePosition(oldPosition.getPositionID(), oldPosition);
+			}
+			this.db_help.updateSKU(sku);
+			return {status: 200, body: ""};
 		} catch (e) {
-			return { status: 503, body: {}, message: e };
+			return {status: 503, body: e}
 		}
-		return { status: 200, body: {}, message: {} };
-	}//: void
+	}
+
+	deleteSKU(id) { 
+		return this.db_help.deleteSKU(id);
+	}
 
 	/** SKU Item **/
 	async getSKUItems() {
@@ -112,157 +106,106 @@ class Warehouse {
 
 	}//: List<SKUItem>
 
-	async getSKUItemsBySKU(skuid /*: String*/) {
-		if (typeof skuid !== 'string')
-			return { status: 422, body: {}, message: {} };
-		let skuitems = [];
-		try {
-			await (await this.getSKUItems()).body.forEach((value, key) => { value.SKUID == skuid && value.available == 1 ? skuitems.push(value) : {} });
-			if (skuitems.length === 0)
-				return { status: 404, body: {}, message: {} };
-
-		} catch (e) {
-			return { status: 500, body: {}, message: {} };
-		}
-		return { status: 200, body: skuitems, message: {} };
-	}//: List<SKUItem>
-
-	async getSKUItemByRFID(rfid /*: String*/) {
-		if (typeof rfid !== 'string')
-			return { status: 422, body: {}, message: {} };
-		let skuitems;
-		try {
-			skuitems = await this.getSKUItems();
-			if (skuitems.body.size === 0 || skuitems.body.get(rfid) == undefined)
-				return { status: 404, body: {}, message: {} };
-
-		} catch (e) {
-			return { status: 500, body: {}, message: {} };
-		}
-		return { status: 200, body: skuitems.body.get(rfid), message: {} };
-
-	} //: SKUItem
-
-	async createSKUItem(rfid /*: String*/, skuid /*: String*/, dateOfStock /*: String*/) {
-		if (typeof rfid !== 'string' || typeof skuid !== 'string' || typeof dateOfStock !== 'string')
-			return { status: 422, body: {}, message: {} };
-
-		let date;
-		if (dateOfStock != null && !(date = dayjs(dateOfStock, ["YYYY/MM/DD HH:mm", "YYYY/MM/DD"])).isValid()) {
-			return { status: 422, body: {}, message: {} };
-		}
-		try {
-			let newSKUItem = new SKUItem(rfid, skuid, 0, date);
-			await this.db_help.storeSKUItem(newSKUItem);
-		} catch (e) {
-			return { status: 503, body: {}, message: e };
-		}
-		return { status: 201, body: {} };
-	}//: void
-
-	async updateSKUItem(rfid /*: String*/, newRFID, newAvailable, newDateOfStock) {
-		//TODO: UPDATE POSITION FIELDS!!!
-		if (typeof rfid !== 'string' || typeof newRFID !== 'string' || typeof newAvailable !== 'number' || typeof newDateOfStock !== 'string')
-			if (newAvailable !== 1 || newAvailable !== 0)
-				return { status: 422, body: {}, message: {} };
-		let date;
-		if (newDateOfStock != null && !(date = dayjs(newDateOfStock, ["YYYY/MM/DD HH:mm", "YYYY/MM/DD"])).isValid()) {
-			return { status: 422, body: {}, message: {} };
-		}
-		try {
-			let skuitem = await this.getSKUItemByRFID(rfid);
-			if (skuitem.status === 404) return { status: 404, body: {}, message: {} };
-			await this.db_help.updateSKUItem(rfid, new SKUItem(newRFID, skuitem.body.getSKUId(), newAvailable, date));
-		} catch (e) {
-			return { status: 503, body: {}, message: e };
-		}
-		return { status: 200, body: {}, message: {} };
-	}//: void
-
-	async deleteSKUItems(rfid /*: String*/) {
-		if (typeof rfid !== 'string')
-			return { status: 422, body: {}, message: typeof rfid };
-		try {
-			let skuitem = await this.getSKUItemByRFID(rfid);
-			if (skuitem.status === 404) return { status: 404, body: {}, message: {} };
-			await this.db_help.deleteSKUItem(rfid);
-		} catch (e) {
-			return { status: 503, body: {}, message: e };
-		}
-		return { status: 204, body: {}, message: {} };
-	}// : void
-
-	/** Position **/
-	async getPositions() {
-		//TODO: USER PERMISSIONS
-		let Positions;
-		try {
-			Positions = await this.db_help.loadPosition();
-		} catch (e) {
-			return { status: 500, body: {}, message: e };
-		}
-
-		return { status: 200, body: Positions };
-
+	getSKUItems() {
+		return this.db_help.loadSKUItems();
 	}
 
-	async createPosition(positionID /*: String*/, aisleID /*: String*/, row /*: String*/, col /*: String*/, maxWeight /*: Integer*/, maxVolume /*: Integer*/) {
-		if (typeof positionID !== 'string' || typeof aisleID !== 'string' || typeof row !== 'string' ||
-			typeof col !== 'string' || typeof maxWeight !== 'number' || typeof maxVolume != 'number')
-			return { status: 422, body: {}, message: {} };
-		if (positionID.slice(0, 4) !== aisleID || positionID.slice(4, 8) !== row || positionID.slice(8, 12) !== col)
-			return { status: 422, body: {}, message: {} };
+	getSKUItemsBySKUID(skuid) {
+		return this.db_help.loadSKUItemBySKUID(skuid);
+	}
 
+	getSKUItemByRFID(rfid) {
+		return this.db_help.loadSKUItemByRFID(rfid);
+	}
+
+	async createSKUItem(rfid, skuid, dateOfStock) {
+		let date;
+		if (dateOfStock != null && !(date = dayjs(dateOfStock, ["YYYY/MM/DD HH:mm", "YYYY/MM/DD"])).isValid()) {
+			return { status: 422, body: "Date isn't in correct format" };
+		}
+		try {
+			const sku = await this.db_help.loadSKUbyID(skuid);
+			if (!sku) return {status: 404, body: "sku not found"};
+			await this.db_help.storeSKUItem(new SKUItem(rfid, skuid, 0, date));
+			return {status: 201, body: ""};
+		} catch(e) {
+			return {status: 503, body: e};
+		}
+	}
+
+	async updateSKUItem(rfid, newRFID, newAvailable, newDateOfStock) {
+		let date;
+		if (newDateOfStock != null && !(date = dayjs(newDateOfStock, ["YYYY/MM/DD HH:mm", "YYYY/MM/DD"])).isValid()) {
+			return { status: 422, body: "Date isn't in correct format" };
+		}
+		try {
+			let skuitem = await this.db_help.loadSKUItemByRFID(rfid)
+			if (!skuitem) return { status: 404, body: "SkuItem not found" };
+			skuitem.setRFID(newRFID);
+			skuitem.setDateOfStock((newDateOfStock === null ? newDateOfStock : date));
+			skuitem.setAvailable(newAvailable);
+			await this.db_help.updateSKUItem(rfid, skuitem);
+			return { status: 200, body: "" };
+		} catch (e) {
+			return { status: 503, body: {}, message: e };
+		}
+	}
+
+	deleteSKUItem(rfid) {
+		return this.db_help.deleteSKUItem(rfid);
+	}
+
+	/** Position **/
+	getPositions() {
+		return this.db_help.loadPositions();
+	}
+
+	getPositionById(posID) {
+		return this.db_help.loadPositionByID(posID);
+	}
+
+	async createPosition(positionID, aisleID, row, col, maxWeight, maxVolume) {
+		if (positionID.slice(0, 4) !== aisleID || positionID.slice(4, 8) !== row || positionID.slice(8, 12) !== col)
+			return { status: 422, body: "ID isn't coherent with other params"};
 		try {
 			let newPosition = new Position(positionID, aisleID, row, col, maxWeight, maxVolume);
 			await this.db_help.storePosition(newPosition);
+			return { status: 201, body: {} };
 		} catch (e) {
 			return { status: 503, body: {}, message: e };
 		}
-		return { status: 201, body: {} };
 	}
 
-	async getPositionById(posID) {
-		let positions;
+	async updatePosition(posID, newPositionID, newAisleID = undefined, newRow = undefined, newCol = undefined, newMaxWeight = undefined, newMaxVolume = undefined, newOccupiedWeight = undefined, newOccupiedVolume = undefined) {
 		try {
-			positions = await this.getPositions();
-			if (positions.body.size === 0 || positions.body.get(posID) == undefined)
-				return { status: 404, body: {}, message: {} };
+			let position = await this.db_help.loadPositionByID(posID);
+			if (!position) return { status: 404, body: "position not found" };
+			if (newAisleID !== undefined) {
+				let newPosID = newAisleID+newRow+newCol;
+				position.setPositionID(newPosID);
+				position.setAisleID(newAisleID);
+				position.setRow(newRow);
+				position.setCol(newCol);
+				position.setMaxWeight(newMaxWeight);
+				position.setMaxVolume(newMaxVolume);
+				position.setOccupiedWeight(newOccupiedWeight);
+				position.setOccupiedVolume(newOccupiedVolume);
+			} else {
+				position.setPositionID(newPositionID);
+				position.setAisleID(newPositionID.slice(0, 4));
+				position.setRow(newPositionID.slice(4, 8));
+				position.setCol(newPositionID.slice(8, 12));
+			}
+			await this.db_help.updatePosition(posID, position);
+			return { status: 200, body: "" };
 		} catch (e) {
-			return { status: 503, body: {}, message: e };
+			return { status: 503, body: e };
 		}
-		return { status: 200, body: positions.body.get(posID), message: {} };
 	}
 
-	async updatePosition(posID /*: String*/, newAisleID, newRow, newCol, newMaxWeight = undefined, newMaxVolume = undefined, newOccupiedWeight = undefined, newOccupiedVolume = undefined) {
-		if (typeof posID !== 'string' || typeof newAisleID !== 'string' || typeof newRow !== 'string'|| typeof newCol !== 'string')
-				return { status: 422, body: {}, message: {} };
-		let newPosID = newAisleID+newRow+newCol;
-		try {
-			let position = await this.getPositionById(posID);
-			if (position.status === 404) return { status: 404, body: {}, message: {} };
-			if (newMaxWeight !== undefined)
-				await this.db_help.updatePosition(posID, new Position(newPosID, newAisleID, newRow, newCol, newMaxWeight, newMaxVolume, newOccupiedWeight, newOccupiedVolume));
-			else
-				await this.db_help.updatePosition(posID, new Position(newPosID, newAisleID, newRow, newCol, position.body.getMaxWeight(), position.body.getMaxVolume(), position.body.getOccupiedWeight(), position.body.getOccupiedVolume()));
-		} catch (e) {
-			return { status: 503, body: {}, message: e };
-		}
-		return { status: 200, body: {}, message: {} };
-	}//: void
-
-	async deletePosition(posID /*: String*/) {
-		if (typeof posID !== 'string')
-			return { status: 422, body: {}, message: typeof posID };
-		try {
-			let skuitem = await this.getPositionById(posID);
-			if (skuitem.status === 404) return { status: 404, body: {}, message: {} };
-			await this.db_help.deletePosition(posID);
-		} catch (e) {
-			return { status: 503, body: {}, message: e };
-		}
-		return { status: 204, body: {}, message: {} };
-	}// : void
+	deletePosition(posID) {
+		return this.db_help.deletePosition(posID);
+	}
 
 	/** Test Descriptor **/
 	getTestDescriptors() {

@@ -1,6 +1,6 @@
 class Position {
 
-    constructor(positionID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight=0, occupedVolume=0 /*skuID = undefined*/){
+    constructor(positionID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight=0, occupiedVolume=0){
         this.positionID = positionID;
         this.aisleID = aisleID;
         this.row = row;
@@ -8,8 +8,7 @@ class Position {
         this.maxWeight = maxWeight;
         this.maxVolume = maxVolume;
         this.occupiedWeight = occupiedWeight;
-        this.occupedVolume = occupedVolume;
-        //this.SKUId = skuID;
+        this.occupiedVolume = occupiedVolume;
     }
     
     getPositionID() { return this.positionID; }//: String
@@ -19,9 +18,9 @@ class Position {
     getMaxWeight() { return this.maxWeight; }//: Double
     getMaxVolume() { return this.maxVolume; }//: Double
     getOccupiedWeight() { return this.occupiedWeight; }//: Double
-    getOccupiedVolume() { return this.occupedVolume; }//: Double
-    //getSKUID() { return this.SKUId; }
-    
+    getOccupiedVolume() { return this.occupiedVolume; }//: Double
+
+    setPositionID(newPosID) { this.positionID = newPosID; }
     setAisleID(newAisleID /*: String*/) { this.aisleID = newAisleID; }//: void
     setRow(newRow /*: String*/) { this.row = newRow; }// : void
     setCol(newCol /*: String*/) { this.col = newCol; }//: void
@@ -30,11 +29,10 @@ class Position {
     setOccupiedWeight(newOccupiedWeight /*: Integer*/) {this.occupiedWeight = newOccupiedWeight; }//: void
     addOccupiedWeight(weight /*: Integer*/) { this.occupiedWeight += weight; }//: void
     subOccupiedWeight(weight /*: Integer*/) { this.occupiedWeight -= weight; }//:void
-    setOccupiedVolume(newOccupiedVolume /*: Integer*/) { this.occupedVolume = newOccupiedVolume; }//: void
-    addOccupiedVolume(volume /*: Integer*/) { this.occupedVolume += volume; }// : void
-    subOccupiedVolume(volume /*: Integer*/) { this.occupedVolume -= volume; }//: void
+    setOccupiedVolume(newOccupiedVolume /*: Integer*/) { this.occupiedVolume = newOccupiedVolume; }//: void
+    addOccupiedVolume(volume /*: Integer*/) { this.occupiedVolume += volume; }// : void
+    subOccupiedVolume(volume /*: Integer*/) { this.occupiedVolume -= volume; }//: void
     setPosition(newPositionID /*: String*/) { this.positionID = newPositionID; }//: void
-    //setSKU(newSKUid /*: String*/) { this.SKUId = newSKUid; }//: void  
 }
 
 module.exports = Position;
