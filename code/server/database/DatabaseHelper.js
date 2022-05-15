@@ -8,6 +8,8 @@ const RestockOrder = require("../components/RestockOrder");
 const {User} = require("../components/User");
 const {TestDescriptor} = require("../components/TestDescriptor");
 const {TestResult} = require("../components/TestResult");
+const ReturnOrder = require("../components/ReturnOrder");
+const InternalOrder = require("../components/InternalOrder")
 
 class DatabaseHelper {
 	constructor(dbFile) {
@@ -153,6 +155,27 @@ class DatabaseHelper {
     		PRIMARY KEY (ROID, ITEMID)
 		);`;
 		this.db.run(createTableROProducts, (err) => err && console.log(err));
+		
+		/** Return Order **/
+		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
+			id INTEGER NOT NULL,
+			returnDate DATETIME NOT NULL,
+			products ARRAY NOT NULL,
+			restockOrderId INTEGER NOT NULL,
+				PRIMARY KEY (id)
+		);`;
+		this.db.run(createTableReturnOrder, (err) => err && console.log(err));
+
+		/** Internal Order **/
+		const createTableInternalOrder = `CREATE TABLE IF NOT EXISTS InternalOrder (
+			id INTEGER NOT NULL,
+			issueDate DATETIME NOT NULL,
+			state VARCHAR(10) NOT NULL,
+			products ARRAY NOT NULL,
+			customerId INTEGER NOT NULL,
+				PRIMARY KEY (id)
+		);`;
+		this.db.run(createTableInternalOrder, (err) => err && console.log(err));
 	}
 
 	/** SKU **/
@@ -770,6 +793,147 @@ class DatabaseHelper {
         this.RestockOrders.set(newROproduct.ROID, newROproduct.ITEMID, newROproduct);
 
     }
+	
+	/** RETURN ORDER **/
+	loadReturnOrders() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM ReturnOrder;`;
+			this.db.all(sql, [], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new ReturnOrder(r.id, r.returnDate, r.products, r.restockOrderId)));
+				}
+			});
+		});
+	}
+	
+	loadReturnOrderByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM ReturnOrder WHERE id = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new ReturnOrder(row.id, row.returnDate, row.products, row.restockOrderId));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
+
+	createReturnOrder(returnOrder) {
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO ReturnOrder(returnDate, products, restockOrderId) VALUES (?, ?, ?);`;
+			this.db.run(sql, [returnOrder.returnDate, returnOrder.products, returnOrder.restockOrderId], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			})
+		});
+	}
+	
+	deleteReturnOrder(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM ReturnOrder WHERE id = ?`;
+			this.db.run(sql, [id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+	
+/** INTERNAL ORDER **/
+	selectInternalOrders() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM InternalOrder;`;
+			this.db.all(sql, [], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new InternalOrder(r.id, r.issueDate, r.state, r.products, r.customerId)));
+				}
+			});
+		});
+	}
+
+	selectInternalOrderByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM InternalOrder WHERE id = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new InternalOrder(row.id, row.issueDate, row.state, row.products, row.customerId));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
+
+	selectInternalOrdersIssued() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM InternalOrder WHERE state = ?;`;
+			this.db.all(sql, ['issued'], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new InternalOrder(r.id, r.issueDate, r.state, r.products, r.customerId)));
+				}
+			});
+		});
+	}
+
+	selectInternalOrdersAccepted() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM InternalOrder WHERE state = ?;`;
+			this.db.all(sql, ['accepted'], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new InternalOrder(r.id, r.issueDate, r.state, r.products, r.customerId)));
+				}
+			});
+		});
+	}
+
+	createInternalOrder(internalOrder) {
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO InternalOrder(issueDate, state, products, customerId) VALUES (?, ?, ?, ?);`;
+			this.db.run(sql, [internalOrder.issueDate, internalOrder.state, internalOrder.products, internalOrder.customerId], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			})
+		});
+	}
+
+	deleteInternalOrder(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM InternalOrder WHERE id = ?`;
+			this.db.run(sql, [id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+
 }
 
 exports.DatabaseHelper = DatabaseHelper;

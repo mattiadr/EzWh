@@ -8,6 +8,8 @@ const Position = require("./Position")
 const {UserRole, User} = require("./User");
 const {TestDescriptor} = require("./TestDescriptor");
 const {TestResult} = require("./TestResult");
+const ReturnOrder = require("./ReturnOrder")
+const InternalOrder = require("./InternalOrder")
 
 class Warehouse {
 	constructor(dbFile="./database/ezwh.db") {
@@ -388,6 +390,58 @@ class Warehouse {
 			return {status: 503, body: e};
 		}
 	}
+
+		/** RETURN ORDER **/
+		getReturnOrders() {
+			return this.db_help.loadReturnOrders();
+		}
+	
+		getReturnOrderByID(id) {
+			return this.db_help.loadReturnOrderByID(id);
+		}
+	
+		async newReturnOrder(returnDate, products, restockOrderId) {
+			try {
+				await this.db_help.createReturnOrder(new ReturnOrder(null, returnDate, products, restockOrderId));
+				return {status: 201, body: ""};
+			} catch (e) {
+				return {status: 503, body: e};
+			}
+		}	
+	
+		deleteReturnOrder(id) {
+			return this.db_help.deleteReturnOrder(id);
+		}
+	
+		/** INTERNAL ORDER **/
+		getInternalOrders() {
+			return this.db_help.selectInternalOrders();
+		}
+		
+		getInternalOrdersIssued() {
+			return this.db_help.selectInternalOrdersIssued();
+		}
+	
+		getInternalOrdersAccepted() {
+			return this.db_help.selectInternalOrdersAccepted();
+		}
+	
+		getInternalOrderByID() {
+			return this.db_help.selectInternalOrderByID();
+		}
+	
+		async newInternalOrder(issueDate, state, products, customerId) {
+			try {
+				await this.db_help.createInternalOrder(new InternalOrder(null, issueDate, state, products, customerId));
+				return {status: 201, body: ""};
+			} catch (e) {
+				return {status: 503, body: e};
+			}
+		}	
+	
+		deleteInternalOrder(id) {
+			return this.db_help.deleteInternalOrder(id);
+		}
 }
 
 exports.Warehouse = Warehouse;

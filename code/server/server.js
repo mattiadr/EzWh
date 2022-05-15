@@ -437,6 +437,121 @@ app.delete("/api/users/:username/:type",
 		return res.status(result.status).send(result.body);
 });
 
+/** RETURN ORDERS **/
+
+/* GET */
+app.get("/api/returnOrders",
+	(req, res) => {
+		wh.getReturnOrders().then((returnOrders) => {
+			res.status(200).json(returnOrders.map((ro) => ({id: ro.id, returnDate: ro.returnDate, products: ro.products, restockOrderId: ro.restockOrderId})));
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+app.get("/api/returnOrders/:id",
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.getReturnOrderByID(req.params.id).then((ro) => {
+			if (ro) {
+				res.status(200).json({id: ro.id, returnDate: ro.returnDate, products: ro.products, restockOrderId: ro.restockOrderId});
+			} else {
+				res.status(404).end();
+			}
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+
+/* POST */
+app.post("/api/returnOrder",
+	body("returnDate").exists(),
+	body("products").isArray(),
+	body("restockOrderId").isInt(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		const result = await wh.newReturnOrder(req.body.returnDate, req.body.products, req.body.restockOrderId);
+		return res.status(result.status).send(result.body);
+});
+
+/* DELETE */
+app.delete("/api/returnOrder/:id",
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.deleteReturnOrder(req.params.id).then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+
+/** INTERNAL ORDER */
+
+/* GET */
+app.get("/api/internalOrders",
+	(req, res) => {
+		wh.getInternalOrders().then((internalOrders) => {
+			res.status(200).json(internalOrders.map((io) => ({id: io.id, issueDate: io.issueDate, state: io.state, products: io.products, customerId: io.customerId})));
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	});
+	app.get("/api/internalOrdersIssued",
+	(req, res) => {
+		wh.getInternalOrdersIssued().then((internalOrders) => {
+			res.status(200).json(internalOrders.map((io) => ({id: io.id, issueDate: io.issueDate, state: io.state, products: io.products, customerId: io.customerId})));
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	});
+	app.get("/api/internalOrdersAccepted",
+	(req, res) => {
+		wh.getInternalOrdersAccepted().then((internalOrders) => {
+			res.status(200).json(internalOrders.map((io) => ({id: io.id, issueDate: io.issueDate, state: io.state, products: io.products, customerId: io.customerId})));
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	});
+	app.get("/api/internalOrders/:id",
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.getInternalOrderByID(req.params.id).then((io) => {
+			if (io) {
+				res.status(200).json({id: io.id, issueDate: io.issueDate, state: io.state , products: io.products, customerId: io.customerId});
+			} else {
+				res.status(404).end();
+			}
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+
+	/* POST */
+	app.post("/api/internalOrder",
+	body("issueDate").exists(),
+	body("products").exists(),
+	body("customerId").isInt(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		const result = await wh.newInternalOrder(req.body.issueDate, 'issued', req.body.products, req.body.customerId);
+		return res.status(result.status).send(result.body);
+	});
+
+	/* PUT */
+
+	/* DELETE */
+	app.delete("/api/internalOrder/:id",
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.deleteInternalOrder(req.params.id).then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	});
 
 // activate the server
 app.listen(port, () => {
