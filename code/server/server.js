@@ -711,8 +711,7 @@ app.get("/api/internalOrders",
 
 	/* PUT */
 	app.put("/api/restockorderproduct/:id",
-	param("id")[0].isInt(),
-	param("id")[1].exists(),
+	param("id").isInt(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
 		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
