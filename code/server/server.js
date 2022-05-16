@@ -557,7 +557,7 @@ app.get("/api/internalOrders",
 	/** Item */
 
 	/* GET */
-	app.get("/api/item",
+	app.get("/api/items",
 	(req, res) => {
 		wh.getItems().then((Items) => {
 			res.status(200).json(Items.map((io) => ({ITEMID: io.ITEMID, description: io.description, price: io.price, SKUID: io.SKUID, supplierId: io.supplierId})));
@@ -565,7 +565,7 @@ app.get("/api/internalOrders",
 			res.status(500).send(err);
 		});
 	});
-	app.get("/api/item/:id",
+	app.get("/api/items/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -593,7 +593,7 @@ app.get("/api/internalOrders",
 	});
 
 	/* PUT */
-	app.put("/api/item/:id",
+	app.put("/api/items/:id",
 	param("id").exists(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
@@ -616,7 +616,7 @@ app.get("/api/internalOrders",
 
 	/* Restock Order */
 	/* GET */
-	app.get("/api/restockorder",
+	app.get("/api/restockOrders",
 	(req, res) => {
 		wh.getRestockOrders().then((restockOrders) => {
 			res.status(200).json(restockOrders.map((io) => ({ROID: io.ROID, issueDate: io.issueDate, state: io.state, supplierId: io.supplierId, transportNote: io.transportNote, skuItems: io.skuItems})));
@@ -624,7 +624,7 @@ app.get("/api/internalOrders",
 			res.status(500).send(err);
 		});
 	});
-	app.get("/api/restockorder/:id",
+	app.get("/api/restockOrders/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -640,7 +640,7 @@ app.get("/api/internalOrders",
 	});
 
 	/* POST */
-	app.post("/api/restockorder",
+	app.post("/api/restockOrder",
 	body("issueDate").isDate(),
 	body("state").exists(),
 	body("supplierId").isInt(),
@@ -653,7 +653,7 @@ app.get("/api/internalOrders",
 	});
 
 	/* PUT */
-	app.put("/api/restockorder/:id",
+	app.put("/api/restockOrders/:id",
 	param("id").exists(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
@@ -663,7 +663,7 @@ app.get("/api/internalOrders",
 	});
 
 	/* DELETE */
-	app.delete("/api/restockorder/:id",
+	app.delete("/api/restockOrder/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -676,7 +676,7 @@ app.get("/api/internalOrders",
 
 	/* Restock Order Product */
 	/* GET */
-	app.get("/api/restockorderproduct",
+	app.get("/api/restockOrderProducts",
 	(req, res) => {
 		wh.getRestockOrderProducts().then((restockOrderProducts) => {
 			res.status(200).json(restockOrderProducts.map((io) => ({ROID: io.ROID, ITEMID: io.ITEMID, quantity: io.quantity})));
@@ -684,7 +684,7 @@ app.get("/api/internalOrders",
 			res.status(500).send(err);
 		});
 	});
-	app.get("/api/restockorderproduct/:id",
+	app.get("/api/restockOrderProducts/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -700,7 +700,7 @@ app.get("/api/internalOrders",
 	});
 
 	/* POST */
-	app.post("/api/restockorderproduct",
+	app.post("/api/restockOrderproducts",
 	body("quantity").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
@@ -709,7 +709,7 @@ app.get("/api/internalOrders",
 	});
 
 	/* PUT */
-	app.put("/api/restockorderproduct/:id",
+	app.put("/api/restockOrderProducts/:id",
 	param("id").isInt(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
@@ -719,7 +719,7 @@ app.get("/api/internalOrders",
 	});
 
 	/* DELETE */
-	app.delete("/api/restockorderproduct/:id",
+	app.delete("/api/restockOrderProduct/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
