@@ -11,6 +11,7 @@ const {TestResult} = require("./TestResult");
 const ReturnOrder = require("./ReturnOrder")
 const InternalOrder = require("./InternalOrder");
 const RestockOrder = require("./RestockOrder");
+const RestockOrderProduct = require("./RestockOrderProduct");
 
 class Warehouse {
 	constructor(dbFile="./database/ezwh.db") {
