@@ -140,13 +140,13 @@ class DatabaseHelper {
 		this.db.run(createTableRO, (err) => err && console.log(err));
 
 		/** Restock Order & Item */
-		const createTableROProducts = `CREATE TABLE IF NOT EXISTS ROProducts (
+		const createTableRestockOrderProducts = `CREATE TABLE IF NOT EXISTS ROProducts (
 			ROID integer NOT NULL,
 			ITEMID varchar(12) NOT NULL,
 			quantity integer NOT NULL,
     		PRIMARY KEY (ROID, ITEMID)
 		);`;
-		this.db.run(createTableROProducts, (err) => err && console.log(err));
+		this.db.run(createTableRestockOrderProducts, (err) => err && console.log(err));
 		
 		/** Return Order **/
 		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
