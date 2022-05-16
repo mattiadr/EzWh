@@ -661,7 +661,7 @@ class DatabaseHelper {
 			UPDATE Item
 			SET description = ?, price = ?, SKUID = ?, supplierId = ?
 			WHERE ITEMID=?;
-		`,[newItem.description, newItem.price, newItem.SKUID, newItem.supplierId]);
+		`,[newItem.description, newItem.price, newItem.SKUID, newItem.supplierId, newItem.ITEMID]);
 		this.Items.set(newItem.ITEMID, newItem);
 
 	}
