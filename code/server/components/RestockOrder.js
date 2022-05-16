@@ -2,7 +2,7 @@
 const dayjs = require("dayjs")
 
 class RestockOrder {
-    #ROID;#issueDate;#state;#supplierId;#transportNote;skuItems;
+    #ROID;#issueDate;#state;#supplierId;#transportNote;#skuItems;
 
     constructor(ROID,issueDate,state,supplierId,transportNote,skuItems){
         this.#ROID = ROID; // Integer
