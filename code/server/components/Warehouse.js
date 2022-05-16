@@ -20,7 +20,7 @@ class Warehouse {
 	/** SKU **/
 	async getSKUs() {
 		try {
-			let skus = await this.db_help.loadSKUs();
+			let skus = await this.db_help.selectSKUs();
 			for (let sku of skus) {
 				const testIDs = await this.db_help.selectTestDescriptorsIDBySKUID(sku.getId());
 				sku.setTestDescriptors(testIDs);
@@ -33,7 +33,7 @@ class Warehouse {
 
 	async getSKUbyId(id) {
 		try {
-			let sku = await this.db_help.loadSKUbyID(id);
+			let sku = await this.db_help.selectSKUbyID(id);
 			if (!sku) return {status: 404, body: "sku not found"};
 			const testIDs = await this.db_help.selectTestDescriptorsIDBySKUID(sku.getId());
 			sku.setTestDescriptors(testIDs);
@@ -46,7 +46,7 @@ class Warehouse {
 	async createSKU(description, weight, volume, notes, price, quantity) {
 		try {
 			let newSKU = new SKU(null, description, weight, volume, price, notes, quantity);
-			await this.db_help.storeSKU(newSKU);
+			await this.db_help.insertSKU(newSKU);
 			return { status: 201, body: {} };
 		} catch (e) {
 			return { status: 503, body: {}, message: e };
@@ -55,13 +55,13 @@ class Warehouse {
 
 	async updateSKU(id, positionId , newDescription = undefined, newWeight = undefined, newVolume = undefined, newNotes = undefined, newPrice = undefined, newAvailableQuantity = undefined) {
 		try {
-			const sku = await this.db_help.loadSKUbyID(id);
+			const sku = await this.db_help.selectSKUbyID(id);
 			if (!sku) return {status: 404, body: "sku not found"};
 			let oldPosition = undefined;
 			if(sku.getPosition() != null)
-				oldPosition =  await this.db_help.loadPositionByID(sku.getPosition());
+				oldPosition =  await this.db_help.selectPositionByID(sku.getPosition());
 			if (positionId !== undefined) { //ONLY POSITION
-				const newPosition = await this.db_help.loadPositionByID(positionId);
+				const newPosition = await this.db_help.selectPositionByID(positionId);
 				if(!newPosition) return {status: 404, body: "position not found"};
 				if (newPosition.getOccupiedWeight() + sku.getWeight() >  newPosition.getMaxWeight() ||
 					newPosition.getOccupiedVolume() + sku.getVolume() > newPosition.getMaxVolume())
@@ -78,7 +78,7 @@ class Warehouse {
 				sku.setNotes(newNotes);
 				sku.setAvailableQuantity(newAvailableQuantity);
 			}
-			if (oldPosition != undefined) {
+			if (oldPosition !== undefined) {
 				oldPosition.subOccupiedWeight(sku.getWeight());
 				oldPosition.subOccupiedVolume(sku.getVolume());
 				this.db_help.updatePosition(oldPosition.getPositionID(), oldPosition);
@@ -109,15 +109,15 @@ class Warehouse {
 	}//: List<SKUItem>
 
 	getSKUItems() {
-		return this.db_help.loadSKUItems();
+		return this.db_help.selectSKUItems();
 	}
 
 	getSKUItemsBySKUID(skuid) {
-		return this.db_help.loadSKUItemBySKUID(skuid);
+		return this.db_help.selectSKUItemBySKUID(skuid);
 	}
 
 	getSKUItemByRFID(rfid) {
-		return this.db_help.loadSKUItemByRFID(rfid);
+		return this.db_help.selectSKUItemByRFID(rfid);
 	}
 
 	async createSKUItem(rfid, skuid, dateOfStock) {
@@ -126,9 +126,9 @@ class Warehouse {
 			return { status: 422, body: "Date isn't in correct format" };
 		}
 		try {
-			const sku = await this.db_help.loadSKUbyID(skuid);
+			const sku = await this.db_help.selectSKUbyID(skuid);
 			if (!sku) return {status: 404, body: "sku not found"};
-			await this.db_help.storeSKUItem(new SKUItem(rfid, skuid, 0, date));
+			await this.db_help.insertSKUItem(new SKUItem(rfid, skuid, 0, date));
 			return {status: 201, body: ""};
 		} catch(e) {
 			return {status: 503, body: e};
@@ -141,7 +141,7 @@ class Warehouse {
 			return { status: 422, body: "Date isn't in correct format" };
 		}
 		try {
-			let skuitem = await this.db_help.loadSKUItemByRFID(rfid)
+			let skuitem = await this.db_help.selectSKUItemByRFID(rfid)
 			if (!skuitem) return { status: 404, body: "SkuItem not found" };
 			skuitem.setRFID(newRFID);
 			skuitem.setDateOfStock((newDateOfStock === null ? newDateOfStock : date));
@@ -159,11 +159,11 @@ class Warehouse {
 
 	/** Position **/
 	getPositions() {
-		return this.db_help.loadPositions();
+		return this.db_help.selectPositions();
 	}
 
 	getPositionById(posID) {
-		return this.db_help.loadPositionByID(posID);
+		return this.db_help.selectPositionByID(posID);
 	}
 
 	async createPosition(positionID, aisleID, row, col, maxWeight, maxVolume) {
@@ -171,7 +171,7 @@ class Warehouse {
 			return { status: 422, body: "ID isn't coherent with other params"};
 		try {
 			let newPosition = new Position(positionID, aisleID, row, col, maxWeight, maxVolume);
-			await this.db_help.storePosition(newPosition);
+			await this.db_help.insertPosition(newPosition);
 			return { status: 201, body: {} };
 		} catch (e) {
 			return { status: 503, body: {}, message: e };
@@ -180,7 +180,7 @@ class Warehouse {
 
 	async updatePosition(posID, newPositionID, newAisleID = undefined, newRow = undefined, newCol = undefined, newMaxWeight = undefined, newMaxVolume = undefined, newOccupiedWeight = undefined, newOccupiedVolume = undefined) {
 		try {
-			let position = await this.db_help.loadPositionByID(posID);
+			let position = await this.db_help.selectPositionByID(posID);
 			if (!position) return { status: 404, body: "position not found" };
 			if (newAisleID !== undefined) {
 				let newPosID = newAisleID+newRow+newCol;
@@ -218,7 +218,7 @@ class Warehouse {
 		return this.db_help.selectTestDescriptorByID(id);
 	}
 
-	async newTestDescriptor(name, procedureDescription, idSKU) {
+	async createTestDescriptor(name, procedureDescription, idSKU) {
 		try {
 			const SKU = await this.db_help.selectSKUbyID(idSKU);
 			if (!SKU) return {status: 404, body: "sku not found"};
@@ -229,7 +229,7 @@ class Warehouse {
 		}
 	}
 
-	async modifyTestDescriptor(id, newName, newProcedureDescription, newIdSKU) {
+	async updateTestDescriptor(id, newName, newProcedureDescription, newIdSKU) {
 		try {
 			const testDescriptor = await this.db_help.selectTestDescriptorByID(id);
 			if (!testDescriptor) return {status: 404, body: "id not found"};
@@ -277,7 +277,7 @@ class Warehouse {
 		}
 	}
 
-	async newTestResult(rfid, idTestDescriptor, date, result) {
+	async createTestResult(rfid, idTestDescriptor, date, result) {
 		try {
 			const SKUItem = await this.db_help.selectSKUItemByRFID(rfid);
 			if (!SKUItem) return {status: 404, body: "skuitem not found"};
@@ -290,7 +290,7 @@ class Warehouse {
 		}
 	}
 
-	async modifyTestResult(rfid, id, newIdTestDescriptor, newDate, newResult) {
+	async updateTestResult(rfid, id, newIdTestDescriptor, newDate, newResult) {
 		try {
 			const SKUItem = await this.db_help.selectSKUItemByRFID(rfid);
 			if (!SKUItem) return {status: 404, body: "skuitem not found"};
@@ -319,15 +319,15 @@ class Warehouse {
 		return {};
 	}
 
-	getSuppliers() {
-		return this.db_help.selectUsers().then((users) => users.filter((u) => u.role === UserRole.SUPPLIER));
-	}
-
 	getUsers() {
 		return this.db_help.selectUsers().then((users) => users.filter((u) => u.role !== UserRole.MANAGER));
 	}
 
-	async newUser(email, name, surname, password, type) {
+	getUsersByRole(role) {
+		return this.db_help.selectUsers().then((users) => users.filter((u) => u.role === role));
+	}
+
+	async createUser(email, name, surname, password, type) {
 		if (!Object.values(UserRole).includes(type)) return {status: 422, body: "type does not exist"};
 
 		try {
@@ -362,6 +362,11 @@ class Warehouse {
 		}
 	}
 
+	logout() {
+		// TODO
+		return true;
+	}
+
 	async modifyUserRights(email, oldType, newType) {
 		const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
 		if (!allowedTypes.includes(oldType) || !allowedTypes.includes(newType)) return {status: 422, body: "invalid type"};
@@ -391,57 +396,57 @@ class Warehouse {
 		}
 	}
 
-		/** RETURN ORDER **/
-		getReturnOrders() {
-			return this.db_help.loadReturnOrders();
+	/** Return Order **/
+	getReturnOrders() {
+		return this.db_help.selectReturnOrders();
+	}
+
+	getReturnOrderByID(id) {
+		return this.db_help.selectReturnOrderByID(id);
+	}
+
+	async newReturnOrder(returnDate, products, restockOrderId) {
+		try {
+			await this.db_help.insertReturnOrder(new ReturnOrder(null, returnDate, products, restockOrderId));
+			return {status: 201, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
 		}
-	
-		getReturnOrderByID(id) {
-			return this.db_help.loadReturnOrderByID(id);
+	}
+
+	deleteReturnOrder(id) {
+		return this.db_help.deleteReturnOrder(id);
+	}
+
+	/** Internal Order **/
+	getInternalOrders() {
+		return this.db_help.selectInternalOrders();
+	}
+
+	getInternalOrdersIssued() {
+		return this.db_help.selectInternalOrdersIssued();
+	}
+
+	getInternalOrdersAccepted() {
+		return this.db_help.selectInternalOrdersAccepted();
+	}
+
+	getInternalOrderByID() {
+		return this.db_help.selectInternalOrderByID();
+	}
+
+	async newInternalOrder(issueDate, state, products, customerId) {
+		try {
+			await this.db_help.insertInternalOrder(new InternalOrder(null, issueDate, state, products, customerId));
+			return {status: 201, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
 		}
-	
-		async newReturnOrder(returnDate, products, restockOrderId) {
-			try {
-				await this.db_help.createReturnOrder(new ReturnOrder(null, returnDate, products, restockOrderId));
-				return {status: 201, body: ""};
-			} catch (e) {
-				return {status: 503, body: e};
-			}
-		}	
-	
-		deleteReturnOrder(id) {
-			return this.db_help.deleteReturnOrder(id);
-		}
-	
-		/** INTERNAL ORDER **/
-		getInternalOrders() {
-			return this.db_help.selectInternalOrders();
-		}
-		
-		getInternalOrdersIssued() {
-			return this.db_help.selectInternalOrdersIssued();
-		}
-	
-		getInternalOrdersAccepted() {
-			return this.db_help.selectInternalOrdersAccepted();
-		}
-	
-		getInternalOrderByID() {
-			return this.db_help.selectInternalOrderByID();
-		}
-	
-		async newInternalOrder(issueDate, state, products, customerId) {
-			try {
-				await this.db_help.createInternalOrder(new InternalOrder(null, issueDate, state, products, customerId));
-				return {status: 201, body: ""};
-			} catch (e) {
-				return {status: 503, body: e};
-			}
-		}	
-	
-		deleteInternalOrder(id) {
-			return this.db_help.deleteInternalOrder(id);
-		}
+	}
+
+	deleteInternalOrder(id) {
+		return this.db_help.deleteInternalOrder(id);
+	}
 }
 
 exports.Warehouse = Warehouse;

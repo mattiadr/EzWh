@@ -17,10 +17,7 @@ class DatabaseHelper {
 		this.db = new sqlite3.Database(this.dbFile, (err) => err && console.log(err));
 		this.createTables();
 
-		// TODO remove maps?
-		this.SKUs = new Map();
-		this.SKUItems = new Map();
-		this.Positions = new Map();
+		// TODO remove maps
 		this.Items = new Map();
         this.RestockOrders = new Map();
 		this.ROProducts = new Map();
@@ -134,7 +131,7 @@ class DatabaseHelper {
     		PRIMARY KEY (ITEMID)
 		);`;
 		this.db.run(createTableItem, (err) => err && console.log(err));
-		
+
 		/** Restock Order */
 		const createTableRO = `CREATE TABLE IF NOT EXISTS RestockOrder (
 			ROID INTEGER NOT NULL,
@@ -179,7 +176,7 @@ class DatabaseHelper {
 	}
 
 	/** SKU **/
-	loadSKUs() {
+	selectSKUs() {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM SKU;`;
 			this.db.all(sql, [], (err, rows) => {
@@ -192,7 +189,7 @@ class DatabaseHelper {
 		});
 	}
 
-	loadSKUbyID(id) {
+	selectSKUbyID(id) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM SKU WHERE SKUID = ?;`;
 			this.db.get(sql, [id], (err, row) => {
@@ -209,7 +206,7 @@ class DatabaseHelper {
 		});
 	}
 
-	storeSKU(newSKU) {
+	insertSKU(newSKU) {
 		return new Promise((resolve, reject) => {
 			const sql = `INSERT INTO SKU(description, weight, volume, price, notes, positionId, availableQuantity)
 						 VALUES(?, ?, ?, ?, ?, ? , ?);`;
@@ -252,7 +249,7 @@ class DatabaseHelper {
 	}
 
 	/** SKU Item **/
-	loadSKUItems() {
+	selectSKUItems() {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM SKUItem;`;
 			this.db.all(sql, [], (err, rows) => {
@@ -265,7 +262,7 @@ class DatabaseHelper {
 		});
 	}
 
-	loadSKUItemByRFID(rfid) {
+	selectSKUItemByRFID(rfid) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM SKUItem WHERE RFID = ?;`;
 			this.db.get(sql, [rfid], (err, row) => {
@@ -282,7 +279,7 @@ class DatabaseHelper {
 		});
 	}
 
-	loadSKUItemBySKUID(skuid) {
+	selectSKUItemBySKUID(skuid) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM SKUItem WHERE SKUID = ? AND available = 1;`;
 			this.db.get(sql, [skuid], (err, row) => {
@@ -299,7 +296,7 @@ class DatabaseHelper {
 		});
 	}
 
-	storeSKUItem(newSKUItem) {
+	insertSKUItem(newSKUItem) {
 		return new Promise((resolve, reject) => {
 			const sql = `INSERT INTO SKUItem(RFID, SKUID, available, dateOfStock)
 						 VALUES(?, ?, ?, ?);`;
@@ -342,7 +339,7 @@ class DatabaseHelper {
 	}
 
 	/** Position **/
-	loadPositions() {
+	selectPositions() {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM Position;`;
 			this.db.all(sql, [], (err, rows) => {
@@ -355,7 +352,7 @@ class DatabaseHelper {
 		});
 	}
 
-	loadPositionByID(id) {
+	selectPositionByID(id) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM Position WHERE posID = ?;`;
 			this.db.get(sql, [id], (err, row) => {
@@ -372,7 +369,7 @@ class DatabaseHelper {
 		});
 	}
 
-	storePosition(newPosition) {
+	insertPosition(newPosition) {
 		return new Promise((resolve, reject) => {
 			const sql = `INSERT INTO Position(posID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume)
 						 VALUES(?, ?, ?, ?, ?, ?, ?, ?);`;
@@ -416,6 +413,7 @@ class DatabaseHelper {
 			});
 		});
 	}
+
 	/** Test Descriptor **/
 	selectTestDescriptors() {
 		return new Promise((resolve, reject) => {
@@ -641,6 +639,7 @@ class DatabaseHelper {
 		});
 	}
 
+	/** Item **/
 	async loadItem() {
         if (this.Items.size == 0) { //first time
             let rows = await this.queryDBAll(`SELECT * FROM Item;`);
@@ -794,8 +793,8 @@ class DatabaseHelper {
 
     }
 	
-	/** RETURN ORDER **/
-	loadReturnOrders() {
+	/** Return Order **/
+	selectReturnOrders() {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM ReturnOrder;`;
 			this.db.all(sql, [], (err, rows) => {
@@ -808,7 +807,7 @@ class DatabaseHelper {
 		});
 	}
 	
-	loadReturnOrderByID(id) {
+	selectReturnOrderByID(id) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM ReturnOrder WHERE id = ?;`;
 			this.db.get(sql, [id], (err, row) => {
@@ -825,7 +824,7 @@ class DatabaseHelper {
 		});
 	}
 
-	createReturnOrder(returnOrder) {
+	insertReturnOrder(returnOrder) {
 		return new Promise((resolve, reject) => {
 			const sql = `INSERT INTO ReturnOrder(returnDate, products, restockOrderId) VALUES (?, ?, ?);`;
 			this.db.run(sql, [returnOrder.returnDate, returnOrder.products, returnOrder.restockOrderId], (err) => {
@@ -851,7 +850,7 @@ class DatabaseHelper {
 		});
 	}
 	
-/** INTERNAL ORDER **/
+	/** Internal Order **/
 	selectInternalOrders() {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM InternalOrder;`;
@@ -908,7 +907,7 @@ class DatabaseHelper {
 		});
 	}
 
-	createInternalOrder(internalOrder) {
+	insertInternalOrder(internalOrder) {
 		return new Promise((resolve, reject) => {
 			const sql = `INSERT INTO InternalOrder(issueDate, state, products, customerId) VALUES (?, ?, ?, ?);`;
 			this.db.run(sql, [internalOrder.issueDate, internalOrder.state, internalOrder.products, internalOrder.customerId], (err) => {
