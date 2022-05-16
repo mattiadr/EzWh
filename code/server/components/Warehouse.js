@@ -54,7 +54,7 @@ class Warehouse {
 			return { status: 503, body: {}, message: e };
 		}
 	}
-
+	
 	async updateSKU(id, positionId , newDescription = undefined, newWeight = undefined, newVolume = undefined, newNotes = undefined, newPrice = undefined, newAvailableQuantity = undefined) {
 		try {
 			const sku = await this.db_help.selectSKUbyID(id);
@@ -71,7 +71,7 @@ class Warehouse {
 				sku.setPosition(positionId);
 				newPosition.addOccupiedWeight(sku.getWeight());
 				newPosition.addOccupiedVolume(sku.getVolume());
-				this.db_help.updatePosition(newPosition.getPositionID(), newPosition);
+				await this.db_help.updatePosition(newPosition.getPositionID(), newPosition);
 			} else {
 				sku.setDescription(newDescription);
 				sku.setWeight(newWeight);
@@ -85,7 +85,7 @@ class Warehouse {
 				oldPosition.subOccupiedVolume(sku.getVolume());
 				this.db_help.updatePosition(oldPosition.getPositionID(), oldPosition);
 			}
-			this.db_help.updateSKU(sku);
+			await this.db_help.updateSKU(sku);
 			return {status: 200, body: ""};
 		} catch (e) {
 			return {status: 503, body: e}
@@ -97,19 +97,6 @@ class Warehouse {
 	}
 
 	/** SKU Item **/
-	async getSKUItems() {
-		//TODO: USER PERMISSIONS
-		let SKUItems;
-		try {
-			SKUItems = await this.db_help.loadSKUItem();
-		} catch (e) {
-			return { status: 500, body: {}, message: e };
-		}
-
-		return { status: 200, body: SKUItems };
-
-	}//: List<SKUItem>
-
 	getSKUItems() {
 		return this.db_help.selectSKUItems();
 	}
@@ -162,10 +149,6 @@ class Warehouse {
 	/** Position **/
 	getPositions() {
 		return this.db_help.selectPositions();
-	}
-
-	getPositionById(posID) {
-		return this.db_help.selectPositionByID(posID);
 	}
 
 	async createPosition(positionID, aisleID, row, col, maxWeight, maxVolume) {

@@ -36,8 +36,8 @@ class SKU{
     setAvailableQuantity(newAvailableQuantity) { this.availableQuantity = newAvailableQuantity; }
     setTestDescriptors(testDescriptors) { this.testDescriptors = testDescriptors; }
 
-    addQuantity(sumQuantity) { this.addQuantity+=sumQuantity; }
-    subQuantity(subQuantity) { this.addQuantity-=subQuantity; }
+    addQuantity(sumQuantity) { this.availableQuantity+=sumQuantity; }
+    subQuantity(subQuantity) { this.availableQuantity-=subQuantity; }
     addTest(newTestID) { this.testDescriptors.push(newTestID); }
     addItemID(itemID) { this.itemsID.push(itemID); }
     addSkuItemID(skuItemID) { this.sku_itemsID.push(skuItemID); }
