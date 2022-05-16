@@ -789,7 +789,7 @@ class DatabaseHelper {
 
 	}
 
-	selectRestockOrderProductByID(id) {
+	selectRestockOrderProductsByID(id) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM ROProduct WHERE ROID = ?;`;
 			this.db.get(sql, [id], (err, row) => {

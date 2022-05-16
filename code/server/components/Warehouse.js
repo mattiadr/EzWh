@@ -517,7 +517,7 @@ class Warehouse {
 		}
 	}
 
-	async updateItem(ROID,issueDate = undefined,state = undefined,supplierId = undefined,transportNote = undefined,skuItems = undefined) {
+	async updateRestockOrder(ROID,issueDate = undefined,state = undefined,supplierId = undefined,transportNote = undefined,skuItems = undefined) {
 		try {
 			let restockorder = await this.db_help.selectRestockOrderByID(ROID);
 			if (!restockorder) return { status: 404, body: "restock order not found" };
@@ -544,6 +544,48 @@ class Warehouse {
 
 	deleteRestockOrder(restockorderID) {
 		return this.db_help.deleteRestockOrder(restockorderID);
+	}
+
+	/* Restock Order Product */
+
+	getRestockOrderProductById(restockorderproductID) {
+		return this.db_help.selectRestockOrderByID(restockorderproductID);
+	}
+
+	getRestockOrderProducts() {
+		return this.db_help.selectRestockOrderProduct();
+	}
+
+	async createRestockOrderProduct(ROID,ITEMID,quantity) {
+		try {
+			let newRestockOrderProduct = new RestockOrderProduct(ROID,ITEMID,quantity);
+			await this.db_help.insertRestockOrderProduct(newRestockOrderProduct);
+			return { status: 201, body: {} };
+		} catch (e) {
+			return { status: 503, body: {}, message: e };
+		}
+	}
+
+	async updateRestockOrderProduct(ROID,ITEMID,quantity = undefined) {
+		try {
+			let restockorderproduct = await this.db_help.selectRestockOrderProductsByID(ROID);
+			if (!restockorderproduct) return { status: 404, body: "restock order products not found" };
+			if (ROID !== undefined & ITEMID !== undefined) {
+				restockorderproduct.setQuantity(quantity);
+			} else {
+				restockorderproduct.setRestockOrderId(ROID);
+				restockorderproduct.setItemId(ITEMID);
+				restockorderproduct.setQuantity(quantity);
+			}
+			await this.db_help.updateRestockOrderProduct(ROID, ITEMID, restockorderproduct);
+			return { status: 200, body: "" };
+		} catch (e) {
+			return { status: 503, body: e };
+		}
+	}
+
+	deleteRestockOrderProduct(restockorderproductID) {
+		return this.db_help.deleteRestockOrderProduct(restockorderproductID);
 	}
 }
 
