@@ -685,8 +685,7 @@ app.get("/api/internalOrders",
 		});
 	});
 	app.get("/api/restockorderproduct/:id",
-	param("id")[0].isInt(),
-	param("id")[1].exists(),
+	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		wh.getRestockOrderProductByID(req.params.id[0], req.params.id[1]).then((io) => {
