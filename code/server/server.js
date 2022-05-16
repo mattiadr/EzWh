@@ -554,6 +554,58 @@ app.get("/api/internalOrders",
 		});
 	});
 
+	/* Item */
+
+	/* GET */
+	app.get("/api/item",
+	(req, res) => {
+		wh.getItems().then((io) => {
+			res.status(200).json(internalOrders.map((item) => ({ITEMID: io.ITEMID, description: io.description, price: io.price, SKUID: io.SKUID, supplierId: io.supplierId})));
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	});
+	app.get("/api/item/:id",
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.getItemByID(req.params.id).then((io) => {
+			if (io) {
+				res.status(200).json({ITEMID: io.ITEMID, description: io.description, price: io.price, SKUID: io.SKUID, supplierId: io.supplierId});
+			} else {
+				res.status(404).end();
+			}
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	});
+
+	/* POST */
+	app.post("/api/item",
+	body("description").exists(),
+	body("price").exists(),
+	body("SKUID").exists(),
+	body("supplierId").isInt(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		const result = await wh.createItem(req.body.description, req.body.price, req.body.SKUID, req.body.supplierId);
+		return res.status(result.status).send(result.body);
+	});
+
+	/* PUT */
+
+	/* DELETE */
+	app.delete("/api/item/:id",
+	param("id").exists(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.deleteItem(req.params.id).then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	});
+
 // activate the server
 app.listen(port, () => {
 	console.log(`Server listening at http://localhost:${port}`);

@@ -447,6 +447,53 @@ class Warehouse {
 	deleteInternalOrder(id) {
 		return this.db_help.deleteInternalOrder(id);
 	}
+
+	/* Item */
+
+	getItemById(itemID) {
+		return this.db_help.selectItemByID(itemID);
+	}
+
+	getItems() {
+		return this.db_help.loadItem();
+	}
+
+	async createItem(ITEMID, description, price, SKUID, supplierId) {
+		try {
+			let newItem = new Item(ITEMID, description, price, SKUID, supplierId);
+			await this.db_help.storePosition(newItem);
+			return { status: 201, body: {} };
+		} catch (e) {
+			return { status: 503, body: {}, message: e };
+		}
+	}
+
+	async updateItem(ITEMID, description = undefined, price = undefined, SKUID = undefined, supplierId = undefined) {
+		try {
+			let item = await this.db_help.loadItemByID(ITEMID);
+			if (!item) return { status: 404, body: "item not found" };
+			if (ITEMID !== undefined) {
+				item.setDescription(description);
+				item.setPrice(price);
+				item.setSKUID(SKUID);
+				item.setSupplierId(supplierId);
+			} else {
+				item.setItemId(ITEMID);
+				item.setDescription(description);
+				item.setPrice(price);
+				item.setSKUID(SKUID);
+				item.setSupplierId(supplierId);
+			}
+			await this.db_help.updateItem(ITEMID, item);
+			return { status: 200, body: "" };
+		} catch (e) {
+			return { status: 503, body: e };
+		}
+	}
+
+	deleteItem(itemID) {
+		return this.db_help.deleteItem(itemID);
+	}
 }
 
 exports.Warehouse = Warehouse;
