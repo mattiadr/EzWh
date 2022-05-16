@@ -532,11 +532,11 @@ class Warehouse {
 	/* Restock Order Product */
 
 	getRestockOrderProductById(restockorderproductID) {
-		return this.db_help.selectRestockOrderByID(restockorderproductID);
+		return this.db_help.selectRestockOrderProductsByID(restockorderproductID);
 	}
 
 	getRestockOrderProducts() {
-		return this.db_help.selectRestockOrderProduct();
+		return this.db_help.selectRestockOrderProducts();
 	}
 
 	async createRestockOrderProduct(ROID,ITEMID,quantity) {
