@@ -9,7 +9,8 @@ const {UserRole, User} = require("./User");
 const {TestDescriptor} = require("./TestDescriptor");
 const {TestResult} = require("./TestResult");
 const ReturnOrder = require("./ReturnOrder")
-const InternalOrder = require("./InternalOrder")
+const InternalOrder = require("./InternalOrder");
+const RestockOrder = require("./RestockOrder");
 
 class Warehouse {
 	constructor(dbFile="./database/ezwh.db") {
@@ -455,13 +456,13 @@ class Warehouse {
 	}
 
 	getItems() {
-		return this.db_help.loadItem();
+		return this.db_help.selectItem();
 	}
 
 	async createItem(ITEMID, description, price, SKUID, supplierId) {
 		try {
 			let newItem = new Item(ITEMID, description, price, SKUID, supplierId);
-			await this.db_help.storePosition(newItem);
+			await this.db_help.insertItem(newItem);
 			return { status: 201, body: {} };
 		} catch (e) {
 			return { status: 503, body: {}, message: e };
@@ -470,7 +471,7 @@ class Warehouse {
 
 	async updateItem(ITEMID, description = undefined, price = undefined, SKUID = undefined, supplierId = undefined) {
 		try {
-			let item = await this.db_help.loadItemByID(ITEMID);
+			let item = await this.db_help.selectItemByID(ITEMID);
 			if (!item) return { status: 404, body: "item not found" };
 			if (ITEMID !== undefined) {
 				item.setDescription(description);
@@ -493,6 +494,55 @@ class Warehouse {
 
 	deleteItem(itemID) {
 		return this.db_help.deleteItem(itemID);
+	}
+
+	/* Restock Order */
+
+	getRestockOrderById(restockorderID) {
+		return this.db_help.selectRestockOrderByID(restockorderID);
+	}
+
+	getRestockOrders() {
+		return this.db_help.selectRestockOrder();
+	}
+
+	async createRestockOrder(ROID,issueDate,state,supplierId,transportNote,skuItems) {
+		try {
+			let newRestockOrder = new RestockOrder(ROID,issueDate,state,supplierId,transportNote,skuItems);
+			await this.db_help.storePosition(newRestockOrder);
+			return { status: 201, body: {} };
+		} catch (e) {
+			return { status: 503, body: {}, message: e };
+		}
+	}
+
+	async updateItem(ROID,issueDate = undefined,state = undefined,supplierId = undefined,transportNote = undefined,skuItems = undefined) {
+		try {
+			let restockorder = await this.db_help.selectRestockOrderByID(ROID);
+			if (!restockorder) return { status: 404, body: "restock order not found" };
+			if (ROID !== undefined) {
+				restockorder.setIssueDate(issueDate);
+				restockorder.setState(state);
+				restockorder.setSupplierId(supplierId);
+				restockorder.setTransportNote(transportNote);
+				restockorder.setKUItems(skuItems);
+			} else {
+				restockorder.setItemId(ROID);
+				restockorder.setIssueDate(issueDate);
+				restockorder.setState(state);
+				restockorder.setSupplierId(supplierId);
+				restockorder.setTransportNote(transportNote);
+				restockorder.setKUItems(skuItems);
+			}
+			await this.db_help.updateRestockOrder(ROID, restockorder);
+			return { status: 200, body: "" };
+		} catch (e) {
+			return { status: 503, body: e };
+		}
+	}
+
+	deleteRestockOrder(restockorderID) {
+		return this.db_help.deleteRestockOrder(restockorderID);
 	}
 }
 
