@@ -16,11 +16,6 @@ class DatabaseHelper {
 		this.dbFile = dbFile;
 		this.db = new sqlite3.Database(this.dbFile, (err) => err && console.log(err));
 		this.createTables();
-
-		// TODO remove maps
-		this.Items = new Map();
-        this.RestockOrders = new Map();
-		this.ROProducts = new Map();
 	}
 
 	queryDBAll(sql, params=[]){
@@ -639,177 +634,177 @@ class DatabaseHelper {
 		});
 	}
 
-/** ITEM **/
-async loadItem() {
-	if (this.Items.size == 0) { //first time
-		let rows = await this.queryDBAll(`SELECT * FROM Item;`);
-		this.Items = new Map();
+	/** ITEM **/
+	async selectItem() {
+		if (this.Items.size == 0) { //first time
+			let rows = await this.queryDBAll(`SELECT * FROM Item;`);
+			this.Items = new Map();
 
-		rows.map(row => {
-			const item = new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId);
-			this.Items.set(row.ITEMID, item);
-		})
-	} 
-	return this.Items;
-}
-
-async storeItem(newItem /*: Object*/) {
-	await this.queryDBRun(`
-		INSERT INTO Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId)
-		VALUES(?, ?, ?, ?, ?);
-	`,[row.ITEMID, row.description, row.price, row.SKUID, row.supplierId]);
-	this.Items.set(newItem.ITEMID, newItem);
-}
-
-async updateItem(newItem /*: Object*/) {
-	await this.queryDBRun(`
-		UPDATE Item
-		SET description = ?, price = ?, SKUID = ?, supplierId = ?
-		WHERE ITEMID=?;
-	`,[newItem.description, newItem.price, newItem.SKUID, newItem.supplierId]);
-	this.Items.set(newItem.ITEMID, newItem);
-
-}
-
-async deleteItem(ITEMID) {
-	await this.queryDBRun(`
-		DELETE
-		FROM Item
-		WHERE ITEMID=?;
-	`, [ITEMID]);
-	this.Items.delete(ITEMID);
-}
-
-selectItemByID(id) {
-	return new Promise((resolve, reject) => {
-		const sql = `SELECT * FROM Item WHERE id = ?;`;
-		this.db.get(sql, [id], (err, row) => {
-			if (err) {
-				reject(err.toString());
-			} else {
-				if (row) {
-					resolve(new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId));
-				} else {
-					resolve(null);
-				}
-			}
-		});
-	});
-}
-
-/** RESTOCK ORDER **/
-async loadRO() {
-	if (this.RestockOrders.size == 0) { //first time
-		let rows = await this.queryDBAll(`SELECT * FROM RestockOrder;`);
-		this.RestockOrders = new Map();
-		
-		rows.map(row => {
-			const restockorder = new Item(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems);
-			this.RestockOrders.set(row.ROID, restockorder);
-		})
-	} 
-	return this.RestockOrders;
-}
-
-async storeRO(newRO /*: Object*/) {
-	await this.queryDBRun(`
-		INSERT INTO RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems)
-		VALUES(?, ?, ?, ?, ?, ?, ?);
-	`,[row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems]);
-	this.RestockOrders.set(newRO.ROID, newRO);
-}
-
-async updateRO(newRO /*: Object*/) {
-	await this.queryDBRun(`
-		UPDATE RestockOrder
-		SET issueDate = ?, state = ?, supplierId = ?, transportNote = ?, skuItems = ?
-		WHERE ROID=?;
-	`,[newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote, newRO.skuItems]);
-	this.RestockOrders.set(newRO.ROID, newRO);
-
-}
-
-async deleteRO(ROID) {
-	await this.queryDBRun(`
-		DELETE
-		FROM RestockOrder
-		WHERE ROID=?;
-	`, [ROID]);
-	this.RestockOrders.delete(ROID);
-}
-
-selectROByID(id) {
-	return new Promise((resolve, reject) => {
-		const sql = `SELECT * FROM RestockOrder WHERE id = ?;`;
-		this.db.get(sql, [id], (err, row) => {
-			if (err) {
-				reject(err.toString());
-			} else {
-				if (row) {
-					resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems));
-				} else {
-					resolve(null);
-				}
-			}
-		});
-	});
-}
-
-async loadROProducts() {
-	if (this.ROProducts.size === 0) { //first time
-		let rows = await this.queryDBAll(`SELECT * FROM ROProduct;`);
-
-		rows.map(row => {
-			const roproduct = new ROProduct(row.ROID, row.ITEMID, row.quantity);
-			this.ROProducts.set(row.ROID, row.ITEMID, roproduct);
-		})
+			rows.map(row => {
+				const item = new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId);
+				this.Items.set(row.ITEMID, item);
+			})
+		} 
+		return this.Items;
 	}
-	return this.ROProducts;
-}
 
-async addROProduct(newROproduct) {
-	await this.queryDBRun(`
-		INSERT INTO ROProduct(row.ROID = ?, row.ITEMID = ?, row.quantity = ?)
-		VALUES(?, ?, ?);
-	`,[newROproduct.ROID, newROproduct.ITEMID, newROproduct.quantity]);
-	this.ROProducts.set(newROproduct.ROID, newROproduct.ITEMID, newROproduct);
-}
+	async insertItem(newItem /*: Object*/) {
+		await this.queryDBRun(`
+			INSERT INTO Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId)
+			VALUES(?, ?, ?, ?, ?);
+		`,[row.ITEMID, row.description, row.price, row.SKUID, row.supplierId]);
+		this.Items.set(newItem.ITEMID, newItem);
+	}
 
-async deleteROProduct(ROID, ITEMID) {
-	await this.queryDBRun(`
-		DELETE
-		FROM ROProduct
-		WHERE ROID=?, ITEMID=?;
-	`, [ROID, ITEMID]);
-	this.ROProducts.delete(ROID, ITEMID);
-}
+	async updateItem(newItem /*: Object*/) {
+		await this.queryDBRun(`
+			UPDATE Item
+			SET description = ?, price = ?, SKUID = ?, supplierId = ?
+			WHERE ITEMID=?;
+		`,[newItem.description, newItem.price, newItem.SKUID, newItem.supplierId]);
+		this.Items.set(newItem.ITEMID, newItem);
 
-async updateROproduct(newROproduct) {
-	await this.queryDBRun(`
-		UPDATE ROProduct
-		SET quantity = ?
-		WHERE ROID=?, ITEMID=?;
-	`,[newROproduct.quantity, newROproduct.ROID, newROproduct.ITEMID]);
-	this.RestockOrders.set(newROproduct.ROID, newROproduct.ITEMID, newROproduct);
+	}
 
-}
+	async deleteItem(ITEMID) {
+		await this.queryDBRun(`
+			DELETE
+			FROM Item
+			WHERE ITEMID=?;
+		`, [ITEMID]);
+		this.Items.delete(ITEMID);
+	}
 
-selectROProductByID(id) {
-	return new Promise((resolve, reject) => {
-		const sql = `SELECT * FROM ROProduct WHERE ROID = ?;`;
-		this.db.get(sql, [id], (err, row) => {
-			if (err) {
-				reject(err.toString());
-			} else {
-				if (row) {
-					resolve(new ROProduct(row.ROID, row.ITEMID, row.quantity));
+	selectItemByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM Item WHERE id = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
 				} else {
-					resolve(null);
+					if (row) {
+						resolve(new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId));
+					} else {
+						resolve(null);
+					}
 				}
-			}
+			});
 		});
-	});
-}
+	}
+
+	/** RESTOCK ORDER **/
+	async selectRestockOrder() {
+		if (this.RestockOrders.size == 0) { //first time
+			let rows = await this.queryDBAll(`SELECT * FROM RestockOrder;`);
+			this.RestockOrders = new Map();
+			
+			rows.map(row => {
+				const restockorder = new Item(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems);
+				this.RestockOrders.set(row.ROID, restockorder);
+			})
+		} 
+		return this.RestockOrders;
+	}
+
+	async insertRestockOrder(newRO /*: Object*/) {
+		await this.queryDBRun(`
+			INSERT INTO RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems)
+			VALUES(?, ?, ?, ?, ?, ?, ?);
+		`,[row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems]);
+		this.RestockOrders.set(newRO.ROID, newRO);
+	}
+
+	async updateRestockOrder(newRO /*: Object*/) {
+		await this.queryDBRun(`
+			UPDATE RestockOrder
+			SET issueDate = ?, state = ?, supplierId = ?, transportNote = ?, skuItems = ?
+			WHERE ROID=?;
+		`,[newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote, newRO.skuItems]);
+		this.RestockOrders.set(newRO.ROID, newRO);
+
+	}
+
+	async deleteRestockOrder(ROID) {
+		await this.queryDBRun(`
+			DELETE
+			FROM RestockOrder
+			WHERE ROID=?;
+		`, [ROID]);
+		this.RestockOrders.delete(ROID);
+	}
+
+	selectRestockOrderByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM RestockOrder WHERE id = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
+
+	async selectRestockOrderProducts() {
+		if (this.ROProducts.size === 0) { //first time
+			let rows = await this.queryDBAll(`SELECT * FROM ROProduct;`);
+
+			rows.map(row => {
+				const roproduct = new ROProduct(row.ROID, row.ITEMID, row.quantity);
+				this.ROProducts.set(row.ROID, row.ITEMID, roproduct);
+			})
+		}
+		return this.ROProducts;
+	}
+
+	async insertRestockOrderProduct(newROproduct) {
+		await this.queryDBRun(`
+			INSERT INTO ROProduct(row.ROID = ?, row.ITEMID = ?, row.quantity = ?)
+			VALUES(?, ?, ?);
+		`,[newROproduct.ROID, newROproduct.ITEMID, newROproduct.quantity]);
+		this.ROProducts.set(newROproduct.ROID, newROproduct.ITEMID, newROproduct);
+	}
+
+	async deleteRestockOrderProduct(ROID, ITEMID) {
+		await this.queryDBRun(`
+			DELETE
+			FROM ROProduct
+			WHERE ROID=?, ITEMID=?;
+		`, [ROID, ITEMID]);
+		this.ROProducts.delete(ROID, ITEMID);
+	}
+
+	async updateRestockOrderProduct(newROproduct) {
+		await this.queryDBRun(`
+			UPDATE ROProduct
+			SET quantity = ?
+			WHERE ROID=?, ITEMID=?;
+		`,[newROproduct.quantity, newROproduct.ROID, newROproduct.ITEMID]);
+		this.RestockOrders.set(newROproduct.ROID, newROproduct.ITEMID, newROproduct);
+
+	}
+
+	selectRestockOrderProductByID(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM ROProduct WHERE ROID = ?;`;
+			this.db.get(sql, [id], (err, row) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					if (row) {
+						resolve(new ROProduct(row.ROID, row.ITEMID, row.quantity));
+					} else {
+						resolve(null);
+					}
+				}
+			});
+		});
+	}
 	
 	/** Return Order **/
 	selectReturnOrders() {
