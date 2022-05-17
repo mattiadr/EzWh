@@ -3,7 +3,7 @@ const express = require('express');
 const {body, param, validationResult} = require('express-validator');
 
 const {Warehouse} = require("./components/Warehouse");
-const {UserRole, User} = require("./components/User");
+const {UserRole} = require("./components/User");
 
 // init express
 const app = new express();
@@ -262,7 +262,7 @@ app.put("/api/testDescriptor/:id",
 	body("newIdSKU").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
-		const result = await wh.updateTestDescriptor(req.params.id, req.body["newName"], req.body["newProcedureDescription"], req.body["newIdSKU"]);
+		const result = await wh.updateTestDescriptor(req.params.id, req.body.newName, req.body.newProcedureDescription, req.body.newIdSKU);
 		return res.status(result.status).send(result.body);
 });
 
@@ -319,7 +319,7 @@ app.put("/api/skuitems/:rfid/testResult/:id",
 	body("newResult").isBoolean(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params or body");
-		const result = await wh.updateTestResult(req.params.rfid, req.params.id, req.body["newIdTestDescriptor"], req.body["newDate"], req.body["newResult"]);
+		const result = await wh.updateTestResult(req.params.rfid, req.params.id, req.body.newIdTestDescriptor, req.body.newDate, req.body.newResult);
 		return res.status(result.status).send(result.body);
 });
 
@@ -424,7 +424,7 @@ app.put("/api/users/:username",
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
 		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
-		const result = await wh.modifyUserRights(req.params.username, req.body["oldType"], req.body["newType"]);
+		const result = await wh.updateUserRights(req.params.username, req.body.oldType, req.body.newType);
 		return res.status(result.status).send(result.body);
 });
 
@@ -438,7 +438,8 @@ app.delete("/api/users/:username/:type",
 		return res.status(result.status).send(result.body);
 });
 
-/** RETURN ORDERS **/
+
+/** Return Order **/
 
 /* GET */
 app.get("/api/returnOrders",
@@ -467,6 +468,7 @@ app.get("/api/returnOrders/:id",
 /* POST */
 app.post("/api/returnOrder",
 	body("returnDate").exists(),
+	body("products").isArray(),
 	body("restockOrderId").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
@@ -486,7 +488,9 @@ app.delete("/api/returnOrder/:id",
 		});
 });
 
+
 /** Return Order Product **/
+
 /* GET */
 app.get("/api/returnOrderProducts",
 (req, res) => {
@@ -542,7 +546,8 @@ param("id").isInt(),
 	});
 });
 
-/** INTERNAL ORDER */
+
+/** Internal Order */
 
 /* GET */
 app.get("/api/internalOrders",
@@ -584,8 +589,8 @@ app.get("/api/internalOrders/:id",
 		});
 });
 
-	/* POST */
-	app.post("/api/internalOrder",
+/* POST */
+app.post("/api/internalOrder",
 	body("issueDate").exists(),
 	body("customerId").isInt(),
 	async (req, res) => {
@@ -594,18 +599,18 @@ app.get("/api/internalOrders/:id",
 		return res.status(result.status).send(result.body);
 	});
 
-	/* PUT */
-	app.put("/api/internalOrders/:id",
+/* PUT */
+app.put("/api/internalOrders/:id",
 	param("id").isInt(),
 	body("newState").exists(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
-		const result = await wh.updateInternalOrder(req.params.id, req.body["newState"]);
+		const result = await wh.updateInternalOrder(req.params.id, req.body.newState);
 		return res.status(result.status).send(result.body);
 	});
 
-	/* DELETE */
-	app.delete("/api/internalOrder/:id",
+/* DELETE */
+app.delete("/api/internalOrder/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -616,7 +621,9 @@ app.get("/api/internalOrders/:id",
 		});
 	});
 
+
 /** Internal Order Product **/
+
 /* GET */
 app.get("/api/internalOrderProducts",
 (req, res) => {
@@ -670,20 +677,21 @@ param("id").isInt(),
 	}).catch((err) => {
 		res.status(500).send(err);
 	});
-});	
+});
 
-	/** Item */
 
-	/* GET */
-	app.get("/api/items",
+/** Item */
+
+/* GET */
+app.get("/api/items",
 	(req, res) => {
 		wh.getItems().then((Items) => {
 			res.status(200).json(Items.map((io) => ({ITEMID: io.ITEMID, description: io.description, price: io.price, SKUID: io.SKUID, supplierId: io.supplierId})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
-	app.get("/api/items/:id",
+});
+app.get("/api/items/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -696,10 +704,10 @@ param("id").isInt(),
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
+});
 
-	/* POST */
-	app.post("/api/item",
+/* POST */
+app.post("/api/item",
 	body("description").exists(),
 	body("price").exists(),
 	body("SKUID").exists(),
@@ -708,20 +716,20 @@ param("id").isInt(),
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
 		const result = await wh.createItem(req.body.description, req.body.price, req.body.SKUID, req.body.supplierId);
 		return res.status(result.status).send(result.body);
-	});
+});
 
-	/* PUT */
-	app.put("/api/items/:id",
+/* PUT */
+app.put("/api/items/:id",
 	param("id").exists(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
 		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
 		const result = await wh.updateItem(req.params.ITEMID, req.params.description, req.params.price, req.params.SKUId, req.params.supplierId);
 		return res.status(result.status).send(result.body);
-	});
+});
 
-	/* DELETE */
-	app.delete("/api/item/:id",
+/* DELETE */
+app.delete("/api/item/:id",
 	param("id").exists(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -730,19 +738,21 @@ param("id").isInt(),
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
+});
 
-	/* Restock Order */
-	/* GET */
-	app.get("/api/restockOrders",
+
+/** Restock Order **/
+
+/* GET */
+app.get("/api/restockOrders",
 	(req, res) => {
 		wh.getRestockOrders().then((restockOrders) => {
 			res.status(200).json(restockOrders.map((io) => ({ROID: io.ROID, issueDate: io.issueDate, state: io.state, supplierId: io.supplierId, transportNote: io.transportNote, skuItems: io.skuItems})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
-	app.get("/api/restockOrders/:id",
+});
+app.get("/api/restockOrders/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -755,10 +765,10 @@ param("id").isInt(),
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
+});
 
-	/* POST */
-	app.post("/api/restockOrder",
+/* POST */
+app.post("/api/restockOrder",
 	body("issueDate").isDate(),
 	body("state").exists(),
 	body("supplierId").isInt(),
@@ -768,20 +778,20 @@ param("id").isInt(),
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
 		const result = await wh.createRestockOrder(req.body.issueDate, req.body.state, req.body.supplierId, req.body.transportNote, req.body.skuItems);
 		return res.status(result.status).send(result.body);
-	});
+});
 
-	/* PUT */
-	app.put("/api/restockOrders/:id",
+/* PUT */
+app.put("/api/restockOrders/:id",
 	param("id").exists(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
 		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
 		const result = await wh.updateRestockOrder(req.params.ROID, req.params.issueDate, req.params.state, req.params.supplierId, req.params.transportNote, req.params.skuItems);
 		return res.status(result.status).send(result.body);
-	});
+});
 
-	/* DELETE */
-	app.delete("/api/restockOrder/:id",
+/* DELETE */
+app.delete("/api/restockOrder/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -790,19 +800,21 @@ param("id").isInt(),
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
+});
 
-	/* Restock Order Product */
-	/* GET */
-	app.get("/api/restockOrderProducts",
+
+/** Restock Order Product **/
+
+/* GET */
+app.get("/api/restockOrderProducts",
 	(req, res) => {
 		wh.getRestockOrderProducts().then((restockOrderProducts) => {
 			res.status(200).json(restockOrderProducts.map((io) => ({ROID: io.ROID, ITEMID: io.ITEMID, quantity: io.quantity})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
-	app.get("/api/restockOrderProducts/:id",
+});
+app.get("/api/restockOrderProducts/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -815,29 +827,29 @@ param("id").isInt(),
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
+});
 
-	/* POST */
-	app.post("/api/restockOrderproducts",
+/* POST */
+app.post("/api/restockOrderproducts",
 	body("quantity").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
 		const result = await wh.createRestockOrderProduct(req.body.quantity);
 		return res.status(result.status).send(result.body);
-	});
+});
 
-	/* PUT */
-	app.put("/api/restockOrderProducts/:id",
+/* PUT */
+app.put("/api/restockOrderProducts/:id",
 	param("id").isInt(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
 		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
 		const result = await wh.updateRestockOrderProduct(req.params.ROID, req.params.ITEMID, req.quantity);
 		return res.status(result.status).send(result.body);
-	});
+});
 
-	/* DELETE */
-	app.delete("/api/restockOrderProduct/:id",
+/* DELETE */
+app.delete("/api/restockOrderProduct/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
@@ -846,7 +858,8 @@ param("id").isInt(),
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
+});
+
 
 // activate the server
 app.listen(port, () => {

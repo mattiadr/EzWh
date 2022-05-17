@@ -14,6 +14,7 @@ const RestockOrder = require("./RestockOrder");
 const RestockOrderProduct = require("./RestockOrderProduct");
 const ReturnOrderProduct = require("./ReturnOrderProduct")
 const InternalOrderProduct = require("./InternalOrderProduct")
+const Item = require("./Item");
 
 class Warehouse {
 	constructor(dbFile="./database/ezwh.db") {
@@ -94,7 +95,7 @@ class Warehouse {
 		}
 	}
 
-	deleteSKU(id) { 
+	deleteSKU(id) {
 		return this.db_help.deleteSKU(id);
 	}
 
@@ -354,7 +355,7 @@ class Warehouse {
 		return true;
 	}
 
-	async modifyUserRights(email, oldType, newType) {
+	async updateUserRights(email, oldType, newType) {
 		const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
 		if (!allowedTypes.includes(oldType) || !allowedTypes.includes(newType)) return {status: 422, body: "invalid type"};
 
@@ -437,12 +438,11 @@ class Warehouse {
 			if (!internalOrder) return {status: 404, body: "id not found"};
 			internalOrder.state = newState;
 			await this.db_help.updateInternalOrder(internalOrder);
-			if(newState=="accepted" || newState=="ACCEPTED"){
+			if (newState === "accepted" || newState === "ACCEPTED") {
+				return {status: 200, body: {state: internalOrder.state}};
+			} else if (newState === "completed" || newState === "COMPLETED") {
 				return {status: 200, body: {state: internalOrder.state}};
 			}
-			else if(newState=="completed" || newState=="COMPLETED"){
-				return {status: 200, body: {state: internalOrder.state}};				
-			}			
 		} catch (e) {
 			return {status: 503, body: e};
 		}
@@ -656,7 +656,7 @@ class Warehouse {
 		try {
 			let returnOrderProduct = await this.db_help.selectReturnOrderProductByID(returnOrderId);
 			if (!returnOrderProduct) return { status: 404, body: "return order product not found" };
-			if (returnOrderId !== undefined & ITEMID !== undefined) {
+			if (returnOrderId !== undefined && ITEMID !== undefined) {
 				returnOrderProduct.setPrice(price);
 			} else {
 				returnOrderProduct.setReturnOrderId(returnOrderId);
@@ -698,7 +698,7 @@ class Warehouse {
 		try {
 			let internalOrderProduct = await this.db_help.selectInternalOrderProductByID(internalOrderId);
 			if (!internalOrderProduct) return { status: 404, body: "internal order product not found" };
-			if (internalOrderId !== undefined & ITEMID !== undefined) {
+			if (internalOrderId !== undefined && ITEMID !== undefined) {
 				internalOrderProduct.setQuantity(quantity);
 			} else {
 				internalOrderProduct.setInternalOrderId(internalOrderId);
