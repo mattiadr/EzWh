@@ -250,7 +250,7 @@ app.post("/api/testDescriptor",
 	body("idSKU").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-		const result = await wh.newTestDescriptor(req.body.name, req.body.procedureDescription, req.body.idSKU);
+		const result = await wh.createTestDescriptor(req.body.name, req.body.procedureDescription, req.body.idSKU);
 		return res.status(result.status).send(result.body);
 });
 
@@ -262,7 +262,7 @@ app.put("/api/testDescriptor/:id",
 	body("newIdSKU").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
-		const result = await wh.modifyTestDescriptor(req.params.id, req.body["newName"], req.body["newProcedureDescription"], req.body["newIdSKU"]);
+		const result = await wh.updateTestDescriptor(req.params.id, req.body["newName"], req.body["newProcedureDescription"], req.body["newIdSKU"]);
 		return res.status(result.status).send(result.body);
 });
 
@@ -306,7 +306,7 @@ app.post("/api/skuitems/testResult",
 	body("Result").isBoolean(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-		const result = await wh.newTestResult(req.body.rfid, req.body.idTestDescriptor, req.body.Date, req.body.Result);
+		const result = await wh.createTestResult(req.body.rfid, req.body.idTestDescriptor, req.body.Date, req.body.Result);
 		return res.status(result.status).send(result.body);
 });
 
@@ -319,7 +319,7 @@ app.put("/api/skuitems/:rfid/testResult/:id",
 	body("newResult").isBoolean(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params or body");
-		const result = await wh.modifyTestResult(req.params.rfid, req.params.id, req.body["newIdTestDescriptor"], req.body["newDate"], req.body["newResult"]);
+		const result = await wh.updateTestResult(req.params.rfid, req.params.id, req.body["newIdTestDescriptor"], req.body["newDate"], req.body["newResult"]);
 		return res.status(result.status).send(result.body);
 });
 
@@ -347,7 +347,7 @@ app.get("/api/userinfo",
 });
 app.get("/api/suppliers",
 	(req, res) => {
-		wh.getSuppliers().then((suppliers) => {
+		wh.getUsersByRole(UserRole.SUPPLIER).then((suppliers) => {
 			res.status(200).json(suppliers.map((s) => ({id: s.id, name: s.name, surname: s.surname, email: s.email})));
 		}).catch((err) => {
 			res.status(500).send(err);
@@ -367,7 +367,7 @@ app.post("/api/newUser",
 	body("username").isEmail(),
 	body("password").isLength({min: 8}),
 	async (req, res) => {
-		const result = await wh.newUser(req.body.username, req.body.name, req.body.surname, req.body.password, req.body.type);
+		const result = await wh.createUser(req.body.username, req.body.name, req.body.surname, req.body.password, req.body.type);
 		return res.status(result.status).send(result.body);
 });
 app.post("/api/managerSessions",
