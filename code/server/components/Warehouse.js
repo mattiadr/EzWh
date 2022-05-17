@@ -10,6 +10,7 @@ const {TestDescriptor} = require("./TestDescriptor");
 const {TestResult} = require("./TestResult");
 const ReturnOrder = require("./ReturnOrder")
 const InternalOrder = require("./InternalOrder");
+const Item = require("./Item");
 const RestockOrder = require("./RestockOrder");
 const RestockOrderProduct = require("./RestockOrderProduct");
 const ReturnOrderProduct = require("./ReturnOrderProduct")
@@ -459,7 +460,7 @@ class Warehouse {
 	}
 
 	getItems() {
-		return this.db_help.selectItem();
+		return this.db_help.selectItems();
 	}
 
 	async createItem(ITEMID, description, price, SKUID, supplierId) {
@@ -506,7 +507,7 @@ class Warehouse {
 	}
 
 	getRestockOrders() {
-		return this.db_help.selectRestockOrder();
+		return this.db_help.selectRestockOrders();
 	}
 
 	async createRestockOrder(ROID,issueDate,state,supplierId,transportNote,skuItems) {

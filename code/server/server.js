@@ -683,6 +683,7 @@ param("id").isInt(),
 			res.status(500).send(err);
 		});
 	});
+	
 	app.get("/api/items/:id",
 	param("id").isInt(),
 	(req, res) => {
