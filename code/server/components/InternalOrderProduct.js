@@ -8,13 +8,13 @@ class InternalOrderProduct {
     this.#quantity = quantity;
   }
 
-  getInternalOrderId() { return this.#internalOrderId }
-  getItemId() { return this.#ITEMID }
-  getquantity() { return this.#quantity }
+  get internalOrderId() { return this.#internalOrderId }
+  get ITEMID() { return this.#ITEMID }
+  get quantity() { return this.#quantity }
 
-  setInternalOrderId(internalOrderId) { this.#internalOrderId = internalOrderId } 
-  setItemId(ITEMID) { this.#ITEMID = ITEMID } 
-  setQuantity(quantity) { this.#quantity = quantity } 
+  set internalOrderId(internalOrderId) { this.#internalOrderId = internalOrderId } 
+  set ITEMID(ITEMID) { this.#ITEMID = ITEMID } 
+  set quantity(quantity) { this.#quantity = quantity } 
 
 }
 

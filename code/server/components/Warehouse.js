@@ -645,7 +645,10 @@ class Warehouse {
 
 	async createReturnOrderProduct(returnOrderId,ITEMID,price) {
 		try {
-			let newReturnOrderProduct = new ReturnOrderProduct(returnOrderId,ITEMID,price);
+			let newReturnOrderProduct = new ReturnOrderProduct();
+			newReturnOrderProduct.returnOrderId = returnOrderId;
+			newReturnOrderProduct.ITEMID = ITEMID;
+			newReturnOrderProduct.price = price;
 			await this.db_help.insertReturnOrderProduct(newReturnOrderProduct);
 			return { status: 201, body: {} };
 		} catch (e) {
@@ -658,11 +661,11 @@ class Warehouse {
 			let returnOrderProduct = await this.db_help.selectReturnOrderProductByID(returnOrderId);
 			if (!returnOrderProduct) return { status: 404, body: "return order product not found" };
 			if (returnOrderId !== undefined & ITEMID !== undefined) {
-				returnOrderProduct.setPrice(price);
+				returnOrderProduct.price = price;
 			} else {
-				returnOrderProduct.setReturnOrderId(returnOrderId);
-				returnOrderProduct.setItemId(ITEMID);
-				returnOrderProduct.setPrice(price);
+				returnOrderProduct.returnOrderId= returnOrderId;
+				returnOrderProduct.ITEMID= ITEMID;
+				returnOrderProduct.price = price;
 			}
 			await this.db_help.updateReturnOrderProduct(returnOrderId, ITEMID, returnOrderProduct);
 			return { status: 200, body: "" };
@@ -671,8 +674,8 @@ class Warehouse {
 		}
 	}
 
-	deleteReturnOrderProduct(returnOrderProductId, ITEMID) {
-		return this.db_help.deleteReturnOrderProduct(returnOrderProductId, ITEMID);
+	deleteReturnOrderProduct(returnOrderProductId) {
+		return this.db_help.deleteReturnOrderProduct(returnOrderProductId);
 	}
 	
 	/* Internal Order Product */
@@ -687,7 +690,10 @@ class Warehouse {
 
 	async createInternalOrderProduct(internalOrderId,ITEMID,quantity) {
 		try {
-			let newInternalOrderProduct = new InternalOrderProduct(internalOrderId,ITEMID,quantity);
+			let newInternalOrderProduct = new InternalOrderProduct();
+			newInternalOrderProduct.internalOrderId = internalOrderId;
+			newInternalOrderProduct.ITEMID = ITEMID;
+			newInternalOrderProduct.quantity = quantity;
 			await this.db_help.insertInternalOrderProduct(newInternalOrderProduct);
 			return { status: 201, body: {} };
 		} catch (e) {
@@ -700,11 +706,11 @@ class Warehouse {
 			let internalOrderProduct = await this.db_help.selectInternalOrderProductByID(internalOrderId);
 			if (!internalOrderProduct) return { status: 404, body: "internal order product not found" };
 			if (internalOrderId !== undefined & ITEMID !== undefined) {
-				internalOrderProduct.setQuantity(quantity);
+				internalOrderProduct.quantity = quantity;
 			} else {
-				internalOrderProduct.setInternalOrderId(internalOrderId);
-				internalOrderProduct.setItemId(ITEMID);
-				internalOrderProduct.setQuantity(quantity);
+				internalOrderProduct.internalOrderId = internalOrderId;
+				internalOrderProduct.itemId = ITEMID;
+				internalOrderProduct.quantity = quantity;
 			}
 			await this.db_help.updateInternalOrderProduct(internalOrderId, ITEMID, internalOrderProduct);
 			return { status: 200, body: "" };
@@ -713,8 +719,8 @@ class Warehouse {
 		}
 	}
 
-	deleteInternalOrderProduct(internalOrderProductID, ITEMID) {
-		return this.db_help.deleteInternalOrderProduct(internalOrderProductID, ITEMID);
+	deleteInternalOrderProduct(internalOrderProductID) {
+		return this.db_help.deleteInternalOrderProduct(internalOrderProductID);
 	}
 }
 

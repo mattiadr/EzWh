@@ -926,7 +926,7 @@ class DatabaseHelper {
 
 	deleteReturnOrderProduct(returnOrderId, ITEMID) {
 		return new Promise((resolve, reject) => {
-			const sql = `DELETE FROM ReturnOrderProduct WHERE returnOrderId = ?, ITEMID = ?`;
+			const sql = `DELETE FROM ReturnOrderProduct WHERE returnOrderId = ?`;
 			this.db.run(sql, [returnOrderId, ITEMID], (err) => {
 				if (err) {
 					reject(err.toString());
@@ -1085,10 +1085,10 @@ class DatabaseHelper {
 		});
 	}
 
-	deleteInternalOrderProduct(internalOrderId, ITEMID) {
+	deleteInternalOrderProduct(internalOrderId) {
 		return new Promise((resolve, reject) => {
-			const sql = `DELETE FROM InternalOrderProduct WHERE internalOrderId = ?, ITEMID = ?`;
-			this.db.run(sql, [internalOrderId, ITEMID], (err) => {
+			const sql = `DELETE FROM InternalOrderProduct WHERE internalOrderId = ?`;
+			this.db.run(sql, [internalOrderId], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
@@ -1100,7 +1100,7 @@ class DatabaseHelper {
 
 	updateInternalOrderProduct(internalOrderProduct) {
 		return new Promise((resolve, reject) => {
-			const sql = `UPDATE InternalOrderProduct SET quantity = ? WHERE internalOrderId = ?, ITEMID = ?`;
+			const sql = `UPDATE InternalOrderProduct SET quantity = ? WHERE internalOrderId = ?`;
 			this.db.run(sql, [internalOrderProduct.quantity, internalOrderProduct.internalOrderId, internalOrderProduct.ITEMID], (err) => {
 				if (err) {
 					reject(err.toString());
