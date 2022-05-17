@@ -444,7 +444,7 @@ app.delete("/api/users/:username/:type",
 app.get("/api/returnOrders",
 	(req, res) => {
 		wh.getReturnOrders().then((returnOrders) => {
-			res.status(200).json(returnOrders.map((ro) => ({id: ro.id, returnDate: ro.returnDate, products: ro.products, restockOrderId: ro.restockOrderId})));
+			res.status(200).json(returnOrders.map((ro) => ({returnOrderId: ro.returnOrderId, returnDate: ro.returnDate, restockOrderId: ro.restockOrderId})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
@@ -455,7 +455,7 @@ app.get("/api/returnOrders/:id",
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		wh.getReturnOrderByID(req.params.id).then((ro) => {
 			if (ro) {
-				res.status(200).json({id: ro.id, returnDate: ro.returnDate, products: ro.products, restockOrderId: ro.restockOrderId});
+				res.status(200).json({returnOrderId: ro.returnOrderId, returnDate: ro.returnDate, restockOrderId: ro.restockOrderId});
 			} else {
 				res.status(404).end();
 			}
@@ -467,11 +467,10 @@ app.get("/api/returnOrders/:id",
 /* POST */
 app.post("/api/returnOrder",
 	body("returnDate").exists(),
-	body("products").isArray(),
 	body("restockOrderId").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-		const result = await wh.newReturnOrder(req.body.returnDate, req.body.products, req.body.restockOrderId);
+		const result = await wh.newReturnOrder(req.body.returnDate, req.body.restockOrderId);
 		return res.status(result.status).send(result.body);
 });
 
@@ -487,40 +486,96 @@ app.delete("/api/returnOrder/:id",
 		});
 });
 
+/** Return Order Product **/
+/* GET */
+app.get("/api/returnOrderProducts",
+(req, res) => {
+	wh.getReturnOrderProducts().then((returnOrderProducts) => {
+		res.status(200).json(returnOrderProducts.map((rop) => ({returnOrderId: rop.returnOrderId, ITEMID: rop.ITEMID, price: rop.price})));
+	}).catch((err) => {
+		res.status(500).send(err);
+	});
+});
+app.get("/api/returnOrderProducts/:id",
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.getReturnOrderProductById(req.params.id).then((rop) => {
+			if (rop) {
+				res.status(200).json({returnOrderId: rop.returnOrderId, ITEMID: rop.ITEMID, price: rop.price});
+			} else {
+				res.status(404).end();
+			}
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+
+/* POST */
+app.post("/api/returnOrderProduct",
+body("price").exists(),
+async (req, res) => {
+	if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+	const result = await wh.createReturnOrderProduct(req.body.price);
+	return res.status(result.status).send(result.body);
+});
+
+/* PUT */
+app.put("/api/returnOrderProducts/:id",
+param("id").isInt(),
+async (req, res) => {
+	if (!req.is("application/json")) return res.status(422).send("malformed body");
+	if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
+	const result = await wh.updateReturnOrderProduct(req.params.returnOrderId, req.params.ITEMID, req.body.price);
+	return res.status(result.status).send(result.body);
+	});
+
+/* DELETE */
+app.delete("/api/returnOrderProduct/:id",
+param("id").isInt(),
+(req, res) => {
+	if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+	wh.deleteReturnOrderProduct(req.params.returnOrderId, req.params.ITEMID).then(() => {
+		res.status(204).end();
+	}).catch((err) => {
+		res.status(500).send(err);
+	});
+});
+
 /** INTERNAL ORDER */
 
 /* GET */
 app.get("/api/internalOrders",
 	(req, res) => {
 		wh.getInternalOrders().then((internalOrders) => {
-			res.status(200).json(internalOrders.map((io) => ({id: io.id, issueDate: io.issueDate, state: io.state, products: io.products, customerId: io.customerId})));
+			res.status(200).json(internalOrders.map((io) => ({internalOrderId: io.internalOrderId, issueDate: io.issueDate, state: io.state, customerId: io.customerId})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
-	app.get("/api/internalOrdersIssued",
+});
+app.get("/api/internalOrdersIssued",
 	(req, res) => {
 		wh.getInternalOrdersIssued().then((internalOrders) => {
-			res.status(200).json(internalOrders.map((io) => ({id: io.id, issueDate: io.issueDate, state: io.state, products: io.products, customerId: io.customerId})));
+			res.status(200).json(internalOrders.map((io) => ({internalOrderId: io.internalOrderId, issueDate: io.issueDate, state: io.state, customerId: io.customerId})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
-	app.get("/api/internalOrdersAccepted",
+});
+app.get("/api/internalOrdersAccepted",
 	(req, res) => {
 		wh.getInternalOrdersAccepted().then((internalOrders) => {
-			res.status(200).json(internalOrders.map((io) => ({id: io.id, issueDate: io.issueDate, state: io.state, products: io.products, customerId: io.customerId})));
+			res.status(200).json(internalOrders.map((io) => ({internalOrderId: io.internalOrderId, issueDate: io.issueDate, state: io.state, customerId: io.customerId})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	});
-	app.get("/api/internalOrders/:id",
+});
+app.get("/api/internalOrders/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		wh.getInternalOrderByID(req.params.id).then((io) => {
 			if (io) {
-				res.status(200).json({id: io.id, issueDate: io.issueDate, state: io.state , products: io.products, customerId: io.customerId});
+				res.status(200).json({internalOrderId: io.internalOrderId, issueDate: io.issueDate, state: io.state, customerId: io.customerId});
 			} else {
 				res.status(404).end();
 			}
@@ -532,15 +587,22 @@ app.get("/api/internalOrders",
 	/* POST */
 	app.post("/api/internalOrder",
 	body("issueDate").exists(),
-	body("products").exists(),
 	body("customerId").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-		const result = await wh.newInternalOrder(req.body.issueDate, 'issued', req.body.products, req.body.customerId);
+		const result = await wh.newInternalOrder(req.body.issueDate, 'issued', req.body.customerId);
 		return res.status(result.status).send(result.body);
 	});
 
 	/* PUT */
+	app.put("/api/internalOrders/:id",
+	param("id").isInt(),
+	body("newState").exists(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
+		const result = await wh.updateInternalOrder(req.params.id, req.body["newState"]);
+		return res.status(result.status).send(result.body);
+	});
 
 	/* DELETE */
 	app.delete("/api/internalOrder/:id",
@@ -553,6 +615,62 @@ app.get("/api/internalOrders",
 			res.status(500).send(err);
 		});
 	});
+
+/** Internal Order Product **/
+/* GET */
+app.get("/api/internalOrderProducts",
+(req, res) => {
+	wh.getInternalOrderProducts().then((internalOrderProducts) => {
+		res.status(200).json(internalOrderProducts.map((iop) => ({internalOrderId: iop.internalOrderId, ITEMID: iop.ITEMID, quantity: iop.quantity})));
+	}).catch((err) => {
+		res.status(500).send(err);
+	});
+});
+app.get("/api/internalOrderProducts/:id",
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.getInternalOrderProductById(req.params.id).then((iop) => {
+			if (iop) {
+				res.status(200).json({returnOrderId: iop.returnOrderId, ITEMID: iop.ITEMID, quantity: iop.quantity});
+			} else {
+				res.status(404).end();
+			}
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+
+/* POST */
+app.post("/api/internalOrderProduct",
+body("quantity").isInt(),
+async (req, res) => {
+	if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+	const result = await wh.createInternalOrderProduct(req.body.quantity);
+	return res.status(result.status).send(result.body);
+});
+
+/* PUT */
+app.put("/api/internalOrderProducts/:id",
+param("id").isInt(),
+async (req, res) => {
+	if (!req.is("application/json")) return res.status(422).send("malformed body");
+	if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
+	const result = await wh.updateInternalOrderProduct(req.params.returnOrderId, req.params.ITEMID, req.body.quantity);
+	return res.status(result.status).send(result.body);
+	});
+
+/* DELETE */
+app.delete("/api/internalOrderProduct/:id",
+param("id").isInt(),
+(req, res) => {
+	if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+	wh.deleteInternalOrderProduct(req.params.internalOrderId, req.params.ITEMID).then(() => {
+		res.status(204).end();
+	}).catch((err) => {
+		res.status(500).send(err);
+	});
+});	
 
 	/** Item */
 
