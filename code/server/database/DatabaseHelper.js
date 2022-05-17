@@ -734,7 +734,20 @@ class DatabaseHelper {
 				if (err) {
 					reject(err.toString());
 				} else {
-					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.supplierId, r.transportNote, r.skuItems)));
+					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.supplierId, r.transportNote)));
+				}
+			});
+		});
+	}
+
+	selectRestockOrdersIssued() {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM RestockOrder WHERE state = ?;`;
+			this.db.all(sql, ['issued'], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.supplierId, r.transportNote)));
 				}
 			});
 		});
@@ -742,8 +755,8 @@ class DatabaseHelper {
 
 	insertRestockOrder(newRO /*: Object*/) {
 		return new Promise((resolve, reject) => {
-			const sql = `INSERT INTO RestockOrder(newRO.description, newRO.price, newRO.SKUId, newRO.supplierId) VALUES (?, ?, ?, ?, ?);`;
-			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote, newRO.skuItems], (err) => {
+			const sql = `INSERT INTO RestockOrder(newRO.description, newRO.price, newRO.SKUId, newRO.supplierId) VALUES (?, ?, ?, ?);`;
+			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
@@ -756,9 +769,9 @@ class DatabaseHelper {
 	updateRestockOrder(newRO /*: Object*/) {
 		return new Promise((resolve, reject) => {
 			const sql = `UPDATE RestockOrder SET
-				issueDate = ?, state = ?, supplierId = ?, transportNote = ?, skuItems = ?
+				issueDate = ?, state = ?, supplierId = ?, transportNote = ?
 				WHERE ROID = ?`;
-			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote, newRO.skuItems], (err) => {
+			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
@@ -782,7 +795,6 @@ class DatabaseHelper {
 		});
 	}
 
-
 	selectRestockOrderByID(id) {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM RestockOrder WHERE ROID = ?;`;
@@ -791,13 +803,29 @@ class DatabaseHelper {
 					reject(err.toString());
 				} else {
 					if (row) {
-						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems));
+						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote));
 					} else {
 						resolve(null);
 					}
 				}
 			});
 		});
+	}
+
+	insertProducts(RO,itemid,quantity) {
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE RestockOrder SET
+				products = ?
+				WHERE ROID = ?`;
+			this.db.run(sql, [RO.addItem(itemid,quantity)], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
+
 	}
 
 	/** Return Order **/

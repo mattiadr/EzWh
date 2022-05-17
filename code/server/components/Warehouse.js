@@ -507,10 +507,14 @@ class Warehouse {
 		return this.db_help.selectRestockOrders();
 	}
 
+	getRestockOrdersIssued() {
+		return this.db_help.selectRestockOrdersIssued();
+	}
+
 	async createRestockOrder(ROID,issueDate,state,supplierId,transportNote,skuItems) {
 		try {
 			let newRestockOrder = new RestockOrder(ROID,issueDate,state,supplierId,transportNote,skuItems);
-			await this.db_help.storePosition(newRestockOrder);
+			await this.db_help.insertRestockOrder(newRestockOrder);
 			return { status: 201, body: {} };
 		} catch (e) {
 			return { status: 503, body: {}, message: e };
@@ -545,6 +549,7 @@ class Warehouse {
 	deleteRestockOrder(restockorderID) {
 		return this.db_help.deleteRestockOrder(restockorderID);
 	}
+
 		/* Return Order Product */
 
 	getReturnOrderProductById(returnOrderProductId) {
