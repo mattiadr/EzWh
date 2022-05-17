@@ -8,13 +8,13 @@ class ReturnOrderProduct {
     this.#price = price;
   }
 
-  getReturnOrderId() { return this.#returnOrderId }
-  getItemId() { return this.#ITEMID }
-  getPrice() { return this.#price }
+  get returnOrderId() { return this.#returnOrderId }
+  get ITEMID() { return this.#ITEMID }
+  get price() { return this.#price }
 
-  setReturnOrderId(returnOrderId) { this.#returnOrderId = returnOrderId } 
-  setItemId(ITEMID) { this.#ITEMID = ITEMID } 
-  setPrice(price) { this.#price = price } 
+  set returnOrderId(returnOrderId) { this.#returnOrderId = returnOrderId } 
+  set ITEMID(ITEMID) { this.#ITEMID = ITEMID } 
+  set price(price) { this.#price = price } 
 
 }
 
