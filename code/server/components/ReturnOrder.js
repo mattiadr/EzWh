@@ -10,13 +10,13 @@ class ReturnOrder {
     this.#restockOrderId = restockOrderId;
   }
 
-  getReturnOrderId() { return this.#returnOrderId }
-  getReturnDate() { return this.#returnDate }
-  getRestockOrderId() { return this.#restockOrderId }
+  get returnOrderId() { return this.#returnOrderId }
+  get returnDate() { return this.#returnDate }
+  get restockOrderId() { return this.#restockOrderId }
 
-  setReturnOrderId(returnOrderId) { this.#returnOrderId = returnOrderId } 
-  setReturnDate(returnDate) { this.#returnDate = returnDate } 
-  setRestockOrderId(restockOrderId) { this.#restockOrderId = restockOrderId } 
+  set returnOrderId(returnOrderId) { this.#returnOrderId = returnOrderId } 
+  set returnDate(returnDate) { this.#returnDate = returnDate } 
+  set restockOrderId(restockOrderId) { this.#restockOrderId = restockOrderId } 
 
 }
 
