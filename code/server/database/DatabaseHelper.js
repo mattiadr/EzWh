@@ -11,7 +11,6 @@ const {TestResult} = require("../components/TestResult");
 const ReturnOrder = require("../components/ReturnOrder");
 const InternalOrder = require("../components/InternalOrder")
 const ReturnOrderProduct = require("../components/ReturnOrderProduct")
-const RestockOrderProduct = require("../components/RestockOrderProduct")
 const InternalOrderProduct = require("../components/InternalOrderProduct")
 
 class DatabaseHelper {
@@ -655,7 +654,7 @@ class DatabaseHelper {
 	}
 
 	/** ITEM **/
-	async selectItems() {
+	selectItems() {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM Item;`;
 			this.db.all(sql, [], (err, rows) => {
@@ -668,7 +667,7 @@ class DatabaseHelper {
 		});
 	}
 
-	async insertItem(newItem /*: Object*/) {
+	insertItem(newItem /*: Object*/) {
 		return new Promise((resolve, reject) => {
 			const sql = `INSERT INTO Item(newItem.description, newItem.price, newItem.SKUId, newItem.supplierId) VALUES (?, ?, ?, ?);`;
 			this.db.run(sql, [newItem.description, newItem.price, newItem.SKUId, newItem.supplierId], (err) => {
@@ -681,7 +680,7 @@ class DatabaseHelper {
 		});
 	}
 
-	async updateItem(newItem /*: Object*/) {
+	updateItem(newItem /*: Object*/) {
 		return new Promise((resolve, reject) => {
 			const sql = `UPDATE Item SET
 				description = ?, price = ?, SKUId = ?, supplierId = ?
@@ -728,7 +727,7 @@ class DatabaseHelper {
 	}
 
 	/** RESTOCK ORDER **/
-	async selectRestockOrders() {
+	selectRestockOrders() {
 		return new Promise((resolve, reject) => {
 			const sql = `SELECT * FROM RestockOrder;`;
 			this.db.all(sql, [], (err, rows) => {
@@ -741,7 +740,7 @@ class DatabaseHelper {
 		});
 	}
 
-	async insertRestockOrder(newRO /*: Object*/) {
+	insertRestockOrder(newRO /*: Object*/) {
 		return new Promise((resolve, reject) => {
 			const sql = `INSERT INTO RestockOrder(newRO.description, newRO.price, newRO.SKUId, newRO.supplierId) VALUES (?, ?, ?, ?, ?);`;
 			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote, newRO.skuItems], (err) => {
@@ -754,7 +753,7 @@ class DatabaseHelper {
 		});
 	}
 
-	async updateRestockOrder(newRO /*: Object*/) {
+	updateRestockOrder(newRO /*: Object*/) {
 		return new Promise((resolve, reject) => {
 			const sql = `UPDATE RestockOrder SET
 				issueDate = ?, state = ?, supplierId = ?, transportNote = ?, skuItems = ?
@@ -770,7 +769,7 @@ class DatabaseHelper {
 
 	}
 
-	async deleteRestockOrder(id) {
+	deleteRestockOrder(id) {
 		return new Promise((resolve, reject) => {
 			const sql = `DELETE FROM Item WHERE ROID = ?`;
 			this.db.run(sql, [id], (err) => {
@@ -782,6 +781,7 @@ class DatabaseHelper {
 			});
 		});
 	}
+
 
 	selectRestockOrderByID(id) {
 		return new Promise((resolve, reject) => {
@@ -800,78 +800,6 @@ class DatabaseHelper {
 		});
 	}
 
-	async selectRestockOrderProducts() {
-		return new Promise((resolve, reject) => {
-			const sql = `SELECT * FROM RestockOrderProduct;`;
-			this.db.all(sql, [], (err, rows) => {
-				if (err) {
-					reject(err.toString());
-				} else {
-					resolve(rows.map((r) => new RestockOrderProduct(r.ROID, r.ITEMID, r.quantity)));
-				}
-			});
-		});
-	}
-
-	async insertRestockOrderProduct(newROproduct) {
-		return new Promise((resolve, reject) => {
-			const sql = `INSERT INTO RestockOrder(newROproduct.quantity) VALUES (?);`;
-			this.db.run(sql, [newROproduct.quantity], (err) => {
-				if (err) {
-					reject(err.toString());
-				} else {
-					resolve();
-				}
-			});
-		});
-	}
-
-	async deleteRestockOrderProduct(ROID, ITEMID) {
-		return new Promise((resolve, reject) => {
-			const sql = `DELETE FROM RestockOrderProductProduct WHERE ROID = ? AND ITEMID = ?`;
-			this.db.run(sql, [ROID, ITEMID], (err) => {
-				if (err) {
-					reject(err.toString());
-				} else {
-					resolve();
-				}
-			});
-		});
-	}
-
-	async updateRestockOrderProduct(newROproduct) {
-		return new Promise((resolve, reject) => {
-			const sql = `UPDATE RestockOrderProduct SET
-				quantity = ?
-				WHERE ROID = ? AND ITEMID = ?`;
-			this.db.run(sql, [newROproduct.quantity], (err) => {
-				if (err) {
-					reject(err.toString());
-				} else {
-					resolve();
-				}
-			});
-		});
-
-	}
-
-	selectRestockOrderProductsByID(ROID, ITEMID) {
-		return new Promise((resolve, reject) => {
-			const sql = `SELECT * FROM RestockOrder WHERE ROID = ? AND ITEMID = ?;`;
-			this.db.get(sql, [ROID, ITEMID], (err, row) => {
-				if (err) {
-					reject(err.toString());
-				} else {
-					if (row) {
-						resolve(new RestockOrder(row.ROID, row.ITEMID, row.quantity));
-					} else {
-						resolve(null);
-					}
-				}
-			});
-		});
-	}
-	
 	/** Return Order **/
 	selectReturnOrders() {
 		return new Promise((resolve, reject) => {

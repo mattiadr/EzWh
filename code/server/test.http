@@ -1,2 +1,2 @@
-GET http://localhost:3001/api/localhost:3001/api/skus HTTP/1.1
+GET http://localhost:3001/api/localhost:3001/api/items HTTP/1.1
 

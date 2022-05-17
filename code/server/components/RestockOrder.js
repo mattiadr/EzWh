@@ -2,12 +2,13 @@
 const dayjs = require("dayjs")
 
 class RestockOrder {
-    #ROID;#issueDate;#state;#supplierId;#transportNote;#skuItems;
+    #ROID;#issueDate;#state;#products;#supplierId;#transportNote;#skuItems;
 
     constructor(ROID,issueDate,state,supplierId,transportNote,skuItems){
         this.#ROID = ROID; // Integer
         this.#issueDate = dayjs(issueDate); // String
         this.#state = state; // StateRestock
+        this.#products = new Map();
         this.#supplierId = supplierId; // Integer
         this.#transportNote = transportNote; // TransportNote
         this.#skuItems = skuItems; // Collection<SKUItem>
@@ -16,16 +17,19 @@ class RestockOrder {
     getRestockOrderId() { return this.#ROID; }
     getIssueDate() { return this.#issueDate; }
     getState() { return this.#state; }
+    getProducts() { return this.#products;}
     getSupplierID() { return this.#supplierId; }
     getTransportNote() { return this.#transportNote; }
     getSKUItems() { return this.#skuItems; }
     
-    setRestockOrderId(ROID) { this.#ROID = ROID; }
     setIssueDate(issuedate) { this.#issueDate = issuedate; }
     setState(state) { this.#state = state; }
-    setSupplierID(supplierid) { this.#supplierId = supplierid; }
+    setSupplierId(supplierid) { this.#supplierId = supplierid; }
     setTransportNote(transportnote) { this.#transportNote = transportnote; }
     setSKUItems(skuitems) { this.#skuItems = skuitems; }
+    addItem(item,quantity) { this.#products.set(item,quantity); }
+    removeItem(item) { this.#products.delete(item); }
+    modifyQuantity(item,quantity) { this.#products.set(item,quantity); }
 
 }
 

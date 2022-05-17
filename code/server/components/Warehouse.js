@@ -11,7 +11,6 @@ const {TestResult} = require("./TestResult");
 const ReturnOrder = require("./ReturnOrder")
 const InternalOrder = require("./InternalOrder");
 const RestockOrder = require("./RestockOrder");
-const RestockOrderProduct = require("./RestockOrderProduct");
 const ReturnOrderProduct = require("./ReturnOrderProduct")
 const InternalOrderProduct = require("./InternalOrderProduct")
 const Item = require("./Item");
@@ -546,49 +545,6 @@ class Warehouse {
 	deleteRestockOrder(restockorderID) {
 		return this.db_help.deleteRestockOrder(restockorderID);
 	}
-
-	/* Restock Order Product */
-
-	getRestockOrderProductById(restockorderproductID) {
-		return this.db_help.selectRestockOrderProductsByID(restockorderproductID);
-	}
-
-	getRestockOrderProducts() {
-		return this.db_help.selectRestockOrderProducts();
-	}
-
-	async createRestockOrderProduct(ROID,ITEMID,quantity) {
-		try {
-			let newRestockOrderProduct = new RestockOrderProduct(ROID,ITEMID,quantity);
-			await this.db_help.insertRestockOrderProduct(newRestockOrderProduct);
-			return { status: 201, body: {} };
-		} catch (e) {
-			return { status: 503, body: {}, message: e };
-		}
-	}
-
-	async updateRestockOrderProduct(ROID,ITEMID,quantity = undefined) {
-		try {
-			let restockorderproduct = await this.db_help.selectRestockOrderProductsByID(ROID);
-			if (!restockorderproduct) return { status: 404, body: "restock order products not found" };
-			if (ROID !== undefined & ITEMID !== undefined) {
-				restockorderproduct.setQuantity(quantity);
-			} else {
-				restockorderproduct.setRestockOrderId(ROID);
-				restockorderproduct.setItemId(ITEMID);
-				restockorderproduct.setQuantity(quantity);
-			}
-			await this.db_help.updateRestockOrderProduct(ROID, ITEMID, restockorderproduct);
-			return { status: 200, body: "" };
-		} catch (e) {
-			return { status: 503, body: e };
-		}
-	}
-
-	deleteRestockOrderProduct(restockorderproductID) {
-		return this.db_help.deleteRestockOrderProduct(restockorderproductID);
-	}
-
 		/* Return Order Product */
 
 	getReturnOrderProductById(returnOrderProductId) {

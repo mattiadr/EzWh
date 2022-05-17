@@ -801,65 +801,6 @@ app.delete("/api/restockOrder/:id",
 		});
 });
 
-
-/** Restock Order Product **/
-
-/* GET */
-app.get("/api/restockOrderProducts",
-	(req, res) => {
-		wh.getRestockOrderProducts().then((restockOrderProducts) => {
-			res.status(200).json(restockOrderProducts.map((io) => ({ROID: io.ROID, ITEMID: io.ITEMID, quantity: io.quantity})));
-		}).catch((err) => {
-			res.status(500).send(err);
-		});
-});
-app.get("/api/restockOrderProducts/:id",
-	param("id").isInt(),
-	(req, res) => {
-		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
-		wh.getRestockOrderProductByID(req.params.id[0], req.params.id[1]).then((io) => {
-			if (io) {
-				res.status(200).json({ROID: io.ROID, ITEMID: io.ITEMID, quantity: io.quantity});
-			} else {
-				res.status(404).end();
-			}
-		}).catch((err) => {
-			res.status(500).send(err);
-		});
-});
-
-/* POST */
-app.post("/api/restockOrderproducts",
-	body("quantity").isInt(),
-	async (req, res) => {
-		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-		const result = await wh.createRestockOrderProduct(req.body.quantity);
-		return res.status(result.status).send(result.body);
-});
-
-/* PUT */
-app.put("/api/restockOrderProducts/:id",
-	param("id").isInt(),
-	async (req, res) => {
-		if (!req.is("application/json")) return res.status(422).send("malformed body");
-		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
-		const result = await wh.updateRestockOrderProduct(req.params.ROID, req.params.ITEMID, req.quantity);
-		return res.status(result.status).send(result.body);
-});
-
-/* DELETE */
-app.delete("/api/restockOrderProduct/:id",
-	param("id").isInt(),
-	(req, res) => {
-		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
-		wh.deleteRestockOrderProduct(req.params.ROID, req.params.ITEMID).then(() => {
-			res.status(204).end();
-		}).catch((err) => {
-			res.status(500).send(err);
-		});
-});
-
-
 // activate the server
 app.listen(port, () => {
 	console.log(`Server listening at http://localhost:${port}`);
