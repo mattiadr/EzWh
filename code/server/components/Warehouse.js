@@ -12,6 +12,8 @@ const ReturnOrder = require("./ReturnOrder")
 const InternalOrder = require("./InternalOrder");
 const RestockOrder = require("./RestockOrder");
 const RestockOrderProduct = require("./RestockOrderProduct");
+const ReturnOrderProduct = require("./ReturnOrderProduct")
+const InternalOrderProduct = require("./InternalOrderProduct")
 
 class Warehouse {
 	constructor(dbFile="./database/ezwh.db") {
@@ -390,9 +392,9 @@ class Warehouse {
 		return this.db_help.selectReturnOrderByID(id);
 	}
 
-	async newReturnOrder(returnDate, products, restockOrderId) {
+	async newReturnOrder(returnDate, restockOrderId) {
 		try {
-			await this.db_help.insertReturnOrder(new ReturnOrder(null, returnDate, products, restockOrderId));
+			await this.db_help.insertReturnOrder(new ReturnOrder(null, returnDate, restockOrderId));
 			return {status: 201, body: ""};
 		} catch (e) {
 			return {status: 503, body: e};
@@ -420,10 +422,27 @@ class Warehouse {
 		return this.db_help.selectInternalOrderByID();
 	}
 
-	async newInternalOrder(issueDate, state, products, customerId) {
+	async newInternalOrder(issueDate, state, customerId) {
 		try {
-			await this.db_help.insertInternalOrder(new InternalOrder(null, issueDate, state, products, customerId));
+			await this.db_help.insertInternalOrder(new InternalOrder(null, issueDate, state, customerId));
 			return {status: 201, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
+	}
+
+	async updateInternalOrder(id, newState) {
+		try {
+			const internalOrder = await this.db_help.selectInternalOrderByID(id);
+			if (!internalOrder) return {status: 404, body: "id not found"};
+			internalOrder.state = newState;
+			await this.db_help.updateInternalOrder(internalOrder);
+			if(newState=="accepted" || newState=="ACCEPTED"){
+				return {status: 200, body: {state: internalOrder.state}};
+			}
+			else if(newState=="completed" || newState=="COMPLETED"){
+				return {status: 200, body: {state: internalOrder.state}};				
+			}			
 		} catch (e) {
 			return {status: 503, body: e};
 		}
@@ -569,6 +588,132 @@ class Warehouse {
 
 	deleteRestockOrderProduct(restockorderproductID) {
 		return this.db_help.deleteRestockOrderProduct(restockorderproductID);
+	}
+
+		/* Restock Order Product */
+
+	getRestockOrderProductById(restockorderproductID) {
+		return this.db_help.selectRestockOrderProductsByID(restockorderproductID);
+	}
+
+	getRestockOrderProducts() {
+		return this.db_help.selectRestockOrderProducts();
+	}
+
+	async createRestockOrderProduct(ROID,ITEMID,quantity) {
+		try {
+			let newRestockOrderProduct = new RestockOrderProduct(ROID,ITEMID,quantity);
+			await this.db_help.insertRestockOrderProduct(newRestockOrderProduct);
+			return { status: 201, body: {} };
+		} catch (e) {
+			return { status: 503, body: {}, message: e };
+		}
+	}
+
+	async updateRestockOrderProduct(ROID,ITEMID,quantity = undefined) {
+		try {
+			let restockorderproduct = await this.db_help.selectRestockOrderProductsByID(ROID);
+			if (!restockorderproduct) return { status: 404, body: "restock order products not found" };
+			if (ROID !== undefined & ITEMID !== undefined) {
+				restockorderproduct.setQuantity(quantity);
+			} else {
+				restockorderproduct.setRestockOrderId(ROID);
+				restockorderproduct.setItemId(ITEMID);
+				restockorderproduct.setQuantity(quantity);
+			}
+			await this.db_help.updateRestockOrderProduct(ROID, ITEMID, restockorderproduct);
+			return { status: 200, body: "" };
+		} catch (e) {
+			return { status: 503, body: e };
+		}
+	}
+
+	deleteRestockOrderProduct(restockorderproductID) {
+		return this.db_help.deleteRestockOrderProduct(restockorderproductID);
+	}
+
+	/* Return Order Product */
+
+	getReturnOrderProductById(returnOrderProductId) {
+		return this.db_help.selectReturnOrderProductByID(returnOrderProductId);
+	}
+
+	getReturnOrderProducts() {
+		return this.db_help.selectReturnOrderProducts();
+	}
+
+	async createReturnOrderProduct(returnOrderId,ITEMID,price) {
+		try {
+			let newReturnOrderProduct = new ReturnOrderProduct(returnOrderId,ITEMID,price);
+			await this.db_help.insertReturnOrderProduct(newReturnOrderProduct);
+			return { status: 201, body: {} };
+		} catch (e) {
+			return { status: 503, body: {}, message: e };
+		}
+	}
+
+	async updateReturnOrderProduct(returnOrderId,ITEMID,price = undefined) {
+		try {
+			let returnOrderProduct = await this.db_help.selectReturnOrderProductByID(returnOrderId);
+			if (!returnOrderProduct) return { status: 404, body: "return order product not found" };
+			if (returnOrderId !== undefined & ITEMID !== undefined) {
+				returnOrderProduct.setPrice(price);
+			} else {
+				returnOrderProduct.setReturnOrderId(returnOrderId);
+				returnOrderProduct.setItemId(ITEMID);
+				returnOrderProduct.setPrice(price);
+			}
+			await this.db_help.updateReturnOrderProduct(returnOrderId, ITEMID, returnOrderProduct);
+			return { status: 200, body: "" };
+		} catch (e) {
+			return { status: 503, body: e };
+		}
+	}
+
+	deleteReturnOrderProduct(returnOrderProductId, ITEMID) {
+		return this.db_help.deleteReturnOrderProduct(returnOrderProductId, ITEMID);
+	}
+	
+	/* Internal Order Product */
+
+	getInternalOrderProductById(internalOrderProductId) {
+		return this.db_help.selectInternalOrderProductByID(internalOrderProductId);
+	}
+
+	getInternalOrderProducts() {
+		return this.db_help.selectInternalOrderProducts();
+	}
+
+	async createInternalOrderProduct(internalOrderId,ITEMID,quantity) {
+		try {
+			let newInternalOrderProduct = new InternalOrderProduct(internalOrderId,ITEMID,quantity);
+			await this.db_help.insertInternalOrderProduct(newInternalOrderProduct);
+			return { status: 201, body: {} };
+		} catch (e) {
+			return { status: 503, body: {}, message: e };
+		}
+	}
+
+	async updateInternalOrderProduct(internalOrderId,ITEMID,quantity = undefined) {
+		try {
+			let internalOrderProduct = await this.db_help.selectInternalOrderProductByID(internalOrderId);
+			if (!internalOrderProduct) return { status: 404, body: "internal order product not found" };
+			if (internalOrderId !== undefined & ITEMID !== undefined) {
+				internalOrderProduct.setQuantity(quantity);
+			} else {
+				internalOrderProduct.setInternalOrderId(internalOrderId);
+				internalOrderProduct.setItemId(ITEMID);
+				internalOrderProduct.setQuantity(quantity);
+			}
+			await this.db_help.updateInternalOrderProduct(internalOrderId, ITEMID, internalOrderProduct);
+			return { status: 200, body: "" };
+		} catch (e) {
+			return { status: 503, body: e };
+		}
+	}
+
+	deleteInternalOrderProduct(internalOrderProductID, ITEMID) {
+		return this.db_help.deleteInternalOrderProduct(internalOrderProductID, ITEMID);
 	}
 }
 
