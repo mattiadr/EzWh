@@ -152,10 +152,10 @@ class DatabaseHelper {
 		
 		/** Return Order **/
 		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
-			id INTEGER NOT NULL,
+			returnOrderId INTEGER NOT NULL,
 			returnDate DATETIME NOT NULL,
 			restockOrderId INTEGER NOT NULL,
-				PRIMARY KEY (id)
+				PRIMARY KEY (returnOrderId)
 		);`;
 		this.db.run(createTableReturnOrder, (err) => err && console.log(err));
 
@@ -170,11 +170,11 @@ class DatabaseHelper {
 
 		/** Internal Order **/
 		const createTableInternalOrder = `CREATE TABLE IF NOT EXISTS InternalOrder (
-			id INTEGER NOT NULL,
+			internalOrderId INTEGER NOT NULL,
 			issueDate DATETIME NOT NULL,
 			state VARCHAR(10) NOT NULL,
 			customerId INTEGER NOT NULL,
-				PRIMARY KEY (id)
+				PRIMARY KEY (internalOrderId)
 		);`;
 		this.db.run(createTableInternalOrder, (err) => err && console.log(err));
 
