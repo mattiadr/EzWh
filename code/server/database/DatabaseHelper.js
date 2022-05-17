@@ -144,13 +144,13 @@ class DatabaseHelper {
 		this.db.run(createTableRestockOrder, (err) => err && console.log(err));
 
 		/** Restock Order & Item */
-		const createTableRestockOrderProducts = `CREATE TABLE IF NOT EXISTS ROProducts (
+		const createTableRestockOrderProduct = `CREATE TABLE IF NOT EXISTS RestockOrderProduct (
 			ROID integer NOT NULL,
 			ITEMID varchar(12) NOT NULL,
 			quantity integer NOT NULL,
     		PRIMARY KEY (ROID, ITEMID)
 		);`;
-		this.db.run(createTableRestockOrderProducts, (err) => err && console.log(err));
+		this.db.run(createTableRestockOrderProduct, (err) => err && console.log(err));
 		
 		/** Return Order **/
 		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
@@ -720,7 +720,7 @@ class DatabaseHelper {
 				if (err) {
 					reject(err.toString());
 				} else {
-					resolve(rows.map((r) => new Item(r.ROID, r.issueDate, r.state, r.supplierId, r.transportNote, r.skuItems)));
+					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.supplierId, r.transportNote, r.skuItems)));
 				}
 			});
 		});
@@ -771,15 +771,16 @@ class DatabaseHelper {
 	}
 
 	async selectRestockOrderProducts() {
-		if (this.ROProducts.size === 0) { //first time
-			let rows = await this.queryDBAll(`SELECT * FROM ROProduct;`);
-
-			rows.map(row => {
-				const roproduct = new ROProduct(row.ROID, row.ITEMID, row.quantity);
-				this.ROProducts.set(row.ROID, row.ITEMID, roproduct);
-			})
-		}
-		return this.ROProducts;
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT * FROM RestockOrderProduct;`;
+			this.db.all(sql, [], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new RestockOrderProduct(r.ROID, r.ITEMID, r.quantity)));
+				}
+			});
+		});
 	}
 
 	async insertRestockOrderProduct(newROproduct) {
