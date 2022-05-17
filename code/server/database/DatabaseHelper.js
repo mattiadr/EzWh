@@ -785,7 +785,7 @@ class DatabaseHelper {
 
 	selectRestockOrderByID(id) {
 		return new Promise((resolve, reject) => {
-			const sql = `SELECT * FROM RestockOrder WHERE id = ?;`;
+			const sql = `SELECT * FROM RestockOrder WHERE ROID = ?;`;
 			this.db.get(sql, [id], (err, row) => {
 				if (err) {
 					reject(err.toString());
@@ -814,41 +814,56 @@ class DatabaseHelper {
 	}
 
 	async insertRestockOrderProduct(newROproduct) {
-		await this.queryDBRun(`
-			INSERT INTO ROProduct(row.ROID = ?, row.ITEMID = ?, row.quantity = ?)
-			VALUES(?, ?, ?);
-		`,[newROproduct.ROID, newROproduct.ITEMID, newROproduct.quantity]);
-		this.ROProducts.set(newROproduct.ROID, newROproduct.ITEMID, newROproduct);
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO RestockOrder(newROproduct.quantity) VALUES (?);`;
+			this.db.run(sql, [newROproduct.quantity], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	async deleteRestockOrderProduct(ROID, ITEMID) {
-		await this.queryDBRun(`
-			DELETE
-			FROM ROProduct
-			WHERE ROID=?, ITEMID=?;
-		`, [ROID, ITEMID]);
-		this.ROProducts.delete(ROID, ITEMID);
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM RestockOrderProductProduct WHERE ROID = ? AND ITEMID = ?`;
+			this.db.run(sql, [ROID, ITEMID], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	async updateRestockOrderProduct(newROproduct) {
-		await this.queryDBRun(`
-			UPDATE ROProduct
-			SET quantity = ?
-			WHERE ROID=?, ITEMID=?;
-		`,[newROproduct.quantity, newROproduct.ROID, newROproduct.ITEMID]);
-		this.RestockOrders.set(newROproduct.ROID, newROproduct.ITEMID, newROproduct);
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE RestockOrderProduct SET
+				quantity = ?
+				WHERE ROID = ? AND ITEMID = ?`;
+			this.db.run(sql, [newROproduct.quantity], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 
 	}
 
-	selectRestockOrderProductsByID(id) {
+	selectRestockOrderProductsByID(ROID, ITEMID) {
 		return new Promise((resolve, reject) => {
-			const sql = `SELECT * FROM ROProduct WHERE ROID = ?;`;
-			this.db.get(sql, [id], (err, row) => {
+			const sql = `SELECT * FROM RestockOrder WHERE ROID = ? AND ITEMID = ?;`;
+			this.db.get(sql, [ROID, ITEMID], (err, row) => {
 				if (err) {
 					reject(err.toString());
 				} else {
 					if (row) {
-						resolve(new ROProduct(row.ROID, row.ITEMID, row.quantity));
+						resolve(new RestockOrder(row.ROID, row.ITEMID, row.quantity));
 					} else {
 						resolve(null);
 					}
