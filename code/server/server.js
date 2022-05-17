@@ -539,7 +539,7 @@ app.delete("/api/returnOrderProduct/:id",
 param("id").isInt(),
 (req, res) => {
 	if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
-	wh.deleteReturnOrderProduct(req.params.returnOrderId, req.params.ITEMID).then(() => {
+	wh.deleteReturnOrderProduct(req.params.returnOrderId).then(() => {
 		res.status(204).end();
 	}).catch((err) => {
 		res.status(500).send(err);
@@ -653,26 +653,25 @@ app.post("/api/internalOrderProduct",
 body("quantity").isInt(),
 async (req, res) => {
 	if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-	const result = await wh.createInternalOrderProduct(req.body.quantity);
+	const result = await wh.createInternalOrderProduct(req.body.internalOrderId, req.body.ITEMID ,req.body.quantity);
 	return res.status(result.status).send(result.body);
 });
 
 /* PUT */
-app.put("/api/internalOrderProducts/:id",
-param("id").isInt(),
+app.put("/api/internalOrderProducts/:internalOrderId/:ITEMID",
+param("internalOrderId").isInt(),
 async (req, res) => {
 	if (!req.is("application/json")) return res.status(422).send("malformed body");
-	if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
-	const result = await wh.updateInternalOrderProduct(req.params.returnOrderId, req.params.ITEMID, req.body.quantity);
+	const result = await wh.updateInternalOrderProduct(req.params.internalOrderId, req.params.ITEMID, req.body.quantity);
 	return res.status(result.status).send(result.body);
 	});
 
 /* DELETE */
-app.delete("/api/internalOrderProduct/:id",
-param("id").isInt(),
+app.delete("/api/internalOrderProduct/:internalOrderId",
+param("internalOrderId").isInt(),
 (req, res) => {
 	if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
-	wh.deleteInternalOrderProduct(req.params.internalOrderId, req.params.ITEMID).then(() => {
+	wh.deleteInternalOrderProduct(req.params.internalOrderId).then(() => {
 		res.status(204).end();
 	}).catch((err) => {
 		res.status(500).send(err);
