@@ -662,42 +662,57 @@ class DatabaseHelper {
 				if (err) {
 					reject(err.toString());
 				} else {
-					resolve(rows.map((r) => new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId)));
+					resolve(rows.map((r) => new Item(r.ITEMID, r.description, r.price, r.SKUID, r.supplierId)));
 				}
 			});
 		});
 	}
 
 	async insertItem(newItem /*: Object*/) {
-		await this.queryDBRun(`
-			INSERT INTO Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId)
-			VALUES(?, ?, ?, ?, ?);
-		`,[row.ITEMID, row.description, row.price, row.SKUID, row.supplierId]);
-		this.Items.set(newItem.ITEMID, newItem);
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO Item(newItem.description, newItem.price, newItem.SKUId, newItem.supplierId) VALUES (?, ?, ?, ?);`;
+			this.db.run(sql, [newItem.description, newItem.price, newItem.SKUId, newItem.supplierId], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	async updateItem(newItem /*: Object*/) {
-		await this.queryDBRun(`
-			UPDATE Item
-			SET description = ?, price = ?, SKUID = ?, supplierId = ?
-			WHERE ITEMID=?;
-		`,[newItem.description, newItem.price, newItem.SKUID, newItem.supplierId, newItem.ITEMID]);
-		this.Items.set(newItem.ITEMID, newItem);
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE Item SET
+				description = ?, price = ?, SKUId = ?, supplierId = ?
+				WHERE ITEMID = ?`;
+			this.db.run(sql, [newItem.description, newItem.price, newItem.SKUId, newItem.supplierId], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 
 	}
 
-	async deleteItem(ITEMID) {
-		await this.queryDBRun(`
-			DELETE
-			FROM Item
-			WHERE ITEMID=?;
-		`, [ITEMID]);
-		this.Items.delete(ITEMID);
+	deleteItem(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM Item WHERE ITEMID = ?`;
+			this.db.run(sql, [id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	selectItemByID(id) {
 		return new Promise((resolve, reject) => {
-			const sql = `SELECT * FROM Item WHERE id = ?;`;
+			const sql = `SELECT * FROM Item WHERE ITEMID = ?;`;
 			this.db.get(sql, [id], (err, row) => {
 				if (err) {
 					reject(err.toString());
@@ -727,30 +742,45 @@ class DatabaseHelper {
 	}
 
 	async insertRestockOrder(newRO /*: Object*/) {
-		await this.queryDBRun(`
-			INSERT INTO RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems)
-			VALUES(?, ?, ?, ?, ?, ?, ?);
-		`,[row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote, row.skuItems]);
-		this.RestockOrders.set(newRO.ROID, newRO);
+		return new Promise((resolve, reject) => {
+			const sql = `INSERT INTO RestockOrder(newRO.description, newRO.price, newRO.SKUId, newRO.supplierId) VALUES (?, ?, ?, ?, ?);`;
+			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote, newRO.skuItems], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	async updateRestockOrder(newRO /*: Object*/) {
-		await this.queryDBRun(`
-			UPDATE RestockOrder
-			SET issueDate = ?, state = ?, supplierId = ?, transportNote = ?, skuItems = ?
-			WHERE ROID=?;
-		`,[newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote, newRO.skuItems]);
-		this.RestockOrders.set(newRO.ROID, newRO);
+		return new Promise((resolve, reject) => {
+			const sql = `UPDATE RestockOrder SET
+				issueDate = ?, state = ?, supplierId = ?, transportNote = ?, skuItems = ?
+				WHERE ROID = ?`;
+			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote, newRO.skuItems], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 
 	}
 
-	async deleteRestockOrder(ROID) {
-		await this.queryDBRun(`
-			DELETE
-			FROM RestockOrder
-			WHERE ROID=?;
-		`, [ROID]);
-		this.RestockOrders.delete(ROID);
+	async deleteRestockOrder(id) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM Item WHERE ROID = ?`;
+			this.db.run(sql, [id], (err) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	selectRestockOrderByID(id) {

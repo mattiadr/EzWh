@@ -10,7 +10,6 @@ const {TestDescriptor} = require("./TestDescriptor");
 const {TestResult} = require("./TestResult");
 const ReturnOrder = require("./ReturnOrder")
 const InternalOrder = require("./InternalOrder");
-const Item = require("./Item");
 const RestockOrder = require("./RestockOrder");
 const RestockOrderProduct = require("./RestockOrderProduct");
 const ReturnOrderProduct = require("./ReturnOrderProduct")
@@ -455,7 +454,7 @@ class Warehouse {
 
 	/* Item */
 
-	getItemById(itemID) {
+	getItemByID(itemID) {
 		return this.db_help.selectItemByID(itemID);
 	}
 
@@ -463,13 +462,12 @@ class Warehouse {
 		return this.db_help.selectItems();
 	}
 
-	async createItem(ITEMID, description, price, SKUID, supplierId) {
+	async createItem(description, price, SKUID, supplierId) {
 		try {
-			let newItem = new Item(ITEMID, description, price, SKUID, supplierId);
-			await this.db_help.insertItem(newItem);
-			return { status: 201, body: {} };
+			await this.db_help.insertItem(new Item(null, description, price, SKUID, supplierId));
+			return {status: 201, body: ""};
 		} catch (e) {
-			return { status: 503, body: {}, message: e };
+			return {status: 503, body: e};
 		}
 	}
 
@@ -480,13 +478,13 @@ class Warehouse {
 			if (ITEMID !== undefined) {
 				item.setDescription(description);
 				item.setPrice(price);
-				item.setSKUID(SKUID);
+				item.setSKUId(SKUID);
 				item.setSupplierId(supplierId);
 			} else {
 				item.setItemId(ITEMID);
 				item.setDescription(description);
 				item.setPrice(price);
-				item.setSKUID(SKUID);
+				item.setSKUId(SKUID);
 				item.setSupplierId(supplierId);
 			}
 			await this.db_help.updateItem(ITEMID, item);
@@ -502,7 +500,7 @@ class Warehouse {
 
 	/* Restock Order */
 
-	getRestockOrderById(restockorderID) {
+	getRestockOrderByID(restockorderID) {
 		return this.db_help.selectRestockOrderByID(restockorderID);
 	}
 
@@ -529,14 +527,14 @@ class Warehouse {
 				restockorder.setState(state);
 				restockorder.setSupplierId(supplierId);
 				restockorder.setTransportNote(transportNote);
-				restockorder.setKUItems(skuItems);
+				restockorder.setSKUItems(skuItems);
 			} else {
 				restockorder.setItemId(ROID);
 				restockorder.setIssueDate(issueDate);
 				restockorder.setState(state);
 				restockorder.setSupplierId(supplierId);
 				restockorder.setTransportNote(transportNote);
-				restockorder.setKUItems(skuItems);
+				restockorder.setSKUItems(skuItems);
 			}
 			await this.db_help.updateRestockOrder(ROID, restockorder);
 			return { status: 200, body: "" };
@@ -591,49 +589,7 @@ class Warehouse {
 		return this.db_help.deleteRestockOrderProduct(restockorderproductID);
 	}
 
-		/* Restock Order Product */
-
-	getRestockOrderProductById(restockorderproductID) {
-		return this.db_help.selectRestockOrderProductsByID(restockorderproductID);
-	}
-
-	getRestockOrderProducts() {
-		return this.db_help.selectRestockOrderProducts();
-	}
-
-	async createRestockOrderProduct(ROID,ITEMID,quantity) {
-		try {
-			let newRestockOrderProduct = new RestockOrderProduct(ROID,ITEMID,quantity);
-			await this.db_help.insertRestockOrderProduct(newRestockOrderProduct);
-			return { status: 201, body: {} };
-		} catch (e) {
-			return { status: 503, body: {}, message: e };
-		}
-	}
-
-	async updateRestockOrderProduct(ROID,ITEMID,quantity = undefined) {
-		try {
-			let restockorderproduct = await this.db_help.selectRestockOrderProductsByID(ROID);
-			if (!restockorderproduct) return { status: 404, body: "restock order products not found" };
-			if (ROID !== undefined & ITEMID !== undefined) {
-				restockorderproduct.setQuantity(quantity);
-			} else {
-				restockorderproduct.setRestockOrderId(ROID);
-				restockorderproduct.setItemId(ITEMID);
-				restockorderproduct.setQuantity(quantity);
-			}
-			await this.db_help.updateRestockOrderProduct(ROID, ITEMID, restockorderproduct);
-			return { status: 200, body: "" };
-		} catch (e) {
-			return { status: 503, body: e };
-		}
-	}
-
-	deleteRestockOrderProduct(restockorderproductID) {
-		return this.db_help.deleteRestockOrderProduct(restockorderproductID);
-	}
-
-	/* Return Order Product */
+		/* Return Order Product */
 
 	getReturnOrderProductById(returnOrderProductId) {
 		return this.db_help.selectReturnOrderProductByID(returnOrderProductId);

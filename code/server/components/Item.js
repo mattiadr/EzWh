@@ -10,17 +10,17 @@ class Item {
         this.#supplierId = supplierId; // Integer
     }
 
-    getItemID() { return this.#ITEMID; }
+    getItemId() { return this.#ITEMID; }
     getDescription() { return this.#description; }
     getPrice() { return this.#price; }
     getSKUId() { return this.#SKUId; }
-    getSupplierID() { return this.#supplierId; }
+    getSupplierId() { return this.#supplierId; }
 
-    setItemID(itemid) { this.#ITEMID = itemid; }
+    setItemId(itemid) { this.#ITEMID = itemid; }
     setDescription(description) { this.#description = description; }
     setPrice(price) { this.#price = price; }
     setSKUId(skuid) { this.#SKUId = skuid; }
-    setSupplierID(supplierid) { this.#supplierId = supplierid; }
+    setSupplierId(supplierid) { this.#supplierId = supplierid; }
     
 }
 
