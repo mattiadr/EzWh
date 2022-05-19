@@ -135,21 +135,13 @@ class DatabaseHelper {
 			ROID INTEGER NOT NULL,
 			issueDate DATETIME NOT NULL,
 			state varchar(10) NOT NULL,
+			products varchar(10) NOT NULL,
 			supplierID INTEGER NOT NULL,
 			transportNote varchar(12) NOT NULL,
 			skuItems varchar(50) NOT NULL,
     		PRIMARY KEY (ROID)
 		);`;
 		this.db.run(createTableRestockOrder, (err) => err && console.log(err));
-
-		/** Restock Order & Item */
-		const createTableRestockOrderProduct = `CREATE TABLE IF NOT EXISTS RestockOrderProduct (
-			ROID integer NOT NULL,
-			ITEMID varchar(12) NOT NULL,
-			quantity integer NOT NULL,
-    		PRIMARY KEY (ROID, ITEMID)
-		);`;
-		this.db.run(createTableRestockOrderProduct, (err) => err && console.log(err));
 		
 		/** Return Order **/
 		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
@@ -734,7 +726,7 @@ class DatabaseHelper {
 				if (err) {
 					reject(err.toString());
 				} else {
-					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.supplierId, r.transportNote)));
+					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.products, r.supplierId, r.transportNote)));
 				}
 			});
 		});
@@ -747,7 +739,7 @@ class DatabaseHelper {
 				if (err) {
 					reject(err.toString());
 				} else {
-					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.supplierId, r.transportNote)));
+					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.products, r.supplierId, r.transportNote)));
 				}
 			});
 		});
@@ -755,8 +747,8 @@ class DatabaseHelper {
 
 	insertRestockOrder(newRO /*: Object*/) {
 		return new Promise((resolve, reject) => {
-			const sql = `INSERT INTO RestockOrder(newRO.description, newRO.price, newRO.SKUId, newRO.supplierId) VALUES (?, ?, ?, ?);`;
-			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote], (err) => {
+			const sql = `INSERT INTO RestockOrder(issueDate, state, products, supplierId, transportNote) VALUES (?, ?, ?, ?, ?);`;
+			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.products, newRO.supplierId, newRO.transportNote], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
@@ -771,7 +763,7 @@ class DatabaseHelper {
 			const sql = `UPDATE RestockOrder SET
 				issueDate = ?, state = ?, supplierId = ?, transportNote = ?
 				WHERE ROID = ?`;
-			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.supplierId, newRO.transportNote], (err) => {
+			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.products, newRO.supplierId, newRO.transportNote], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
@@ -803,7 +795,7 @@ class DatabaseHelper {
 					reject(err.toString());
 				} else {
 					if (row) {
-						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote));
+						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote));
 					} else {
 						resolve(null);
 					}
@@ -812,12 +804,33 @@ class DatabaseHelper {
 		});
 	}
 
-	insertProducts(RO,itemid,quantity) {
+	selectProducts(roid) {
+		return new Promise((resolve, reject) => {
+			const sql = `SELECT skuItems FROM RestockOrder WHERE ROID = ?`;
+			const ro = this.selectRestockOrderByID(roid)
+			this.db.all(sql,
+				[ro.forEach(x => x.getSKUItems()
+					.filter(v =>
+					{
+						if (v.getTestResults().filter(w => w.getResult() === false).count() > 0) return true;
+						else return false;
+					})
+				)], (err, rows) => {
+				if (err) {
+					reject(err.toString());
+				} else {
+					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.products, r.supplierId, r.transportNote)));
+				}
+			});
+		});
+	}
+
+	insertProducts(RO,items) {
 		return new Promise((resolve, reject) => {
 			const sql = `UPDATE RestockOrder SET
 				products = ?
 				WHERE ROID = ?`;
-			this.db.run(sql, [RO.addItem(itemid,quantity)], (err) => {
+			this.db.run(sql, [RO.addItems(items),RO.ROID], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {

@@ -4,11 +4,11 @@ const dayjs = require("dayjs")
 class RestockOrder {
     #ROID;#issueDate;#state;#products;#supplierId;#transportNote;#skuItems;
 
-    constructor(ROID,issueDate,state,supplierId,transportNote){
+    constructor(ROID,issueDate,state,products,supplierId,transportNote){
         this.#ROID = ROID; // Integer
         this.#issueDate = dayjs(issueDate); // String
         this.#state = state; // StateRestock
-        this.#products = new Map();
+        this.#products = products;
         this.#supplierId = supplierId; // Integer
         this.#transportNote = transportNote; // TransportNote
         this.#skuItems = new Map(); // Collection<SKUItem>
@@ -28,8 +28,11 @@ class RestockOrder {
     setTransportNote(transportnote) { this.#transportNote = transportnote; }
     setSKUItems(skuitems) { this.#skuItems = skuitems; }
 
-    addItem(itemid,quantity) { return this.#products.set(itemid,quantity); }
-    removeItem(itemid) { this.#products.delete(itemid); }
+    addItems(items) {
+        items.forEach((k,v) => this.#skuItems.set(v,k));
+        return this.#skuItems;
+    }
+    removeItem(itemid) { this.#products.delete(itemid); return this.#products; }
     modifyQuantity(itemid,quantity) { this.#products.set(itemid,quantity); }
     addSkuItems(itemid,quantity) { return this.#products.set(itemid,quantity); }
 

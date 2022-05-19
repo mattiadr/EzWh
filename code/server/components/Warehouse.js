@@ -511,13 +511,21 @@ class Warehouse {
 		return this.db_help.selectRestockOrdersIssued();
 	}
 
-	async createRestockOrder(ROID,issueDate,state,supplierId,transportNote,skuItems) {
+	addProducts(RO,items) {
+		return this.db_help.insertProducts(RO,items);
+	}
+
+	getProducts(roid) {
+		return this.db_help.selectProducts(roid);
+	}
+
+	async createRestockOrder(issueDate,state,products,supplierId,transportNote,skuItems) {
 		try {
-			let newRestockOrder = new RestockOrder(ROID,issueDate,state,supplierId,transportNote,skuItems);
-			await this.db_help.insertRestockOrder(newRestockOrder);
+			await this.db_help.insertRestockOrder(new RestockOrder(Math.random(),issueDate,state,products,supplierId,transportNote,skuItems));
 			return { status: 201, body: {} };
 		} catch (e) {
-			return { status: 503, body: {}, message: e };
+			console.log("exception", e);
+			return {status: 503, body: e};
 		}
 	}
 

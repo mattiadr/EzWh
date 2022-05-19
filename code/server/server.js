@@ -774,13 +774,26 @@ app.get("/api/restockOrders/:id",
 		});
 });
 
+app.get("/api/restockOrders/:id/returnItems",
+	param("id").isInt(),
+	(req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
+		wh.getProducts(req.params.id).then((io) => {
+			if (io) {
+				res.status(200).json({skuItems: io.skuItems});
+			} else {
+				res.status(404).end();
+			}
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	});
+
 /* POST */
 app.post("/api/restockOrder",
-	body("issueDate").isDate(),
-	body("state").exists(),
+	body("issueDate").exists(),
 	body("supplierId").isInt(),
-	body("transportNote").exists(),
-	body("skuItems").exists(),
+	body("products").exists(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
 		const result = await wh.createRestockOrder(req.body.issueDate, req.body.state, req.body.supplierId, req.body.transportNote, req.body.skuItems);
@@ -793,9 +806,20 @@ app.put("/api/restockOrders/:id",
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
 		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
-		const result = await wh.updateRestockOrder(req.params.ROID, req.params.issueDate, req.params.state, req.params.supplierId, req.params.transportNote, req.params.skuItems);
+		const ro = wh.getRestockOrderByID(req.params.id);
+		const result = await wh.updateRestockOrder(req.params.id, ro.issueDate, ro.state, ro.supplierId, ro.transportNote, ro.skuItems);
 		return res.status(result.status).send(result.body);
 });
+
+app.put("/api/restockOrder/:id/skuItems",
+	param("id").exists(),
+	async (req, res) => {
+		if (!req.is("application/json")) return res.status(422).send("malformed body");
+		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
+		const ro = wh.getRestockOrderByID(req.params.id);
+		const result = await wh.addProducts(ro, req.body.skuItems);
+		return res.status(result.status).send(result.body);
+	});
 
 /* DELETE */
 app.delete("/api/restockOrder/:id",
