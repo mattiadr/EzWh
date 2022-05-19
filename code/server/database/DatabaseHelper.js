@@ -5,6 +5,7 @@ const SKUItem = require("../components/SKUItem");
 const Position = require("../components/Position");
 const Item = require("../components/Item");
 const RestockOrder = require("../components/RestockOrder");
+const RestockOrderSKU = require("../components/RestockOrderSKU");
 const {User} = require("../components/User");
 const {TestDescriptor} = require("../components/TestDescriptor");
 const {TestResult} = require("../components/TestResult");
@@ -143,13 +144,22 @@ class DatabaseHelper {
 		this.db.run(createTableRestockOrder, (err) => err && console.log(err));
 
 		/** Restock Order & Item */
-		const createTableRestockOrderProducts = `CREATE TABLE IF NOT EXISTS ROProducts (
+		const createTableRestockOrderSKU = `CREATE TABLE IF NOT EXISTS ROSKU (
 			ROID integer NOT NULL,
-			ITEMID varchar(12) NOT NULL,
-			quantity integer NOT NULL,
-    		PRIMARY KEY (ROID, ITEMID)
+			SKUID integer NOT NULL,
+			RFID integer NOT NULL,
+    		PRIMARY KEY (ROID, SKUID)
 		);`;
-		this.db.run(createTableRestockOrderProducts, (err) => err && console.log(err));
+		this.db.run(createTableRestockOrderSKU, (err) => err && console.log(err));
+		const createTableRestockOrderItem = `CREATE TABLE IF NOT EXISTS ROItem (
+			ROID integer NOT NULL,
+			description varchar(100) NOT NULL,
+			price double NOT NULL,
+			SKUID varchar(12) NOT NULL,
+			quantity integer NOT NULL,
+    		PRIMARY KEY (ROID, SKUID)
+		);`;
+		this.db.run(createTableRestockOrderItem, (err) => err && console.log(err));
 		
 		/** Return Order **/
 		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
@@ -729,13 +739,30 @@ class DatabaseHelper {
 	/** RESTOCK ORDER **/
 	selectRestockOrders() {
 		return new Promise((resolve, reject) => {
-			const sql = `SELECT * FROM RestockOrder;`;
-			this.db.all(sql, [], (err, rows) => {
+			const sql1 = `SELECT * FROM RestockOrder;`;
+			const sql2 = `SELECT * FROM RestockOrderSKU WHERE ROID = ?;`;
+			const sql3 = `SELECT * FROM RestockOrderItem WHERE ROID = ?;`;
+			this.db.all(sql1, [], (err, rows) => {
 				if (err) {
 					reject(err.toString());
 				} else {
-					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.products, r.supplierId, r.transportNote)));
-				}
+					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.supplierId, r.transportNote)));
+					this.db.all(sql2, [r.ROID], (err, rows) => {
+						if (err) {
+							reject(err.toString());
+						} else {
+							resolve(rows.map((rr) => new RestockOrderSKU(rr.ROID,rr.SKUID,rr.RFID)));
+						}
+					});
+					this.db.all(sql3, [r.ROID], (err, rows) => {
+						if (err) {
+							reject(err.toString());
+						} else {
+							resolve(rows.map((s) => new RestockOrderItem(s.ROID,s.SKUId,s.description,s.price,s.quantity)));
+						}
+					});
+
+				};
 			});
 		});
 	}
@@ -747,19 +774,27 @@ class DatabaseHelper {
 				if (err) {
 					reject(err.toString());
 				} else {
-					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.products, r.supplierId, r.transportNote)));
+					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.supplierId, r.transportNote)));
 				}
 			});
 		});
 	}
 
-	insertRestockOrder(newRO /*: Object*/) {
+	insertRestockOrder(newRO, newROI) {
 		return new Promise((resolve, reject) => {
-			const sql = `INSERT INTO RestockOrder(issueDate, state, products, supplierId, transportNote) VALUES (?, ?, ?, ?, ?);`;
-			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.products, newRO.supplierId, newRO.transportNote], (err) => {
+			const sql1 = `INSERT INTO RestockOrder(issueDate, supplierId) VALUES (?, ?);`;
+			const sql2 = `INSERT INTO RestockOrderItem(ROID,SKUID,description,price,quantity) VALUES (?,?,?,?,?);`;
+			this.db.run(sql1, [newRO.getIssueDate(), newRO.getSupplierId()], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
+					this.db.run(sql2, [newROI.getRestockOrderId(),newROI.getSKUId(),newROI.getDescription(),newROI.getPrice(),newROI.getQuantity()], (err) => {
+						if (err) {
+							reject(err.toString());
+						} else {
+							resolve();
+						}
+					});
 					resolve();
 				}
 			});
@@ -771,7 +806,7 @@ class DatabaseHelper {
 			const sql = `UPDATE RestockOrder SET
 				issueDate = ?, state = ?, supplierId = ?, transportNote = ?
 				WHERE ROID = ?`;
-			this.db.run(sql, [newRO.issueDate, newRO.state, newRO.products, newRO.supplierId, newRO.transportNote], (err) => {
+			this.db.run(sql, [newRO.getIssueDate(), newRO.getState(), newRO.getSupplierId(), newRO.getTransportNote(), newRO.getRestockOrderId()], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
@@ -803,7 +838,7 @@ class DatabaseHelper {
 					reject(err.toString());
 				} else {
 					if (row) {
-						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.products, row.supplierId, row.transportNote));
+						resolve(new RestockOrder(row.ROID, row.issueDate, row.state, row.supplierId, row.transportNote));
 					} else {
 						resolve(null);
 					}

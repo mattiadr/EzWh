@@ -799,7 +799,7 @@ app.post("/api/restockOrder",
 	body("products").exists(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-		const result = await wh.createRestockOrder(req.body.issueDate, req.body.state, req.body.supplierId, req.body.transportNote, req.body.skuItems);
+		const result = await wh.createRestockOrder(req.body.issueDate, req.body.products.SKUId, req.body.products.description,req.body.products.price,req.body.products.qty,req.body.supplierId);
 		return res.status(result.status).send(result.body);
 });
 

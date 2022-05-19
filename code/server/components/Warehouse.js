@@ -14,6 +14,7 @@ const RestockOrder = require("./RestockOrder");
 const ReturnOrderProduct = require("./ReturnOrderProduct")
 const InternalOrderProduct = require("./InternalOrderProduct")
 const Item = require("./Item");
+const RestockOrderItem = require("./RestockOrderItem");
 
 class Warehouse {
 	constructor(dbFile="./database/ezwh.db") {
@@ -501,46 +502,15 @@ class Warehouse {
 		return this.db_help.selectRestockOrdersIssued();
 	}
 
-	addProducts(RO,items) {
-		return this.db_help.insertProducts(RO,items);
-	}
-
-	getProducts(roid) {
-		return this.db_help.selectProducts(roid);
-	}
-
-	async createRestockOrder(issueDate,state,products,supplierId,transportNote,skuItems) {
+	async createRestockOrder(issueDate,SKUId,description,price,quantity,supplierId) {
 		try {
-			await this.db_help.insertRestockOrder(new RestockOrder(Math.random(),issueDate,state,products,supplierId,transportNote,skuItems));
+			let ROID = int(10*Math.random());
+			await this.db_help.insertRestockOrder(new RestockOrder(ROID,issueDate,'issued',supplierId,null),
+			new RestockOrderItem(ROID,SKUId,description,price,quantity));
 			return { status: 201, body: {} };
 		} catch (e) {
 			console.log("exception", e);
 			return {status: 503, body: e};
-		}
-	}
-
-	async updateRestockOrder(ROID,issueDate = undefined,state = undefined,supplierId = undefined,transportNote = undefined,skuItems = undefined) {
-		try {
-			let restockorder = await this.db_help.selectRestockOrderByID(ROID);
-			if (!restockorder) return { status: 404, body: "restock order not found" };
-			if (ROID !== undefined) {
-				restockorder.setIssueDate(issueDate);
-				restockorder.setState(state);
-				restockorder.setSupplierId(supplierId);
-				restockorder.setTransportNote(transportNote);
-				restockorder.setSKUItems(skuItems);
-			} else {
-				restockorder.setItemId(ROID);
-				restockorder.setIssueDate(issueDate);
-				restockorder.setState(state);
-				restockorder.setSupplierId(supplierId);
-				restockorder.setTransportNote(transportNote);
-				restockorder.setSKUItems(skuItems);
-			}
-			await this.db_help.updateRestockOrder(ROID, restockorder);
-			return { status: 200, body: "" };
-		} catch (e) {
-			return { status: 503, body: e };
 		}
 	}
 
