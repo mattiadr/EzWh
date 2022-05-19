@@ -707,13 +707,14 @@ app.get("/api/items/:id",
 
 /* POST */
 app.post("/api/item",
+	body("id").isInt(),
 	body("description").exists(),
 	body("price").exists(),
-	body("SKUId").exists(),
+	body("SKUId").isInt(),
 	body("supplierId").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-		const result = await wh.createItem(req.body.description, req.body.price, req.body.SKUId, req.body.supplierId);
+		const result = await wh.createItem(req.body.id, req.body.description, req.body.price, req.body.SKUId, req.body.supplierId);
 		return res.status(result.status).send(result.body);
 });
 

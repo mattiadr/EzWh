@@ -461,26 +461,26 @@ class Warehouse {
 		return this.db_help.selectItems();
 	}
 
-	async createItem(description, price, SKUID, supplierId) {
+	async createItem(id, description, price, SKUID, supplierId) {
 		try {
-			await this.db_help.insertItem(new Item(null, description, price, SKUID, supplierId));
+			await this.db_help.insertItem(new Item(id, description, price, SKUID, supplierId));
 			return {status: 201, body: ""};
 		} catch (e) {
 			return {status: 503, body: e};
 		}
 	}
 
-	async updateItem(ITEMID, description = undefined, price = undefined, SKUID = undefined, supplierId = undefined) {
+	async updateItem(id, description = undefined, price = undefined, SKUID = undefined, supplierId = undefined) {
 		try {
-			let item = await this.db_help.selectItemByID(ITEMID);
+			let item = await this.db_help.selectItemByID(id);
 			if (!item) return { status: 404, body: "item not found" };
-			if (ITEMID !== undefined) {
+			if (id !== undefined) {
 				item.setDescription(description);
 				item.setPrice(price);
 				item.setSKUId(SKUID);
 				item.setSupplierId(supplierId);
 			} else {
-				item.setItemId(ITEMID);
+				item.setItemId(id);
 				item.setDescription(description);
 				item.setPrice(price);
 				item.setSKUId(SKUID);

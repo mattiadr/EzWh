@@ -123,7 +123,7 @@ class DatabaseHelper {
 		const createTableItem = `CREATE TABLE IF NOT EXISTS Item (
 			ITEMID varchar(12) NOT NULL,
 			description varchar(100) NOT NULL,
-			price DOUBLE NOT NULL,
+			price double NOT NULL,
 			SKUID varchar(12) NOT NULL,
 			supplierID varchar(12) NOT NULL,
     		PRIMARY KEY (ITEMID)
@@ -135,13 +135,21 @@ class DatabaseHelper {
 			ROID INTEGER NOT NULL,
 			issueDate DATETIME NOT NULL,
 			state varchar(10) NOT NULL,
-			products varchar(10) NOT NULL,
 			supplierID INTEGER NOT NULL,
 			transportNote varchar(12) NOT NULL,
 			skuItems varchar(50) NOT NULL,
     		PRIMARY KEY (ROID)
 		);`;
 		this.db.run(createTableRestockOrder, (err) => err && console.log(err));
+
+		/** Restock Order & Item */
+		const createTableRestockOrderProducts = `CREATE TABLE IF NOT EXISTS ROProducts (
+			ROID integer NOT NULL,
+			ITEMID varchar(12) NOT NULL,
+			quantity integer NOT NULL,
+    		PRIMARY KEY (ROID, ITEMID)
+		);`;
+		this.db.run(createTableRestockOrderProducts, (err) => err && console.log(err));
 		
 		/** Return Order **/
 		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
@@ -167,7 +175,7 @@ class DatabaseHelper {
 			issueDate DATETIME NOT NULL,
 			state VARCHAR(10) NOT NULL,
 			customerId INTEGER NOT NULL,
-				PRIMARY KEY (internalOrderId)
+			PRIMARY KEY (internalOrderId)
 		);`;
 		this.db.run(createTableInternalOrder, (err) => err && console.log(err));
 
@@ -661,8 +669,8 @@ class DatabaseHelper {
 
 	insertItem(newItem /*: Object*/) {
 		return new Promise((resolve, reject) => {
-			const sql = `INSERT INTO Item(newItem.description, newItem.price, newItem.SKUId, newItem.supplierId) VALUES (?, ?, ?, ?);`;
-			this.db.run(sql, [newItem.description, newItem.price, newItem.SKUId, newItem.supplierId], (err) => {
+			const sql = `INSERT INTO Item(ITEMID, description, price, SKUId, supplierId) VALUES (?, ?, ?, ?, ?);`;
+			this.db.run(sql, [newItem.ITEMID, newItem.description, newItem.price, newItem.SKUId, newItem.supplierId], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
