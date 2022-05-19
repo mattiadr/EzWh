@@ -661,7 +661,7 @@ class DatabaseHelper {
 				if (err) {
 					reject(err.toString());
 				} else {
-					resolve(rows.map((r) => new Item(r.ITEMID, r.description, r.price, r.SKUID, r.supplierId)));
+					resolve(rows.map((r) => new Item(r.ITEMID, r.description, r.price, r.SKUID, r.supplierID)));
 				}
 			});
 		});
@@ -669,7 +669,7 @@ class DatabaseHelper {
 
 	insertItem(newItem /*: Object*/) {
 		return new Promise((resolve, reject) => {
-			const sql = `INSERT INTO Item(ITEMID, description, price, SKUId, supplierId) VALUES (?, ?, ?, ?, ?);`;
+			const sql = `INSERT INTO Item(ITEMID, description, price, SKUID, supplierID) VALUES (?, ?, ?, ?, ?);`;
 			this.db.run(sql, [newItem.getItemId(), newItem.getDescription(), newItem.getPrice(), newItem.getSKUId(), newItem.getSupplierId()], (err) => {
 				if (err) {
 					reject(err.toString());
@@ -683,9 +683,9 @@ class DatabaseHelper {
 	updateItem(newItem /*: Object*/) {
 		return new Promise((resolve, reject) => {
 			const sql = `UPDATE Item SET
-				description = ?, price = ?, SKUId = ?, supplierId = ?
-				WHERE ITEMID = ?`;
-			this.db.run(sql, [newItem.getDescription(), newItem.getPrice(), newItem.getSKUId(), newItem.getSupplierId()], (err) => {
+				description = ?, price = ?, SKUID = ?, supplierID = ?
+				WHERE ITEMID = ?;`;
+			this.db.run(sql, [newItem.getDescription(), newItem.getPrice(), newItem.getSKUId(), newItem.getSupplierId(), newItem.getItemId()], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
@@ -717,7 +717,7 @@ class DatabaseHelper {
 					reject(err.toString());
 				} else {
 					if (row) {
-						resolve(new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierId));
+						resolve(new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierID));
 					} else {
 						resolve(null);
 					}
