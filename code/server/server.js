@@ -685,7 +685,7 @@ param("internalOrderId").isInt(),
 app.get("/api/items",
 	(req, res) => {
 		wh.getItems().then((Items) => {
-			res.status(200).json(Items.map((io) => ({ITEMID: io.ITEMID, description: io.description, price: io.price, SKUID: io.SKUID, supplierId: io.supplierId})));
+			res.status(200).json(Items.map((io) => ({ITEMID: io.getItemId(), description: io.getDescription(), price: io.getPrice(), SKUID: io.getSKUId(), supplierId: io.getSupplierId()})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
