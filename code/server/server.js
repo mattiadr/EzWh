@@ -720,12 +720,13 @@ app.post("/api/item",
 
 /* PUT */
 app.put("/api/item/:id",
+	param("id").exists(),
 	body("newDescription").exists(),
 	body("newPrice").exists(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
 		if (!validationResult(req).isEmpty()) return res.status(404).send("missing id");
-		const result = await wh.updateItem(req.params.id, req.body.newDescription, req.body.newPrice, req.body.newSKUId, req.body.newSupplierId);
+		const result = await wh.updateItem(req.params.id, req.body.newDescription, req.body.newPrice);
 		return res.status(result.status).send(result.body);
 });
 
