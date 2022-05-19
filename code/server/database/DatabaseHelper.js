@@ -685,7 +685,7 @@ class DatabaseHelper {
 			const sql = `UPDATE Item SET
 				description = ?, price = ?, SKUId = ?, supplierId = ?
 				WHERE ITEMID = ?`;
-			this.db.run(sql, [newItem.description, newItem.price, newItem.SKUId, newItem.supplierId], (err) => {
+			this.db.run(sql, [newItem.getDescription(), newItem.getPrice(), newItem.getSKUId(), newItem.getSupplierId()], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {

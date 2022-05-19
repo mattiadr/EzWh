@@ -470,23 +470,16 @@ class Warehouse {
 		}
 	}
 
-	async updateItem(id, description = undefined, price = undefined, SKUID = undefined, supplierId = undefined) {
+	async updateItem(id, description, price, SKUId, supplierId) {
 		try {
 			let item = await this.db_help.selectItemByID(id);
 			if (!item) return { status: 404, body: "item not found" };
-			if (id !== undefined) {
-				item.setDescription(description);
-				item.setPrice(price);
-				item.setSKUId(SKUID);
-				item.setSupplierId(supplierId);
-			} else {
-				item.setItemId(id);
-				item.setDescription(description);
-				item.setPrice(price);
-				item.setSKUId(SKUID);
-				item.setSupplierId(supplierId);
-			}
-			await this.db_help.updateItem(ITEMID, item);
+			if (id !== undefined) item.setItemId(id);
+			if (description !== undefined) item.setDescription(description);
+			if (price !== undefined) item.setPrice(price);
+			if (SKUId !== undefined) item.setSKUId(SKUId);
+			if (supplierId !== undefined) item.setSupplierId(supplierId);
+			await this.db_help.updateItem(item);
 			return { status: 200, body: "" };
 		} catch (e) {
 			return { status: 503, body: e };
