@@ -86,7 +86,7 @@ class Warehouse {
 			if (oldPosition !== undefined) {
 				oldPosition.subOccupiedWeight(sku.getWeight());
 				oldPosition.subOccupiedVolume(sku.getVolume());
-				this.db_help.updatePosition(oldPosition.getPositionID(), oldPosition);
+				await this.db_help.updatePosition(oldPosition.getPositionID(), oldPosition);
 			}
 			await this.db_help.updateSKU(sku);
 			return {status: 200, body: ""};
@@ -504,7 +504,7 @@ class Warehouse {
 
 	async createRestockOrder(issueDate,SKUId,description,price,quantity,supplierId) {
 		try {
-			let ROID = int(10*Math.random());
+			let ROID = 10*Math.random();
 			await this.db_help.insertRestockOrder(new RestockOrder(ROID,issueDate,'issued',supplierId,null),
 			new RestockOrderItem(ROID,SKUId,description,price,quantity));
 			return { status: 201, body: {} };
