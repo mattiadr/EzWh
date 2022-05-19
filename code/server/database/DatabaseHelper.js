@@ -670,7 +670,7 @@ class DatabaseHelper {
 	insertItem(newItem /*: Object*/) {
 		return new Promise((resolve, reject) => {
 			const sql = `INSERT INTO Item(ITEMID, description, price, SKUId, supplierId) VALUES (?, ?, ?, ?, ?);`;
-			this.db.run(sql, [newItem.ITEMID, newItem.description, newItem.price, newItem.SKUId, newItem.supplierId], (err) => {
+			this.db.run(sql, [newItem.getItemId(), newItem.getDescription(), newItem.getPrice(), newItem.getSKUId(), newItem.getSupplierId()], (err) => {
 				if (err) {
 					reject(err.toString());
 				} else {
