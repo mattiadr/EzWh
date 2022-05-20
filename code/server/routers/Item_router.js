@@ -9,8 +9,8 @@ const router = express.Router();
 /* GET */
 router.get("/items",
 	(req, res) => {
-		Item_service.getItems().then((Items) => {
-			res.status(200).json(Items.map((io) => ({ITEMID: io.getItemId(), description: io.getDescription(), price: io.getPrice(), SKUID: io.getSKUId(), supplierId: io.getSupplierId()})));
+		Item_service.getItems().then((items) => {
+			res.status(200).json(items.map((item) => ({id: item.id, description: item.description, price: item.price, SKUId: item.SKUID, supplierId: item.supplierID})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
@@ -19,9 +19,9 @@ router.get("/items/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
-		Item_service.getItemByID(req.params.id).then((io) => {
-			if (io) {
-				res.status(200).json({ITEMID: io.ITEMID, description: io.description, price: io.price, SKUID: io.SKUID, supplierId: io.supplierId});
+		Item_service.getItemByID(req.params.id).then((item) => {
+			if (item) {
+				res.status(200).json({id: item.id, description: item.description, price: item.price, SKUId: item.SKUID, supplierId: item.supplierID});
 			} else {
 				res.status(404).end();
 			}
@@ -34,7 +34,7 @@ router.get("/items/:id",
 router.post("/item",
 	body("id").isInt(),
 	body("description").exists(),
-	body("price").exists(),
+	body("price").isFloat({"min": 0}),
 	body("SKUId").isInt(),
 	body("supplierId").isInt(),
 	async (req, res) => {
@@ -45,7 +45,7 @@ router.post("/item",
 
 /* PUT */
 router.put("/item/:id",
-	param("id").exists(),
+	param("id").isInt(),
 	body("newDescription").exists(),
 	body("newPrice").exists(),
 	async (req, res) => {
@@ -57,7 +57,7 @@ router.put("/item/:id",
 
 /* DELETE */
 router.delete("/items/:id",
-	param("id").exists(),
+	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		Item_service.deleteItem(req.params.id).then(() => {

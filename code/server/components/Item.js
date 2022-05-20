@@ -1,26 +1,22 @@
 class Item {
-	#ITEMID; #description; #price; #SKUId; #supplierId;
+	#id; #description; #price; #SKUID; #supplierID;
 
-	constructor (ITEMID, description,price,SKUId,supplierId) {
-		this.#ITEMID = ITEMID; // String
-		this.#description = description; // String
-		this.#price = price; // Double
-		this.#SKUId = SKUId; // String
-		this.#supplierId = supplierId; // Integer
+	constructor (id, description, price, SKUID, supplierID) {
+		this.#id = id;
+		this.#description = description;
+		this.#price = price;
+		this.#SKUID = SKUID;
+		this.#supplierID = supplierID;
 	}
 
-	getItemId() { return this.#ITEMID; }
-	getDescription() { return this.#description; }
-	getPrice() { return this.#price; }
-	getSKUId() { return this.#SKUId; }
-	getSupplierId() { return this.#supplierId; }
+	get id() { return this.#id; }
+	get description() { return this.#description; }
+	get price() { return this.#price; }
+	get SKUID() { return this.#SKUID; }
+	get supplierID() { return this.#supplierID; }
 
-	setItemId(itemid) { this.#ITEMID = itemid; }
-	setDescription(description) { this.#description = description; }
-	setPrice(price) { this.#price = price; }
-	setSKUId(skuid) { this.#SKUId = skuid; }
-	setSupplierId(supplierId) { this.#supplierId = supplierId; }
-
+	set description(value) { this.#description = value; }
+	set price(value) { this.#price = value; }
 }
 
 module.exports = Item;

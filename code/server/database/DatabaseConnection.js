@@ -23,7 +23,7 @@ class DatabaseConnection {
 			notes varchar(50) NOT NULL,
 			positionId varchar(12),
 			availableQuantity integer NOT NULL,
-    		PRIMARY KEY (SKUID)
+			PRIMARY KEY (SKUID)
 		);`;
 		this.db.run(createTableSKU, (err) => err && console.log(err));
 
@@ -33,7 +33,7 @@ class DatabaseConnection {
 			SKUID varchar(12) NOT NULL,
 			available boolean DEFAULT 0,
 			dateOfStock DATETIME,
-    		PRIMARY KEY (RFID)
+			PRIMARY KEY (RFID)
 		);`;
 		this.db.run(createTableSKUItem, (err) => err && console.log(err));
 
@@ -47,7 +47,7 @@ class DatabaseConnection {
 			maxVolume integer NOT NULL,
 			occupiedWeight integer DEFAULT 0,
 			occupiedValue integer DEFAULT 0,
-    		PRIMARY KEY(posID)
+			PRIMARY KEY(posID)
 		);`;
 		this.db.run(createTablePosition, (err) => err && console.log(err));
 
@@ -67,8 +67,8 @@ class DatabaseConnection {
 			idTestDescriptor INTEGER NOT NULL,
 			date VARCHAR(16) NOT NULL,
 			result INTEGER NOT NULL,
-    		rfid VARCHAR(32) NOT NULL,
-    		PRIMARY KEY (id)
+			rfid VARCHAR(32) NOT NULL,
+			PRIMARY KEY (id)
 		)`;
 		this.db.run(createTableTestResult, (err) => err && console.log(err));
 
@@ -87,12 +87,12 @@ class DatabaseConnection {
 
 		/** Item **/
 		const createTableItem = `CREATE TABLE IF NOT EXISTS Item (
-			ITEMID varchar(12) NOT NULL,
+			id varchar(12) NOT NULL,
 			description varchar(100) NOT NULL,
 			price double NOT NULL,
 			SKUID varchar(12) NOT NULL,
 			supplierID varchar(12) NOT NULL,
-    		PRIMARY KEY (ITEMID)
+			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableItem, (err) => err && console.log(err));
 
@@ -104,7 +104,7 @@ class DatabaseConnection {
 			supplierID INTEGER NOT NULL,
 			transportNote varchar(12) NOT NULL,
 			skuItems varchar(50) NOT NULL,
-    		PRIMARY KEY (ROID)
+			PRIMARY KEY (ROID)
 		);`;
 		this.db.run(createTableRestockOrder, (err) => err && console.log(err));
 
@@ -113,7 +113,7 @@ class DatabaseConnection {
 			ROID integer NOT NULL,
 			ITEMID varchar(12) NOT NULL,
 			quantity integer NOT NULL,
-    		PRIMARY KEY (ROID, ITEMID)
+			PRIMARY KEY (ROID, ITEMID)
 		);`;
 		this.db.run(createTableRestockOrderProducts, (err) => err && console.log(err));
 
@@ -150,7 +150,7 @@ class DatabaseConnection {
 			internalOrderId integer NOT NULL,
 			ITEMID varchar(12) NOT NULL,
 			quantity integer NOT NULL,
-    		PRIMARY KEY (internalOrderId, ITEMID)
+			PRIMARY KEY (internalOrderId, ITEMID)
 		);`;
 		this.db.run(createTableInternalOrderProduct, (err) => err && console.log(err));
 	}

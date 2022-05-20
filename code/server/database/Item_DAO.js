@@ -11,49 +11,7 @@ exports.selectItems = () => {
             if (err) {
                 reject(err.toString());
             } else {
-                resolve(rows.map((r) => new Item(r.ITEMID, r.description, r.price, r.SKUID, r.supplierID)));
-            }
-        });
-    });
-}
-
-exports.insertItem = (newItem) => {
-    return new Promise((resolve, reject) => {
-        const sql = `INSERT INTO Item(ITEMID, description, price, SKUID, supplierID) VALUES (?, ?, ?, ?, ?);`;
-        db.run(sql, [newItem.getItemId(), newItem.getDescription(), newItem.getPrice(), newItem.getSKUId(), newItem.getSupplierId()], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        });
-    });
-}
-
-exports.updateItem = (newItem) => {
-    return new Promise((resolve, reject) => {
-        const sql = `UPDATE Item SET
-                     description = ?, price = ?, SKUID = ?, supplierID = ?
-                     WHERE ITEMID = ?;`;
-        db.run(sql, [newItem.getDescription(), newItem.getPrice(), newItem.getSKUId(), newItem.getSupplierId(), newItem.getItemId()], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        });
-    });
-
-}
-
-exports.deleteItem = (id) => {
-    return new Promise((resolve, reject) => {
-        const sql = `DELETE FROM Item WHERE ITEMID = ?`;
-        db.run(sql, [id], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
+                resolve(rows.map((r) => new Item(r.id, r.description, r.price, r.SKUID, r.supplierID)));
             }
         });
     });
@@ -61,16 +19,74 @@ exports.deleteItem = (id) => {
 
 exports.selectItemByID = (id) => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM Item WHERE ITEMID = ?;`;
+        const sql = `SELECT * FROM Item WHERE id = ?;`;
         db.get(sql, [id], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
                 if (row) {
-                    resolve(new Item(row.ITEMID, row.description, row.price, row.SKUID, row.supplierID));
+                    resolve(new Item(row.id, row.description, row.price, row.SKUID, row.supplierID));
                 } else {
                     resolve(null);
                 }
+            }
+        });
+    });
+}
+
+exports.selectItemBySKUID = (skuid) => {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM Item WHERE SKUID = ?;`;
+        db.get(sql, [skuid], (err, row) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                if (row) {
+                    resolve(new Item(row.id, row.description, row.price, row.SKUID, row.supplierID));
+                } else {
+                    resolve(null);
+                }
+            }
+        });
+    });
+}
+
+exports.insertItem = (item) => {
+    return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO Item(id, description, price, SKUID, supplierID) VALUES (?, ?, ?, ?, ?);`;
+        db.run(sql, [item.id, item.description, item.price, item.SKUID, item.supplierID], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+exports.updateItem = (item) => {
+    return new Promise((resolve, reject) => {
+        const sql = `UPDATE Item SET
+                     description = ?, price = ?, SKUID = ?, supplierID = ?
+                     WHERE id = ?;`;
+        db.run(sql, [item.description, item.price, item.SKUID, item.supplierID, item.id], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+exports.deleteItemByID = (id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE FROM Item WHERE id = ?`;
+        db.run(sql, [id], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve();
             }
         });
     });
