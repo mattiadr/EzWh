@@ -1,5 +1,7 @@
-'use strict';
 const DatabaseConnection = require("./DatabaseConnection");
+const ReturnOrder = require("../components/ReturnOrder");
+const ReturnOrderProduct = require("../components/ReturnOrderProduct");
+
 
 const db = DatabaseConnection.getInstance();
 
@@ -114,7 +116,7 @@ exports.deleteReturnOrderProduct = (returnOrderId, ITEMID) => {
 
 exports.updateReturnOrderProduct = (returnOrderProduct) => {
     return new Promise((resolve, reject) => {
-        const sql = `UPDATE ReturnOrderProduct SET price = ? WHERE returnOrderId = ?, ITEMID = ?`;
+        const sql = `UPDATE ReturnOrderProduct SET price = ? WHERE returnOrderId = ? AND ITEMID = ?`;
         db.run(sql, [returnOrderProduct.price, returnOrderProduct.returnOrderId, returnOrderProduct.ITEMID], (err) => {
             if (err) {
                 reject(err.toString());

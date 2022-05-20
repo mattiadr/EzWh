@@ -1,8 +1,9 @@
-'use strict';
 const DatabaseConnection = require("./DatabaseConnection");
+const InternalOrder = require("../components/InternalOrder");
+const InternalOrderProduct = require("../components/InternalOrderProduct");
+
 
 const db = DatabaseConnection.getInstance();
-
 
 exports.selectInternalOrders = () => {
     return new Promise((resolve, reject) => {

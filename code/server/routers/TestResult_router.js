@@ -1,17 +1,18 @@
 const express = require("express");
-const {body, param, validationResult} = require('express-validator');
+const {body, param, validationResult} = require("express-validator");
 
-const Warehouse = require("../components/Warehouse");
+const TestResult_service = require("../services/TestResult_service");
+
 
 const router = express.Router();
-const wh = Warehouse.getInstance();
+
 
 /* GET */
 router.get("/skuitems/:rfid/testResults",
 	param("rfid").exists(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid rfid");
-		const result = await wh.getTestResults(req.params.rfid);
+		const result = await TestResult_service.getTestResults(req.params.rfid);
 		return res.status(result.status).json(result.body);
 });
 router.get("/skuitems/:rfid/testResults/:id",
@@ -19,7 +20,7 @@ router.get("/skuitems/:rfid/testResults/:id",
 	param("id").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params");
-		const result = await wh.getTestResultByID(req.params.rfid, req.params.id);
+		const result = await TestResult_service.getTestResultByID(req.params.rfid, req.params.id);
 		return res.status(result.status).json(result.body);
 });
 
@@ -31,7 +32,7 @@ router.post("/skuitems/testResult",
 	body("Result").isBoolean(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-		const result = await wh.createTestResult(req.body.rfid, req.body.idTestDescriptor, req.body.Date, req.body.Result);
+		const result = await TestResult_service.createTestResult(req.body.rfid, req.body.idTestDescriptor, req.body.Date, req.body.Result);
 		return res.status(result.status).send(result.body);
 });
 
@@ -44,7 +45,7 @@ router.put("/skuitems/:rfid/testResult/:id",
 	body("newResult").isBoolean(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params or body");
-		const result = await wh.updateTestResult(req.params.rfid, req.params.id, req.body.newIdTestDescriptor, req.body.newDate, req.body.newResult);
+		const result = await TestResult_service.updateTestResult(req.params.rfid, req.params.id, req.body.newIdTestDescriptor, req.body.newDate, req.body.newResult);
 		return res.status(result.status).send(result.body);
 });
 
@@ -54,7 +55,7 @@ router.delete("/skuitems/:rfid/testResult/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params");
-		wh.deleteTestResult(req.params.rfid, req.params.id).then(() => {
+		TestResult_service.deleteTestResult(req.params.rfid, req.params.id).then(() => {
 			res.status(204).end();
 		}).catch((err) => {
 			res.status(503).send(err);

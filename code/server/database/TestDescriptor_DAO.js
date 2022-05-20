@@ -1,6 +1,6 @@
-'use strict';
 const TestDescriptor = require("../components/TestDescriptor");
 const DatabaseConnection = require("./DatabaseConnection");
+
 
 const db = DatabaseConnection.getInstance();
 

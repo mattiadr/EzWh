@@ -21,4 +21,4 @@ class TestDescriptor {
 	set idSKU(value) { this.#idSKU = value; }
 }
 
-exports.TestDescriptor = TestDescriptor;
+module.exports = TestDescriptor;

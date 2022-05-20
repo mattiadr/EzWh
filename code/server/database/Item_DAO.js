@@ -1,8 +1,8 @@
-'use strict';
 const DatabaseConnection = require("./DatabaseConnection");
+const Item = require("../components/Item");
+
 
 const db = DatabaseConnection.getInstance();
-
 
 exports.selectItems = () => {
     return new Promise((resolve, reject) => {

@@ -3,6 +3,7 @@ const sqlite3 = require("sqlite3");
 
 class DatabaseConnection {
 	static db = null;
+
 	static getInstance() {
 		if (!this.db) {
 			this.db = new sqlite3.Database("./database/ezwh.db", (err) => err && console.log(err));
@@ -10,6 +11,7 @@ class DatabaseConnection {
 		}
 		return this.db;
 	}
+
 	static createTables() {
 		/** SKU **/
 		const createTableSKU = `CREATE TABLE IF NOT EXISTS SKU (

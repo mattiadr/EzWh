@@ -1,15 +1,15 @@
 const express = require("express");
-const {body, param, validationResult} = require('express-validator');
+const {body, param, validationResult} = require("express-validator");
 
-const Warehouse = require("../components/Warehouse");
+const Item_service = require("../services/Item_service");
+
 
 const router = express.Router();
-const wh = Warehouse.getInstance();
 
 /* GET */
 router.get("/items",
 	(req, res) => {
-		wh.getItems().then((Items) => {
+		Item_service.getItems().then((Items) => {
 			res.status(200).json(Items.map((io) => ({ITEMID: io.getItemId(), description: io.getDescription(), price: io.getPrice(), SKUID: io.getSKUId(), supplierId: io.getSupplierId()})));
 		}).catch((err) => {
 			res.status(500).send(err);
@@ -19,7 +19,7 @@ router.get("/items/:id",
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
-		wh.getItemByID(req.params.id).then((io) => {
+		Item_service.getItemByID(req.params.id).then((io) => {
 			if (io) {
 				res.status(200).json({ITEMID: io.ITEMID, description: io.description, price: io.price, SKUID: io.SKUID, supplierId: io.supplierId});
 			} else {
@@ -39,7 +39,7 @@ router.post("/item",
 	body("supplierId").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
-		const result = await wh.createItem(req.body.id, req.body.description, req.body.price, req.body.SKUId, req.body.supplierId);
+		const result = await Item_service.createItem(req.body.id, req.body.description, req.body.price, req.body.SKUId, req.body.supplierId);
 		return res.status(result.status).send(result.body);
 });
 
@@ -51,7 +51,7 @@ router.put("/item/:id",
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
 		if (!validationResult(req).isEmpty()) return res.status(404).send("missing id");
-		const result = await wh.updateItem(req.params.id, req.body.newDescription, req.body.newPrice);
+		const result = await Item_service.updateItem(req.params.id, req.body.newDescription, req.body.newPrice);
 		return res.status(result.status).send(result.body);
 });
 
@@ -60,7 +60,7 @@ router.delete("/items/:id",
 	param("id").exists(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
-		wh.deleteItem(req.params.id).then(() => {
+		Item_service.deleteItem(req.params.id).then(() => {
 			res.status(204).end();
 		}).catch((err) => {
 			res.status(500).send(err);

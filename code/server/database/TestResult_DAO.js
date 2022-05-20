@@ -1,5 +1,6 @@
-'use strict';
 const DatabaseConnection = require("./DatabaseConnection");
+const TestResult = require("../components/TestResult");
+
 
 const db = DatabaseConnection.getInstance();
 

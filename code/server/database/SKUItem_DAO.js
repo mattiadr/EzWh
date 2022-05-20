@@ -1,5 +1,6 @@
-'use strict';
 const DatabaseConnection = require("./DatabaseConnection");
+const SKUItem = require("../components/SKUItem");
+
 
 const db = DatabaseConnection.getInstance();
 

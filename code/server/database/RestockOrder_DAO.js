@@ -1,8 +1,8 @@
-'use strict';
 const DatabaseConnection = require("./DatabaseConnection");
+const RestockOrder = require("../components/RestockOrder");
+
 
 const db = DatabaseConnection.getInstance();
-
 
 exports.selectRestockOrders = () => {
     return new Promise((resolve, reject) => {
@@ -96,8 +96,7 @@ exports.selectProducts = (roid) => {
         db.all(sql,
             [ro.forEach(x => x.getSKUItems()
                 .filter(v => {
-                    if (v.getTestResults().filter(w => w.getResult() === false).count() > 0) return true;
-                    else return false;
+                    return v.getTestResults().filter(w => w.getResult() === false).count() > 0;
                 })
             )], (err, rows) => {
                 if (err) {

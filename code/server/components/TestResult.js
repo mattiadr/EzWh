@@ -23,4 +23,4 @@ class TestResult {
 	set result(value) { this.#result = value; }
 }
 
-exports.TestResult = TestResult;
+module.exports = TestResult;
