@@ -609,4 +609,15 @@ class Warehouse {
 	}
 }
 
-exports.Warehouse = Warehouse;
+// TODO remove
+// temporary workaround to make warehouse a singleton
+class WarehouseHolder {
+	static wh = null;
+
+	static getInstance() {
+		if (!this.wh) this.wh = new Warehouse();
+		return this.wh;
+	}
+}
+
+module.exports = WarehouseHolder;
