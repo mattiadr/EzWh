@@ -36,6 +36,7 @@ router.post("/newUser",
 	body("username").isEmail(),
 	body("password").isLength({min: 8}),
 	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid email");
 		const result = await User_service.createUser(req.body.username, req.body.name, req.body.surname, req.body.password, req.body.type);
 		return res.status(result.status).send(result.body);
 });
@@ -92,7 +93,7 @@ router.put("/users/:username",
 	param("username").isEmail(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
-		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid email");
 		const result = await User_service.updateUserRights(req.params.username, req.body.oldType, req.body.newType);
 		return res.status(result.status).send(result.body);
 });
@@ -102,7 +103,7 @@ router.delete("/users/:username/:type",
 	param("username").isEmail(),
 	param("type").exists(),
 	async (req, res) => {
-		if (!validationResult(req).isEmpty()) return res.status(404).send("missing params");
+		if (!validationResult(req).isEmpty()) return res.status(422).send("missing params");
 		const result = await User_service.deleteUser(req.params.username, req.params.type);
 		return res.status(result.status).send(result.body);
 });

@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 const {User, UserRole} = require("../components/User");
 
 const User_DAO = require("../database/User_DAO");
@@ -17,11 +19,12 @@ exports.getUsersByRole = (role) => {
 }
 
 exports.createUser = async (email, name, surname, password, type) => {
-	if (!Object.values(UserRole).includes(type)) return {status: 422, body: "type does not exist"};
+	const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
+	if (!allowedTypes.includes(type)) return {status: 422, body: "type does not exist"};
 
 	try {
-		const user = await User_DAO.selectUserByEmail(email);
-		if (user && user.role === type) return {status: 409, body: "username already exists"};
+		const user = await User_DAO.selectUserByEmailAndType(email, type);
+		if (user) return {status: 409, body: "username already exists"};
 
 		const passwordSalt = crypto.randomBytes(256).toString("base64");
 		const passwordHash = crypto.createHash("sha256")
@@ -39,8 +42,8 @@ exports.createUser = async (email, name, surname, password, type) => {
 
 exports.session = async (email, password, role) => {
 	try {
-		const user = await User_DAO.selectUserByEmail(email);
-		if (user && user.role === role && user.checkPassword(password)) {
+		const user = await User_DAO.selectUserByEmailAndType(email, role);
+		if (user && user.checkPassword(password)) {
 			return {status: 200, body: {id: user.id, username: user.email, name: user.name, surname: user.surname}};
 		} else {
 			// login fails if the user is not present, the role is wrong or the password is wrong
@@ -61,8 +64,8 @@ exports.updateUserRights = async (email, oldType, newType) => {
 	if (!allowedTypes.includes(oldType) || !allowedTypes.includes(newType)) return {status: 422, body: "invalid type"};
 
 	try {
-		const user = await User_DAO.selectUserByEmail(email);
-		if (!user || user.role !== oldType) return {status: 404, body: "wrong user or type"};
+		const user = await User_DAO.selectUserByEmailAndType(email, oldType);
+		if (!user) return {status: 404, body: "wrong user or type"};
 		user.role = newType;
 		await User_DAO.updateUser(user);
 		return {status: 200, body: ""};
@@ -76,10 +79,9 @@ exports.deleteUser = async (email, type) => {
 	if (!allowedTypes.includes(type)) return {status: 422, body: "invalid type"};
 
 	try {
-		const user = await User_DAO.selectUserByEmail(email);
-		if (!user.role === type) return {status: 422, body: "wrong type"};
-		await User_DAO.deleteUserByID(user.id);
-		return {status: 200, body: ""};
+		const user = await User_DAO.selectUserByEmailAndType(email, type);
+		if (user) await User_DAO.deleteUserByID(user.id);
+		return {status: 204, body: ""};
 	} catch (e) {
 		return {status: 503, body: e};
 	}

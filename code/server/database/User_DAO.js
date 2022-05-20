@@ -17,10 +17,10 @@ exports.selectUsers = () => {
     });
 }
 
-exports.selectUserByEmail = (email) => {
+exports.selectUserByEmailAndType = (email, type) => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM User WHERE email = ?;`;
-        db.get(sql, [email], (err, row) => {
+        const sql = `SELECT * FROM User WHERE email = ? AND type = ?;`;
+        db.get(sql, [email, type], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
