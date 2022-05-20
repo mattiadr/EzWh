@@ -1,10 +1,13 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
-
-const TestResult_service = require("../services/TestResult_service");
-
-
 const router = express.Router();
+
+const TestResultService = require("../services/TestResult_service");
+const testR_db = require('../database/TestResult_DAO');
+const testD_db = require('../database/TestDescriptor_DAO');
+const sku_db = require('../database/SKU_DAO');
+
+const TestResult_service = new TestResultService(testR_db, testD_db, sku_db)
 
 
 /* GET */

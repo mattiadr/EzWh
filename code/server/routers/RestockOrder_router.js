@@ -1,10 +1,11 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
-
-const RestockOrder_service = require("../services/RestockOrder_service");
-
-
 const router = express.Router();
+
+const RestockOrderService = require("../services/RestockOrder_service");
+const db =  require('../database/RestockOrder_DAO');
+
+const RestockOrder_service = new RestockOrderService(db);
 
 /* GET */
 router.get("/restockOrders",

@@ -1,10 +1,11 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
-
-const InternalOrder_service = require("../services/InternalOrder_service");
-
-
 const router = express.Router();
+
+const db = require('../database/InternalOrder_DAO');
+const InternalOrderService = require("../services/InternalOrder_service");
+
+const InternalOrder_service = new InternalOrderService(db);
 
 /* GET */
 router.get("/internalOrders",

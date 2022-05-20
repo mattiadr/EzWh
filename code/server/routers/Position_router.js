@@ -1,11 +1,14 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
-
-const Position_service = require("../services/Position_service");
-const Position = require("../components/Position");
-
-
 const router = express.Router();
+
+const PositionService = require("../services/Position_service");
+const Position = require("../components/Position");
+const db = require('../database/Position_DAO');
+
+const Position_service = new PositionService(db);
+
+
 
 /* GET */
 router.get('/positions',

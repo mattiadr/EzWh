@@ -1,11 +1,11 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
-
-const ReturnOrder_service = require("../services/ReturnOrder_service");
-
-
 const router = express.Router();
 
+const ReturnOrderService = require("../services/ReturnOrder_service");
+const db =  require('../database/ReturnOrder_DAO');
+
+const ReturnOrder_service = new ReturnOrderService(db);
 
 /* GET */
 router.get("/returnOrders",
