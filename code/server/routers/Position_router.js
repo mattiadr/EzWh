@@ -2,6 +2,7 @@ const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 
 const Position_service = require("../services/Position_service");
+const Position = require("../components/Position");
 
 
 const router = express.Router();
@@ -10,7 +11,7 @@ const router = express.Router();
 router.get('/positions',
 	(req, res) => {
 		Position_service.getPositions().then((positions) => {
-			res.status(200).json(positions.map((p) => ({positionID: p.positionID, aisleID: p.aisleID, row: p.row, col: p.idSKU, maxWeight: p.maxWeight, maxVolume: p.maxVolume, occupiedWeight: p.occupiedWeight, occupiedVolume: p.occupiedVolume})));
+			res.status(200).json(positions.map((p) => ({positionID: p.getPositionID(), aisleID: p.getAisleID(), row: p.getRow(), col: p.getCol(), maxWeight: p.getMaxWeight(), maxVolume: p.getMaxVolume(), occupiedWeight: p.getOccupiedWeight(), occupiedVolume: p.getOccupiedVolume()})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});

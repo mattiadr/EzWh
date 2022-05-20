@@ -2,6 +2,7 @@ const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 
 const SKU_service = require("../services/SKU_service");
+const SKU = require("../components/SKU");
 
 
 const router = express.Router();
@@ -12,7 +13,7 @@ router.get('/skus',
 	async (req, res) => {
 		let result = await SKU_service.getSKUs();
 		if (result.status === 200)
-			return res.status(result.status).json(result.body.map((s) => ({id: s.id, description: s.description, weight: s.weight, volume: s.volume, notes: s.notes, position: s.position, availableQuantity: s.availableQuantity, price:  s.price, testDescriptors: s.testDescriptors})));
+			return res.status(result.status).json(result.body.map((s) => ({id: s.getId(), description: s.getDescription(), weight: s.getWeight(), volume: s.getVolume(), notes: s.getNotes(), position: s.getPosition(), availableQuantity: s.getAvailableQuantity(), price:  s.getPrice(), testDescriptors: s.getTestDescriptors()})));
 		return res.status(result.status).send(result.body);
 });
 router.get('/skus/:id',
@@ -21,7 +22,7 @@ router.get('/skus/:id',
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		let result = await SKU_service.getSKUbyId(req.params.id);
 		if (result.status === 200)
-			return res.status(result.status).json({id: result.body.id, description: result.body.description, weight: result.body.weight, volume: result.body.volume, notes: result.body.notes, position: result.body.position, availableQuantity: result.body.availableQuantity, price:  result.body.price, testDescriptors: result.body.testDescriptors});
+			return res.status(result.status).json({id: result.body.getId(), description: result.body.getDescription(), weight: result.body.getWeight(), volume: result.body.getVolume(), notes: result.body.getNotes(), position: result.body.getPosition(), availableQuantity: result.body.getAvailableQuantity(), price:  result.body.getPrice(), testDescriptors: result.body.getTestDescriptors()});
 		return res.status(result.status).send(result.body);
 });
 

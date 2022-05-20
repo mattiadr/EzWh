@@ -2,6 +2,7 @@ const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 
 const SKUItem_service = require("../services/SKUItem_service");
+const SKUItem = require("../components/SKUItem");
 
 
 const router = express.Router();
@@ -11,7 +12,7 @@ const router = express.Router();
 router.get('/skuitems',
 	(req, res) => {
 		SKUItem_service.getSKUItems().then((skuitems) => {
-			res.status(200).json(skuitems.map((si) => ({RFID: si.RFID, SKUId: si.SKUID, Available: si.available, DateOfStock: si.dateOfStock})));
+			res.status(200).json(skuitems.map((si) => ({RFID: si.getRFID(), SKUId: si.getSKUId(), Available: si.getAvailable(), DateOfStock: si.getDateOfStock()})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
@@ -21,7 +22,7 @@ router.get('/skuitems/sku/:id',
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid skuID");
 		SKUItem_service.getSKUItemsBySKUID(req.params.id).then((si) => {
-			if (si) res.status(200).json({RFID: si.RFID, SKUId: si.SKUID, DateOfStock: si.dateOfStock});
+			if (si) res.status(200).json({RFID: si.getRFID(), SKUId: si.getSKUId(), DateOfStock: si.getDateOfStock()});
 			else res.status(404).end();
 		}).catch((err) => {
 			res.status(500).send(err);
@@ -32,7 +33,7 @@ router.get('/skuitems/:rfid',
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid rfid");
 		SKUItem_service.getSKUItemByRFID(req.params.rfid).then((si) => {
-			if (si) res.status(200).json({RFID: si.RFID, SKUId: si.SKUID, Available: si.available, DateOfStock: si.dateOfStock});
+			if (si) res.status(200).json({RFID: si.getRFID(), SKUId: si.getSKUId(), Available: si.getAvailable(), DateOfStock: si.getDateOfStock()});
 			else res.status(404).end();
 		}).catch((err) => {
 			res.status(500).send(err);
