@@ -41,7 +41,7 @@ exports.selectTestDescriptorsIDBySKUID = (skuid) => {
             if (err) {
                 reject(err.toString());
             } else {
-                resolve(rows);
+                resolve(rows.map(row => row.id));
             }
         });
     });

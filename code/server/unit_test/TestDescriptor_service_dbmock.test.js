@@ -1,8 +1,8 @@
 const TestDescriptor = require('../components/TestDescriptor');
 const SKU = require('../components/SKU');
 const TestDescriptorService = require('../services/TestDescriptor_service');
-const testD_dao = require('../database/mock_TestDescriptor_dao');
-const sku_dao = require('../database/mock_SKU_dao');
+const testD_dao = require('../mock_database/mock_TestDescriptor_dao');
+const sku_dao = require('../mock_database/mock_SKU_dao');
 const TestDescriptor_service = new TestDescriptorService(testD_dao, sku_dao);
 
 // test case definition

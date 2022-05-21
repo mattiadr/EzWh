@@ -79,7 +79,7 @@ describe("testDao_selectTestDescriptors", () => {
                           new TestDescriptor(2, "test descriptor 2", "This test is described by...", 1)]);
     testTestDescriptor(1, "test descriptor 1", "This test is described by...", 1);
     testTestDescriptor(2, "test descriptor 2", "This test is described by...", 1);
-    testTestDescriptorsBySKUID(1, [{id: 1},{id: 2}]);
+    testTestDescriptorsBySKUID(1, [1, 2]);
     //testTestDescriptor(3, "test descriptor 3", "This test is described by...", 1); // -> this test will fail
 
 });
