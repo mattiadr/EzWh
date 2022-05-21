@@ -1,12 +1,13 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 
-const User_service = require("../services/User_service");
+const UserService = require("../services/User_service");
 const {UserRole} = require("../components/User");
 
+const user_db = require("../database/User_DAO");
+const User_service = new UserService(user_db);
 
 const router = express.Router();
-
 
 /* GET */
 router.get("/userinfo",

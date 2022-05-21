@@ -1,12 +1,14 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 
-const SKU_service = require("../services/SKU_service");
-const SKU = require("../components/SKU");
+const SkuService = require("../services/SKU_service");
 
+const sku_db = require("../database/SKU_DAO");
+const testD_db = require("../database/TestDescriptor_DAO");
+const pos_db = require("../database/Position_DAO");
+const SKU_service = new SkuService(sku_db, testD_db, pos_db);
 
 const router = express.Router();
-
 
 /* GET */
 router.get('/skus',

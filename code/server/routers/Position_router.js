@@ -1,9 +1,10 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 
-const Position_service = require("../services/Position_service");
-const Position = require("../components/Position");
+const PositionService = require("../services/Position_service");
 
+const pos_db = require("../database/Position_DAO");
+const Position_service = new PositionService(pos_db);
 
 const router = express.Router();
 

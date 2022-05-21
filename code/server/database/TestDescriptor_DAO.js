@@ -73,6 +73,20 @@ exports.updateTestDescriptor = (testDescriptor) => {
     });
 }
 
+exports.deleteTestDescriptorData = () => {
+    return new Promise((resolve, reject) => {
+      const sql = 'DELETE FROM TestDescriptor';
+      db.run(sql, [], function (err) {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(true);
+      })
+    })
+  };
+  
+
 exports.deleteTestDescriptorByID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM TestDescriptor WHERE id = ?`;
@@ -80,7 +94,7 @@ exports.deleteTestDescriptorByID = (id) => {
             if (err) {
                 reject(err.toString());
             } else {
-                resolve();
+                resolve(true);
             }
         });
     });

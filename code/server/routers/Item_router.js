@@ -1,8 +1,11 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 
-const Item_service = require("../services/Item_service");
+const ItemService = require("../services/Item_service");
 
+const item_db = require("../database/Item_DAO");
+const sku_db = require("../database/SKU_DAO");
+const Item_service = new ItemService(item_db, sku_db);
 
 const router = express.Router();
 

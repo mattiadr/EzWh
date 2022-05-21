@@ -2,9 +2,11 @@ const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 const dayjs = require("dayjs");
 
-const RestockOrder_service = require("../services/RestockOrder_service");
+const RestockOrderService = require("../services/RestockOrder_service");
 const {RestockOrderState} = require("../components/RestockOrder");
 
+const ro_db = require("../database/RestockOrder_DAO");
+const RestockOrder_service = new RestockOrderService(ro_db);
 
 const router = express.Router();
 

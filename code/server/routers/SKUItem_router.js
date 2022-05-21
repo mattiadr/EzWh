@@ -1,12 +1,13 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 
-const SKUItem_service = require("../services/SKUItem_service");
-const SKUItem = require("../components/SKUItem");
+const SKUItemService = require("../services/SKUItem_service");
 
+const skuItem_db = require("../database/SKUItem_DAO");
+const sku_db = require("../database/SKU_DAO");
+const SKUItem_service = new SKUItemService(skuItem_db, sku_db);
 
 const router = express.Router();
-
 
 /* GET */
 router.get('/skuitems',

@@ -1,45 +1,54 @@
 const TestDescriptor = require("../components/TestDescriptor");
 
-const TestDescriptor_DAO = require("../database/TestDescriptor_DAO");
-const SKU_DAO = require("../database/SKU_DAO");
 
+class TestDescriptorService {
+    #testDescriptor_DAO; #sku_DAO;
 
-exports.getTestDescriptors = () => {
-	return TestDescriptor_DAO.selectTestDescriptors();
-}
+    constructor(testDescriptor_DAO, sku_DAO) {
+		this.#testDescriptor_DAO = testDescriptor_DAO;
+		this.#sku_DAO = sku_DAO;
+    }
 
-exports.getTestDescriptorByID = (id) => {
-	return TestDescriptor_DAO.selectTestDescriptorByID(id);
-}
-
-exports.createTestDescriptor = async (name, procedureDescription, idSKU) => {
-	try {
-		const SKU = await SKU_DAO.selectSKUbyID(idSKU);
-		if (!SKU) return {status: 404, body: "sku not found"};
-		await TestDescriptor_DAO.insertTestDescriptor(new TestDescriptor(null, name, procedureDescription, idSKU));
-		return {status: 201, body: ""};
-	} catch (e) {
-		return {status: 503, body: e};
+	getTestDescriptors = () => {
+		return this.#testDescriptor_DAO.selectTestDescriptors();
 	}
-}
-
-exports.updateTestDescriptor = async (id, newName, newProcedureDescription, newIdSKU) => {
-	try {
-		const testDescriptor = await TestDescriptor_DAO.selectTestDescriptorByID(id);
-		if (!testDescriptor) return {status: 404, body: "id not found"};
-		const SKU = await SKU_DAO.selectSKUbyID(newIdSKU);
-		if (!SKU) return {status: 404, body: "sku not found"};
-
-		testDescriptor.name = newName;
-		testDescriptor.procedureDescription = newProcedureDescription;
-		testDescriptor.idSKU = newIdSKU;
-		await TestDescriptor_DAO.updateTestDescriptor(testDescriptor);
-		return {status: 200, body: ""};
-	} catch (e) {
-		return {status: 503, body: e};
+	
+	getTestDescriptorByID = (id) => {
+		return this.#testDescriptor_DAO.selectTestDescriptorByID(id);
 	}
+	
+	createTestDescriptor = async (name, procedureDescription, idSKU) => {
+		try {
+			const SKU = await this.#sku_DAO.selectSKUbyID(idSKU);
+			if (!SKU) return {status: 404, body: "sku not found"};
+			await this.#testDescriptor_DAO.insertTestDescriptor(new TestDescriptor(null, name, procedureDescription, idSKU));
+			return {status: 201, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
+	}
+	
+	updateTestDescriptor = async (id, newName, newProcedureDescription, newIdSKU) => {
+		try {
+			const testDescriptor = await this.#testDescriptor_DAO.selectTestDescriptorByID(id);
+			if (!testDescriptor) return {status: 404, body: "id not found"};
+			const SKU = await this.#sku_DAO.selectSKUbyID(newIdSKU);
+			if (!SKU) return {status: 404, body: "sku not found"};
+	
+			testDescriptor.name = newName;
+			testDescriptor.procedureDescription = newProcedureDescription;
+			testDescriptor.idSKU = newIdSKU;
+			await this.#testDescriptor_DAO.updateTestDescriptor(testDescriptor);
+			return {status: 200, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
+	}
+	
+	deleteTestDescriptor = (id) => {
+		return this.#testDescriptor_DAO.deleteTestDescriptorByID(id);
+	}
+	
 }
 
-exports.deleteTestDescriptor = (id) => {
-	return TestDescriptor_DAO.deleteTestDescriptorByID(id);
-}
+module.exports = TestDescriptorService;
