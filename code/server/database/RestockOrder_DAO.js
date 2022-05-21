@@ -28,7 +28,7 @@ exports.selectRestockOrders = () => {
 			if (err) {
 				reject(err.toString());
 			} else {
-				resolve(rows.map((ro) => new RestockOrder(ro.id, ro.issueDate, ro.state, ro.supplierId)));
+				resolve(rows.map((ro) => new RestockOrder(ro.id, ro.issueDate, ro.state, ro.supplierId, ro.deliveryDate, null)));
 			}
 		});
 	}).then((restockOrders) => Promise.all(restockOrders.map((ro) => selectProductsIntoRestockOrder(ro))));
@@ -41,7 +41,7 @@ exports.selectRestockOrdersByState = (state) => {
 			if (err) {
 				reject(err.toString());
 			} else {
-				resolve(rows.map((ro) => new RestockOrder(ro.id, ro.issueDate, ro.state, ro.supplierId)));
+				resolve(rows.map((ro) => new RestockOrder(ro.id, ro.issueDate, ro.state, ro.supplierId, ro.deliveryDate, null)));
 			}
 		});
 	}).then((restockOrders) => Promise.all(restockOrders.map((ro) => selectProductsIntoRestockOrder(ro))));
@@ -55,7 +55,7 @@ exports.selectRestockOrderByID = (id) => {
 				reject(err.toString());
 			} else {
 				if (row) {
-					resolve(new RestockOrder(row.id, row.issueDate, row.state, row.supplierId));
+					resolve(new RestockOrder(row.id, row.issueDate, row.state, row.supplierId, row.deliveryDate, null));
 				} else {
 					resolve(null);
 				}
@@ -66,8 +66,8 @@ exports.selectRestockOrderByID = (id) => {
 
 exports.insertRestockOrder = (restockOrder) => {
 	return new Promise((resolve, reject) => {
-		const sql = `INSERT INTO RestockOrder(issueDate, state, supplierID) VALUES (?, ?, ?);`;
-		db.run(sql, [restockOrder.issueDate, restockOrder.state, restockOrder.supplierID], function (err) {
+		const sql = `INSERT INTO RestockOrder(issueDate, state, supplierId) VALUES (?, ?, ?);`;
+		db.run(sql, [restockOrder.issueDate, restockOrder.state, restockOrder.supplierId], function (err) {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -88,13 +88,12 @@ exports.insertRestockOrder = (restockOrder) => {
 	}))));
 }
 
-// TODO everything below this
 exports.updateRestockOrder = (restockOrder) => {
 	return new Promise((resolve, reject) => {
 		const sql = `UPDATE RestockOrder SET
-                                             issueDate = ?, state = ?, supplierId = ?, transportNote = ?
-                     WHERE ROID = ?`;
-		db.run(sql, [restockOrder.issueDate, restockOrder.state, restockOrder.products, restockOrder.supplierId, restockOrder.transportNote], (err) => {
+			issueDate = ?, state = ?, supplierId = ?, deliveryDate = ?
+			WHERE id = ?;`;
+		db.run(sql, [restockOrder.issueDate, restockOrder.state, restockOrder.supplierId, restockOrder.deliveryDate, restockOrder.id], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -102,9 +101,9 @@ exports.updateRestockOrder = (restockOrder) => {
 			}
 		});
 	});
-
 }
 
+// TODO everything below this
 exports.deleteRestockOrder = (id) => {
 	return new Promise((resolve, reject) => {
 		const sql = `DELETE FROM Item WHERE ROID = ?`;

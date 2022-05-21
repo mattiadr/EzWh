@@ -11,7 +11,7 @@ exports.selectItems = () => {
             if (err) {
                 reject(err.toString());
             } else {
-                resolve(rows.map((r) => new Item(r.id, r.description, r.price, r.SKUID, r.supplierID)));
+                resolve(rows.map((r) => new Item(r.id, r.description, r.price, r.SKUID, r.supplierId)));
             }
         });
     });
@@ -25,7 +25,7 @@ exports.selectItemByID = (id) => {
                 reject(err.toString());
             } else {
                 if (row) {
-                    resolve(new Item(row.id, row.description, row.price, row.SKUID, row.supplierID));
+                    resolve(new Item(row.id, row.description, row.price, row.SKUID, row.supplierId));
                 } else {
                     resolve(null);
                 }
@@ -42,7 +42,7 @@ exports.selectItemBySKUID = (skuid) => {
                 reject(err.toString());
             } else {
                 if (row) {
-                    resolve(new Item(row.id, row.description, row.price, row.SKUID, row.supplierID));
+                    resolve(new Item(row.id, row.description, row.price, row.SKUID, row.supplierId));
                 } else {
                     resolve(null);
                 }
@@ -53,8 +53,8 @@ exports.selectItemBySKUID = (skuid) => {
 
 exports.insertItem = (item) => {
     return new Promise((resolve, reject) => {
-        const sql = `INSERT INTO Item(id, description, price, SKUID, supplierID) VALUES (?, ?, ?, ?, ?);`;
-        db.run(sql, [item.id, item.description, item.price, item.SKUID, item.supplierID], (err) => {
+        const sql = `INSERT INTO Item(id, description, price, SKUID, supplierId) VALUES (?, ?, ?, ?, ?);`;
+        db.run(sql, [item.id, item.description, item.price, item.SKUID, item.supplierId], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -67,9 +67,9 @@ exports.insertItem = (item) => {
 exports.updateItem = (item) => {
     return new Promise((resolve, reject) => {
         const sql = `UPDATE Item SET
-                     description = ?, price = ?, SKUID = ?, supplierID = ?
+                     description = ?, price = ?, SKUID = ?, supplierId = ?
                      WHERE id = ?;`;
-        db.run(sql, [item.description, item.price, item.SKUID, item.supplierID, item.id], (err) => {
+        db.run(sql, [item.description, item.price, item.SKUID, item.supplierId, item.id], (err) => {
             if (err) {
                 reject(err.toString());
             } else {

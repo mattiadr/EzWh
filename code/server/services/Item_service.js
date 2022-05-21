@@ -12,7 +12,7 @@ exports.getItemByID = (id) => {
 	return Item_DAO.selectItemByID(id);
 }
 
-exports.createItem = async (id, description, price, skuid, supplierID) => {
+exports.createItem = async (id, description, price, skuid, supplierId) => {
 	try {
 		const SKU = await SKU_DAO.selectSKUbyID(skuid);
 		if (!SKU) return {status: 404, body: "sku not found"};
@@ -20,7 +20,7 @@ exports.createItem = async (id, description, price, skuid, supplierID) => {
 		if (item) return {status: 422, body: "supplier sells item with same id"};
 		item = await Item_DAO.selectItemBySKUID(skuid);
 		if (item) return {status: 422, body: "supplier sells item with same skuid"};
-		await Item_DAO.insertItem(new Item(id, description, price, skuid, supplierID));
+		await Item_DAO.insertItem(new Item(id, description, price, skuid, supplierId));
 		return {status: 201, body: ""};
 	} catch (e) {
 		return {status: 503, body: e};

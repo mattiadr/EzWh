@@ -1,5 +1,4 @@
 const dayjs = require("dayjs")
-const Item = require("./Item");
 
 const RestockOrderState = Object.freeze({
 	ISSUED: "ISSUED",
@@ -11,29 +10,30 @@ const RestockOrderState = Object.freeze({
 });
 
 class RestockOrder {
-	#id; #issueDate; #state; #supplierID; #transportNote; #products; #skuItems;
+	#id; #issueDate; #state; #supplierId; #deliveryDate; #products; #skuItems;
 
-	constructor(id, issueDate, state, supplierID) {
+	constructor(id, issueDate, state, supplierId, deliveryDate = null, products = null) {
 		this.#id = id;
 		this.#issueDate = dayjs(issueDate);
 		this.#state = state;
-		this.#supplierID = supplierID;
-		this.#transportNote = null;
-		this.#products = null;
+		this.#supplierId = supplierId;
+		this.#deliveryDate = dayjs(deliveryDate);
+		this.#products = products;
 		this.#skuItems = [];
 	}
 
 	get id() { return this.#id; }
 	get issueDate() { return this.#issueDate.format("YYYY/MM/DD HH:mm"); }
 	get state() { return this.#state; }
-	get supplierID() { return this.#supplierID; }
-	get transportNote() { return this.#state === RestockOrderState.ISSUED ? undefined : {"deliveryDate": this.#transportNote.format("YYYY/MM/DD")}; }
+	get supplierId() { return this.#supplierId; }
+	get deliveryDate() { return this.#deliveryDate; }
 	get products() { return this.#products;	}
 	get skuItems() { return this.#skuItems; }
+	get transportNote() { return this.#deliveryDate ? {"deliveryDate": this.#deliveryDate.format("YYYY/MM/DD")} : undefined; }
 
 	set id(id) { this.#id = id; }
 	set state(state) { this.#state = state; }
-	set transportNote(date) { this.#transportNote = dayjs(date); }
+	set deliveryDate(date) { this.#deliveryDate = dayjs(date); }
 	set products(products) { this.#products = products; }
 
 	addSKUItems(skuItems) {

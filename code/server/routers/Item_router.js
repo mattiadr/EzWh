@@ -10,7 +10,7 @@ const router = express.Router();
 router.get("/items",
 	(req, res) => {
 		Item_service.getItems().then((items) => {
-			res.status(200).json(items.map((item) => ({id: item.id, description: item.description, price: item.price, SKUId: item.SKUID, supplierId: item.supplierID})));
+			res.status(200).json(items.map((item) => ({id: item.id, description: item.description, price: item.price, SKUId: item.SKUID, supplierId: item.supplierId})));
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
@@ -21,7 +21,7 @@ router.get("/items/:id",
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		Item_service.getItemByID(req.params.id).then((item) => {
 			if (item) {
-				res.status(200).json({id: item.id, description: item.description, price: item.price, SKUId: item.SKUID, supplierId: item.supplierID});
+				res.status(200).json({id: item.id, description: item.description, price: item.price, SKUId: item.SKUID, supplierId: item.supplierId});
 			} else {
 				res.status(404).end();
 			}

@@ -10,7 +10,7 @@ const router = express.Router();
 
 const checkDate = (field) => {
 	return body(field).custom((value) => {
-		if (value !== null && !dayjs(value, ["YYYY/MM/DD", "YYYY/MM/DD H:m"], true).isValid()) {
+		if (value !== null && !dayjs(value, ["YYYY/MM/DD", "YYYY/MM/DD HH:mm"], true).isValid()) {
 			throw new Error("Invalid date");
 		}
 		return true;
@@ -70,6 +70,7 @@ router.get("/restockOrders/:id",
 				res.status(404).end();
 			}
 		}).catch((err) => {
+			console.log(err)
 			res.status(500).send(err);
 		});
 });
@@ -92,29 +93,30 @@ router.post("/restockOrder",
 		return res.status(result.status).send(result.body);
 });
 
-// TODO everything below this
 /* PUT */
-router.put("/restockOrders/:id",
-	param("id").exists(),
+router.put("/restockOrder/:id",
+	param("id").isInt(),
+	body("newState").isString(),
 	async (req, res) => {
-		if (!req.is("application/json")) return res.status(422).send("malformed body");
-		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
-		const ro = RestockOrder_service.getRestockOrderByID(req.params.id);
-		const result = await RestockOrder_service.updateRestockOrder(req.params.id, ro.issueDate, ro.state, ro.supplierId, ro.transportNote, ro.skuItems);
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id or body");
+		const result = await RestockOrder_service.updateRestockOrderState(req.params.id, req.body.newState);
 		return res.status(result.status).send(result.body);
 });
-
-router.put("/restockOrder/:id/skuItems",
-	param("id").exists(),
+// TODO
+router.put("/restockOrder/:id/skuItems");
+router.put("/restockOrder/:id/transportNote",
+	param("id").isInt(),
+	body("transportNote").isObject(),
 	async (req, res) => {
-		if (!req.is("application/json")) return res.status(422).send("malformed body");
-		if (!validationResult(req).isEmpty()) return res.status(404).send("missing username");
-		const ro = RestockOrder_service.getRestockOrderByID(req.params.id);
-		const result = await RestockOrder_service.addProducts(ro, req.body.skuItems);
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id or body");
+		const deliveryDate = req.body.transportNote.deliveryDate;
+		if (deliveryDate !== null && !dayjs(deliveryDate, ["YYYY/MM/DD", "YYYY/MM/DD HH:mm"], true).isValid()) return res.status(422).send("invalid date");
+		const result = await RestockOrder_service.updateRestockOrderTransportNote(req.params.id, deliveryDate);
 		return res.status(result.status).send(result.body);
 });
 
 /* DELETE */
+// TODO
 router.delete("/restockOrder/:id",
 	param("id").isInt(),
 	(req, res) => {

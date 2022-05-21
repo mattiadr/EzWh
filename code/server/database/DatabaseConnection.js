@@ -91,7 +91,7 @@ class DatabaseConnection {
 			description varchar(100) NOT NULL,
 			price double NOT NULL,
 			SKUID varchar(12) NOT NULL,
-			supplierID varchar(12) NOT NULL,
+			supplierId varchar(12) NOT NULL,
 			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableItem, (err) => err && console.log(err));
@@ -101,8 +101,8 @@ class DatabaseConnection {
 			id INTEGER NOT NULL,
 			issueDate varchar(32) NOT NULL,
 			state varchar(16) NOT NULL,
-			supplierID INTEGER NOT NULL,
-			transportNote varchar(16),
+			supplierId INTEGER NOT NULL,
+			deliveryDate varchar(16),
 			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableRestockOrder, (err) => err && console.log(err));
