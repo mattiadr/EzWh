@@ -53,7 +53,17 @@ exports.updateRestockOrderState = async (id, newState) => {
 	}
 }
 
-// TODO put skuitems
+exports.addSkuItemsToRestockOrder = async (id, skuItems) => {
+	try {
+		const restockOrder = await RestockOrder_DAO.selectRestockOrderByID(id);
+		if (!restockOrder) return {status: 404, body: "restock order not found"};
+		if (restockOrder.state !== RestockOrderState.DELIVERED) return {status: 422, body: "restock order is in invalid state"};
+		await RestockOrder_DAO.insertRestockOrderSKUItems(id, skuItems);
+		return {status: 200, body: ""};
+	} catch (e) {
+		return {status: 503, body: e};
+	}
+}
 
 exports.updateRestockOrderTransportNote = async (id, deliveryDate) => {
 	try {
@@ -69,7 +79,6 @@ exports.updateRestockOrderTransportNote = async (id, deliveryDate) => {
 	}
 }
 
-// TODO everything below this
-exports.deleteRestockOrder = (restockOrderID) => {
-	return RestockOrder_DAO.deleteRestockOrder(restockOrderID);
+exports.deleteRestockOrder = (id) => {
+	return RestockOrder_DAO.deleteRestockOrder(id);
 }

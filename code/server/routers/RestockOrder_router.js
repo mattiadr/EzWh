@@ -102,8 +102,14 @@ router.put("/restockOrder/:id",
 		const result = await RestockOrder_service.updateRestockOrderState(req.params.id, req.body.newState);
 		return res.status(result.status).send(result.body);
 });
-// TODO
-router.put("/restockOrder/:id/skuItems");
+router.put("/restockOrder/:id/skuItems",
+	param("id").isInt(),
+	body("skuItems").isArray(),
+	async (req, res) => {
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id or body");
+		const result = await RestockOrder_service.addSkuItemsToRestockOrder(req.params.id, req.body.skuItems);
+		return res.status(result.status).send(result.body);
+});
 router.put("/restockOrder/:id/transportNote",
 	param("id").isInt(),
 	body("transportNote").isObject(),
@@ -116,7 +122,6 @@ router.put("/restockOrder/:id/transportNote",
 });
 
 /* DELETE */
-// TODO
 router.delete("/restockOrder/:id",
 	param("id").isInt(),
 	(req, res) => {

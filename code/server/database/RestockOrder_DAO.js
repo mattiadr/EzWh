@@ -5,7 +5,7 @@ const {RestockOrder} = require("../components/RestockOrder");
 const db = DatabaseConnection.getInstance();
 
 const selectProductsIntoRestockOrder = (restockOrder) => {
-	return new Promise(((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		// propagate restockOrder null
 		if (!restockOrder) resolve(null);
 
@@ -18,7 +18,24 @@ const selectProductsIntoRestockOrder = (restockOrder) => {
 				resolve(restockOrder);
 			}
 		});
-	}));
+	});
+}
+
+const selectSKUItemsIntoRestockOrder = (restockOrder) => {
+	return new Promise((resolve, reject) => {
+		// propagate restockOrder null
+		if (!restockOrder) resolve(null);
+
+		const sql = `SELECT * FROM RestockOrderSKUItem WHERE roid = ?;`;
+		db.all(sql, [restockOrder.id], (err, rows) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				restockOrder.addSKUItems(rows.map((r) => ({SKUId: r.skuid, rfid: r.rfid})));
+				resolve(restockOrder);
+			}
+		});
+	});
 }
 
 exports.selectRestockOrders = () => {
@@ -31,7 +48,8 @@ exports.selectRestockOrders = () => {
 				resolve(rows.map((ro) => new RestockOrder(ro.id, ro.issueDate, ro.state, ro.supplierId, ro.deliveryDate, null)));
 			}
 		});
-	}).then((restockOrders) => Promise.all(restockOrders.map((ro) => selectProductsIntoRestockOrder(ro))));
+	}).then((restockOrders) => Promise.all(restockOrders.map((ro) => selectProductsIntoRestockOrder(ro))))
+		.then((restockOrders) => Promise.all(restockOrders.map((ro) => selectSKUItemsIntoRestockOrder(ro))));
 }
 
 exports.selectRestockOrdersByState = (state) => {
@@ -44,7 +62,8 @@ exports.selectRestockOrdersByState = (state) => {
 				resolve(rows.map((ro) => new RestockOrder(ro.id, ro.issueDate, ro.state, ro.supplierId, ro.deliveryDate, null)));
 			}
 		});
-	}).then((restockOrders) => Promise.all(restockOrders.map((ro) => selectProductsIntoRestockOrder(ro))));
+	}).then((restockOrders) => Promise.all(restockOrders.map((ro) => selectProductsIntoRestockOrder(ro))))
+		.then((restockOrders) => Promise.all(restockOrders.map((ro) => selectSKUItemsIntoRestockOrder(ro))));
 }
 
 exports.selectRestockOrderByID = (id) => {
@@ -61,7 +80,8 @@ exports.selectRestockOrderByID = (id) => {
 				}
 			}
 		});
-	}).then((restockOrder) => selectProductsIntoRestockOrder(restockOrder));
+	}).then((restockOrder) => selectProductsIntoRestockOrder(restockOrder))
+		.then((restockOrder) => selectSKUItemsIntoRestockOrder(restockOrder));
 }
 
 exports.insertRestockOrder = (restockOrder) => {
@@ -103,10 +123,23 @@ exports.updateRestockOrder = (restockOrder) => {
 	});
 }
 
-// TODO everything below this
+exports.insertRestockOrderSKUItems = (roid, skuItems) => {
+	return Promise.all(skuItems.map((skuItem) => new Promise(((resolve, reject) => {
+		const sql = `INSERT INTO RestockOrderSKUItem(roid, skuid, rfid) VALUES (?, ?, ?);`;
+		db.run(sql, [roid, skuItem.SKUId, skuItem.rfid], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}))));
+}
+
 exports.deleteRestockOrder = (id) => {
 	return new Promise((resolve, reject) => {
-		const sql = `DELETE FROM Item WHERE ROID = ?`;
+		// delete restock order from RestockOrderProduct
+		const sql = `DELETE FROM RestockOrderProduct WHERE roid = ?;`;
 		db.run(sql, [id], (err) => {
 			if (err) {
 				reject(err.toString());
@@ -114,39 +147,25 @@ exports.deleteRestockOrder = (id) => {
 				resolve();
 			}
 		});
-	});
-}
-
-exports.selectProducts = (roid) => {
-	return new Promise((resolve, reject) => {
-		const sql = `SELECT skuItems FROM RestockOrder WHERE ROID = ?`;
-		const ro = this.selectRestockOrderByID(roid)
-		db.all(sql,
-			[ro.forEach(x => x.getSKUItems()
-				.filter(v => {
-					return v.getTestResults().filter(w => w.getResult() === false).count() > 0;
-				})
-			)], (err, rows) => {
-				if (err) {
-					reject(err.toString());
-				} else {
-					resolve(rows.map((r) => new RestockOrder(r.ROID, r.issueDate, r.state, r.products, r.supplierId, r.transportNote)));
-				}
-			});
-	});
-}
-
-exports.insertProducts = (RO, items) => {
-	return new Promise((resolve, reject) => {
-		const sql = `UPDATE RestockOrder SET
-            products = ?
-                     WHERE ROID = ?`;
-		db.run(sql, [RO.addItems(items), RO.ROID], (err) => {
+	}).then(() => new Promise((resolve, reject) => {
+		// delete restock order from RestockOrderSKUItem
+		const sql = `DELETE FROM RestockOrderSKUItem WHERE roid = ?;`;
+		db.run(sql, [id], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
 				resolve();
 			}
 		});
-	});
+	})).then(() => new Promise((resolve, reject) => {
+		// delete restock order from RestockOrder
+		const sql = `DELETE FROM RestockOrder WHERE id = ?;`;
+		db.run(sql, [id], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}));
 }
