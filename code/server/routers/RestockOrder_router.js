@@ -79,7 +79,7 @@ router.get("/restockOrders/:id/returnItems",
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		const result = await RestockOrder_service.getRestockOrderByIDReturnItems(req.params.id);
-		return res.status(result.status).send(result.body);
+		return res.status(result.status).json(result.body);
 });
 
 /* POST */

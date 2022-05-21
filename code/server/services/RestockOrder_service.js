@@ -22,7 +22,8 @@ exports.getRestockOrderByIDReturnItems = async (id) => {
 		const restockOrder = await RestockOrder_DAO.selectRestockOrderByID(id);
 		if (!restockOrder) return {status: 404, body: "restock order not found"};
 		if (restockOrder.state !== RestockOrderState.COMPLETEDRETURN) return {status: 422, body: "restock order is in invalid state"};
-		// TODO filter skuitems
+		const returnItems = await RestockOrder_DAO.selectRestockOrderByIDReturnItems(id);
+		return {status: 200, body: returnItems};
 	} catch (e) {
 		return {status: 500, body: e};
 	}
