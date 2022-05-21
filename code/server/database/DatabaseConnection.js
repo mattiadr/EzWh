@@ -98,24 +98,23 @@ class DatabaseConnection {
 
 		/** Restock Order */
 		const createTableRestockOrder = `CREATE TABLE IF NOT EXISTS RestockOrder (
-			ROID INTEGER NOT NULL,
-			issueDate DATETIME NOT NULL,
-			state varchar(10) NOT NULL,
+			id INTEGER NOT NULL,
+			issueDate varchar(32) NOT NULL,
+			state varchar(16) NOT NULL,
 			supplierID INTEGER NOT NULL,
-			transportNote varchar(12) NOT NULL,
-			skuItems varchar(50) NOT NULL,
-			PRIMARY KEY (ROID)
+			transportNote varchar(16),
+			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableRestockOrder, (err) => err && console.log(err));
 
 		/** Restock Order & Item */
-		const createTableRestockOrderProducts = `CREATE TABLE IF NOT EXISTS ROProducts (
-			ROID integer NOT NULL,
-			ITEMID varchar(12) NOT NULL,
+		const createTableRestockOrderProduct = `CREATE TABLE IF NOT EXISTS RestockOrderProduct (
+			roid integer NOT NULL,
+			skuid varchar(12) NOT NULL,
 			quantity integer NOT NULL,
-			PRIMARY KEY (ROID, ITEMID)
+			PRIMARY KEY (roid, skuid)
 		);`;
-		this.db.run(createTableRestockOrderProducts, (err) => err && console.log(err));
+		this.db.run(createTableRestockOrderProduct, (err) => err && console.log(err));
 
 		/** Return Order **/
 		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
