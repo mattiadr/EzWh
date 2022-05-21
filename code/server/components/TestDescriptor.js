@@ -6,9 +6,6 @@ class TestDescriptor {
 		this.#name = name;
 		this.#procedureDescription = procedureDescription;
 		this.#idSKU = idSKU;
-		this.#name = name;
-		this.#procedureDescription = procedureDescription;
-		this.#idSKU = idSKU;
 	}
 
 	get id() { return this.#id; }
