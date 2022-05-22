@@ -84,6 +84,10 @@ class SkuService {
 	deleteSKU = (id) => {
 		return this.#sku_DAO.deleteSKU(id);
 	}
+
+	deleteSKUs = () =>{
+		return this.#sku_DAO.deleteSKUData();
+	}
 	
 }
 

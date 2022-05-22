@@ -1,5 +1,5 @@
 const express = require("express");
-const {body, param, validationResult} = require("express-validator");
+const { body, param, validationResult } = require("express-validator");
 
 const SkuService = require("../services/SKU_service");
 
@@ -15,18 +15,18 @@ router.get('/skus',
 	async (req, res) => {
 		let result = await SKU_service.getSKUs();
 		if (result.status === 200)
-			return res.status(result.status).json(result.body.map((s) => ({id: s.getId(), description: s.getDescription(), weight: s.getWeight(), volume: s.getVolume(), notes: s.getNotes(), position: s.getPosition(), availableQuantity: s.getAvailableQuantity(), price:  s.getPrice(), testDescriptors: s.getTestDescriptors()})));
+			return res.status(result.status).json(result.body.map((s) => ({ id: s.getId(), description: s.getDescription(), weight: s.getWeight(), volume: s.getVolume(), notes: s.getNotes(), position: s.getPosition(), availableQuantity: s.getAvailableQuantity(), price: s.getPrice(), testDescriptors: s.getTestDescriptors() })));
 		return res.status(result.status).send(result.body);
-});
+	});
 router.get('/skus/:id',
 	param("id").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		let result = await SKU_service.getSKUbyId(req.params.id);
 		if (result.status === 200)
-			return res.status(result.status).json({id: result.body.getId(), description: result.body.getDescription(), weight: result.body.getWeight(), volume: result.body.getVolume(), notes: result.body.getNotes(), position: result.body.getPosition(), availableQuantity: result.body.getAvailableQuantity(), price:  result.body.getPrice(), testDescriptors: result.body.getTestDescriptors()});
+			return res.status(result.status).json({ id: result.body.getId(), description: result.body.getDescription(), weight: result.body.getWeight(), volume: result.body.getVolume(), notes: result.body.getNotes(), position: result.body.getPosition(), availableQuantity: result.body.getAvailableQuantity(), price: result.body.getPrice(), testDescriptors: result.body.getTestDescriptors() });
 		return res.status(result.status).send(result.body);
-});
+	});
 
 /* POST */
 router.post('/sku',
@@ -37,10 +37,10 @@ router.post('/sku',
 	body("price").isFloat(),
 	body("availableQuantity").isInt(),
 	async (req, res) => {
-		if(!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
+		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
 		let result = await SKU_service.createSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
 		return res.status(result.status).json(result.body);
-});
+	});
 
 /* PUT */
 router.put('/sku/:id',
@@ -55,7 +55,7 @@ router.put('/sku/:id',
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
 		let result = await SKU_service.updateSKU(req.params.id, undefined, req.body.newDescription, req.body.newWeight, req.body.newVolume, req.body.newNotes, req.body.newPrice, req.body.newAvailableQuantity);
 		return res.status(result.status).json(result.message);
-});
+	});
 router.put('/sku/:id/position',
 	param("id").isInt(),
 	body("position").exists(),
@@ -63,7 +63,7 @@ router.put('/sku/:id/position',
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
 		let result = await SKU_service.updateSKU(req.params.id, req.body.position);
 		return res.status(result.status).json(result.message);
-});
+	});
 
 /* DELETE */
 router.delete('/skus/:id',
@@ -75,6 +75,16 @@ router.delete('/skus/:id',
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-});
+	});
+
+router.delete('/skus',
+	(req, res) => {
+		SKU_service.deleteSKUs().then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	}
+)
 
 module.exports = router;

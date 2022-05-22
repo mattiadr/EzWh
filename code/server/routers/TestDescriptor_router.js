@@ -20,7 +20,7 @@ router.get("/testDescriptors",
 });
 router.get("/testDescriptors/:id",
 	param("id").isInt(),
-	(req, res) => {
+	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		TestDescriptor_service.getTestDescriptorByID(req.params.id).then((td) => {
 			if (td) {
@@ -59,7 +59,7 @@ router.put("/testDescriptor/:id",
 /* DELETE */
 router.delete("/testDescriptor/:id",
 	param("id").isInt(),
-	(req, res) => {
+	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		TestDescriptor_service.deleteTestDescriptor(req.params.id).then(() => {
 			res.status(204).end();
@@ -67,5 +67,15 @@ router.delete("/testDescriptor/:id",
 			res.status(500).send(err);
 		});
 });
+
+router.delete("/testDescriptors",
+	(req, res) => {
+		TestDescriptor_service.deleteTestDescriptors().then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	}
+)
 
 module.exports = router;

@@ -48,6 +48,10 @@ class TestDescriptorService {
 	deleteTestDescriptor = (id) => {
 		return this.#testDescriptor_DAO.deleteTestDescriptorByID(id);
 	}
+
+	deleteTestDescriptors = () =>{
+		return this.#testDescriptor_DAO.deleteTestDescriptorData();
+	}
 	
 }
 
