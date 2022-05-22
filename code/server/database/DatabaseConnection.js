@@ -46,7 +46,7 @@ class DatabaseConnection {
 			maxWeight integer NOT NULL,
 			maxVolume integer NOT NULL,
 			occupiedWeight integer DEFAULT 0,
-			occupiedValue integer DEFAULT 0,
+			occupiedVolume integer DEFAULT 0,
 			PRIMARY KEY(posID)
 		);`;
 		this.db.run(createTablePosition, (err) => err && console.log(err));
