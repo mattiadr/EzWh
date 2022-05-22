@@ -77,6 +77,7 @@ router.delete('/skus/:id',
 		});
 	});
 
+//TEMPORARY
 router.delete('/skus',
 	(req, res) => {
 		SKU_service.deleteSKUs().then(() => {
@@ -84,7 +85,6 @@ router.delete('/skus',
 		}).catch((err) => {
 			res.status(500).send(err);
 		});
-	}
-)
+	});
 
 module.exports = router;

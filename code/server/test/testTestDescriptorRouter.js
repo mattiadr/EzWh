@@ -10,8 +10,8 @@ var agent = chai.request.agent(app);
 describe('test Test Descriptor apis', () => {
 
     before(async () => {
-        await agent.delete('/api/testDescriptors');
-        await agent.delete('/api/skus');
+        await agent.delete('/api/testDescriptors'); //TEMPORARY
+        await agent.delete('/api/skus'); //TEMPORARY
         await agent.post('/api/sku').send({ "description": "a new sku",
                                             "weight": 100, "volume": 50,
                                             "notes": "first SKU", "price": 10.99,

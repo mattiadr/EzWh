@@ -90,6 +90,16 @@ class UserService {
 			return {status: 503, body: e};
 		}
 	}
+
+	//TEMPORARY
+	deleteUsers = async () => {
+		try {
+			await this.#user_DAO.deleteUserData();
+			return {status: 204, body: ""};
+		} catch (e) {
+			return {status: 503, body: e};
+		}
+	}
 }
 
 module.exports = UserService;

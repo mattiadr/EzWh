@@ -109,4 +109,11 @@ router.delete("/users/:username/:type",
 		return res.status(result.status).send(result.body);
 });
 
+//TEMPORARY
+router.delete("/users",
+	async (req, res) => {
+		const result = await User_service.deleteUsers();
+		return res.status(result.status).json();
+});
+
 module.exports = router;
