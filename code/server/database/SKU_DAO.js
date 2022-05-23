@@ -88,3 +88,16 @@ exports.deleteSKUData = () => {
         });
     });
 }
+
+exports.checkIfPositionOccupied = (positionID) => {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM SKU WHERE positionId = ?;`;
+        db.get(sql, [positionID], (err, row) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve(!!row);
+            }
+        });
+    });
+}

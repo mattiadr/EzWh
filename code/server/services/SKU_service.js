@@ -48,20 +48,27 @@ class SkuService {
 		try {
 			const sku = await this.#sku_DAO.selectSKUbyID(id);
 			if (!sku) return {status: 404, body: "sku not found"};
-			let oldPosition = undefined;
-			if(sku.getPosition() != null)
-				oldPosition =  await this.#position_DAO.selectPositionByID(sku.getPosition());
+			let currentPosition = undefined;
+			if (sku.getPosition() != null)
+				currentPosition =  await this.#position_DAO.selectPositionByID(sku.getPosition());
 			if (positionId !== undefined) { //ONLY POSITION
 				const newPosition = await this.#position_DAO.selectPositionByID(positionId);
-				if(!newPosition) return {status: 404, body: "position not found"};
-				if (newPosition.getOccupiedWeight() + sku.getWeight() >  newPosition.getMaxWeight() ||
-					newPosition.getOccupiedVolume() + sku.getVolume() > newPosition.getMaxVolume())
-						return {status: 422, body: "Can't move sku in that position"};
+				if (!newPosition) return {status: 404, body: "position not found"};
+				const occupied = await this.#sku_DAO.checkIfPositionOccupied(positionId);
+				if (occupied) return {status: 422, body: "position already occupied"};
+				if (sku.getWeight() * sku.getAvailableQuantity() > newPosition.getMaxWeight() ||
+					sku.getVolume() * sku.getAvailableQuantity() > newPosition.getMaxVolume())
+						return {status: 422, body: "weight or volume validation failed"};
 				sku.setPosition(positionId);
-				newPosition.addOccupiedWeight(sku.getWeight());
-				newPosition.addOccupiedVolume(sku.getVolume());
+				newPosition.setOccupiedWeight(sku.getWeight() * sku.getAvailableQuantity());
+				newPosition.setOccupiedVolume(sku.getVolume() * sku.getAvailableQuantity());
 				await this.#position_DAO.updatePosition(newPosition.getPositionID(), newPosition);
 			} else {
+				if (currentPosition && (
+					newWeight * newAvailableQuantity > currentPosition.getMaxWeight() ||
+					newVolume * newAvailableQuantity > currentPosition.getMaxVolume())) {
+					return {status: 422, body: "weight or volume validation failed"};
+				}
 				sku.setDescription(newDescription);
 				sku.setWeight(newWeight);
 				sku.setVolume(newVolume);
@@ -69,10 +76,10 @@ class SkuService {
 				sku.setNotes(newNotes);
 				sku.setAvailableQuantity(newAvailableQuantity);
 			}
-			if (oldPosition !== undefined) {
-				oldPosition.subOccupiedWeight(sku.getWeight());
-				oldPosition.subOccupiedVolume(sku.getVolume());
-				await this.#position_DAO.updatePosition(oldPosition.getPositionID(), oldPosition);
+			if (currentPosition !== undefined) {
+				currentPosition.setOccupiedWeight(0);
+				currentPosition.setOccupiedVolume(0);
+				await this.#position_DAO.updatePosition(currentPosition.getPositionID(), currentPosition);
 			}
 			await this.#sku_DAO.updateSKU(sku);
 			return {status: 200, body: ""};
