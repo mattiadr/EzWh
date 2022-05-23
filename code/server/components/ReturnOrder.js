@@ -1,20 +1,22 @@
 class ReturnOrder {
-	#returnOrderId; #returnDate; #restockOrderId;
+	#id; #returnDate; #restockOrderId; #products;
 
-	constructor(returnOrderId, returnDate, restockOrderId) {
-		this.#returnOrderId = returnOrderId;
+	constructor(id, returnDate, restockOrderId, products) {
+		this.#id = id;
 		this.#returnDate = returnDate;
 		this.#restockOrderId = restockOrderId;
+		this.#products = products;
 	}
 
-	get returnOrderId() { return this.#returnOrderId }
-	get returnDate() { return this.#returnDate }
-	get restockOrderId() { return this.#restockOrderId }
+	get id() { return this.#id; }
+	get returnDate() { return this.#returnDate; }
+	get restockOrderId() { return this.#restockOrderId; }
+	get products() { return this.#products; }
 
-	set returnOrderId(returnOrderId) { this.#returnOrderId = returnOrderId }
-	set returnDate(returnDate) { this.#returnDate = returnDate }
-	set restockOrderId(restockOrderId) { this.#restockOrderId = restockOrderId }
-
+	set id(returnOrderId) { this.#id = returnOrderId; }
+	set returnDate(returnDate) { this.#returnDate = returnDate; }
+	set restockOrderId(restockOrderId) { this.#restockOrderId = restockOrderId; }
+	set products(products) { this.#products = products; }
 }
 
 module.exports = ReturnOrder;

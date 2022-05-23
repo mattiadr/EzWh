@@ -127,19 +127,19 @@ class DatabaseConnection {
 
 		/** Return Order **/
 		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
-			returnOrderId INTEGER NOT NULL,
+			id INTEGER NOT NULL,
 			returnDate DATETIME NOT NULL,
 			restockOrderId INTEGER NOT NULL,
-				PRIMARY KEY (returnOrderId)
+			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableReturnOrder, (err) => err && console.log(err));
 
-		/** Return Order & Item */
+		/** Return Order & Products */
 		const createTableReturnOrderProduct = `CREATE TABLE IF NOT EXISTS ReturnOrderProduct (
-			returnOrderId integer NOT NULL,
-			ITEMID varchar(12) NOT NULL,
-			price double NOT NULL,
-				PRIMARY KEY (returnOrderId, ITEMID)
+			reoid integer NOT NULL,
+			skuid INTEGER NOT NULL,
+			rfid VARCHAR(32),
+			PRIMARY KEY (reoid, skuid)
 		);`;
 		this.db.run(createTableReturnOrderProduct, (err) => err && console.log(err));
 

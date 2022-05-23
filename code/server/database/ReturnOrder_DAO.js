@@ -1,128 +1,99 @@
 const DatabaseConnection = require("./DatabaseConnection");
 const ReturnOrder = require("../components/ReturnOrder");
-const ReturnOrderProduct = require("../components/ReturnOrderProduct");
-
-
 const db = DatabaseConnection.getInstance();
 
+
+const selectProductsIntoReturnOrder = (returnOrder) => {
+	return new Promise((resolve, reject) => {
+		// propagate returnOrder null
+		if (!returnOrder) resolve(null);
+
+		const sql = `SELECT ReturnOrderProduct.skuid, description, price, rfid FROM ReturnOrderProduct, Item WHERE ReturnOrderProduct.skuid = Item.SKUID AND reoid = ?;`;
+		db.all(sql, [returnOrder.id], (err, rows) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				returnOrder.products = rows.map((reop) => ({SKUId: reop.skuid, description: reop.description, price: reop.price, RFID: reop.rfid || undefined}));
+				resolve(returnOrder);
+			}
+		});
+	});
+}
+
 exports.selectReturnOrders = () => {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM ReturnOrder;`;
-        db.all(sql, [], (err, rows) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve(rows.map((r) => new ReturnOrder(r.returnOrderId, r.returnDate, r.restockOrderId)));
-            }
-        });
-    });
+	return new Promise((resolve, reject) => {
+		const sql = `SELECT * FROM ReturnOrder;`;
+		db.all(sql, [], (err, rows) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve(rows.map((r) => new ReturnOrder(r.id, r.returnDate, r.restockOrderId)));
+			}
+		});
+	}).then((restockOrders) => Promise.all(restockOrders.map((reo) => selectProductsIntoReturnOrder(reo))));
 }
 
 exports.selectReturnOrderByID = (returnOrderId) => {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM ReturnOrder WHERE returnOrderId = ?;`;
-        db.get(sql, [returnOrderId], (err, row) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                if (row) {
-                    resolve(new ReturnOrder(row.returnOrderId, row.returnDate, row.restockOrderId));
-                } else {
-                    resolve(null);
-                }
-            }
-        });
-    });
+	return new Promise((resolve, reject) => {
+		const sql = `SELECT * FROM ReturnOrder WHERE id = ?;`;
+		db.get(sql, [returnOrderId], (err, row) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				if (row) {
+					resolve(new ReturnOrder(row.id, row.returnDate, row.restockOrderId));
+				} else {
+					resolve(null);
+				}
+			}
+		});
+	}).then((returnOrder) => selectProductsIntoReturnOrder(returnOrder));
 }
 
 exports.insertReturnOrder = (returnOrder) => {
-    return new Promise((resolve, reject) => {
-        const sql = `INSERT INTO ReturnOrder(returnDate, restockOrderId) VALUES (?, ?);`;
-        db.run(sql, [returnOrder.returnDate, returnOrder.restockOrderId], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        })
-    });
+	return new Promise((resolve, reject) => {
+		const sql = `INSERT INTO ReturnOrder(returnDate, restockOrderId) VALUES (?, ?);`;
+		db.run(sql, [returnOrder.returnDate, returnOrder.restockOrderId], function (err) {
+			if (err) {
+				reject(err.toString());
+			} else {
+				returnOrder.id = this.lastID;
+				resolve();
+			}
+		});
+	}).then(() => Promise.all(returnOrder.products.map((p) => new Promise((resolve, reject) => {
+		// create a promise for each ReturnOrderProduct insertion
+		const sql = `INSERT INTO ReturnOrderProduct(reoid, skuid, rfid) VALUES (?, ?, ?);`;
+		db.run(sql, [returnOrder.id, p.SKUId, p.RFID], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}))));
 }
 
 exports.deleteReturnOrder = (returnOrderId) => {
-    return new Promise((resolve, reject) => {
-        const sql = `DELETE FROM ReturnOrder WHERE returnOrderId = ?`;
-        db.run(sql, [returnOrderId], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        });
-    });
-}
-
-
-exports.selectReturnOrderProducts = () => {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM ReturnOrderProduct;`;
-        db.all(sql, [], (err, rows) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve(rows.map((r) => new ReturnOrderProduct(r.returnOrderId, r.ITEMID, r.price)));
-            }
-        });
-    });
-}
-
-exports.selectReturnOrderProductByID = (returnOrderId) => {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM ReturnOrderProduct WHERE returnOrderId = ?;`;
-        db.all(sql, [returnOrderId], (err, rows) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve(rows.map((r) => new ReturnOrderProduct(r.returnOrderId, r.ITEMID, r.price)));
-            }
-        });
-    });
-}
-
-exports.insertReturnOrderProduct = (ReturnOrderProduct) => {
-    return new Promise((resolve, reject) => {
-        const sql = `INSERT INTO ReturnOrderProduct(returnOrderId, ITEMID, price) VALUES (?, ?, ?);`;
-        db.run(sql, [ReturnOrderProduct.returnOrderId, ReturnOrderProduct.ITEMID, ReturnOrderProduct.price], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        })
-    });
-}
-
-exports.deleteReturnOrderProduct = (returnOrderId, ITEMID) => {
-    return new Promise((resolve, reject) => {
-        const sql = `DELETE FROM ReturnOrderProduct WHERE returnOrderId = ?`;
-        db.run(sql, [returnOrderId, ITEMID], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        });
-    });
-}
-
-exports.updateReturnOrderProduct = (returnOrderProduct) => {
-    return new Promise((resolve, reject) => {
-        const sql = `UPDATE ReturnOrderProduct SET price = ? WHERE returnOrderId = ? AND ITEMID = ?`;
-        db.run(sql, [returnOrderProduct.price, returnOrderProduct.returnOrderId, returnOrderProduct.ITEMID], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        });
-    });
+	return new Promise((resolve, reject) => {
+		// delete return order from ReturnOrderProduct
+		const sql = `DELETE FROM ReturnOrderProduct WHERE reoid = ?`;
+		db.run(sql, [returnOrderId], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}).then(() => new Promise((resolve, reject) => {
+		// delete return order from ReturnOrder
+		const sql = `DELETE FROM ReturnOrder WHERE id = ?`;
+		db.run(sql, [returnOrderId], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}));
 }
