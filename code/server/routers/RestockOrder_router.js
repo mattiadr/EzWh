@@ -29,9 +29,9 @@ router.get("/restockOrders",
 				id: ro.id,
 				issueDate: ro.issueDate,
 				state: ro.state,
+				products: ro.products,
 				supplierId: ro.supplierId,
 				transportNote: ro.transportNote,
-				products: ro.products,
 				skuItems: ro.skuItems,
 			})));
 		}).catch((err) => {
@@ -46,9 +46,9 @@ router.get("/restockOrdersIssued",
 				id: ro.id,
 				issueDate: ro.issueDate,
 				state: ro.state,
+				products: ro.products,
 				supplierId: ro.supplierId,
 				transportNote: ro.transportNote,
-				products: ro.products,
 				skuItems: ro.skuItems,
 			})));
 		}).catch((err) => {
@@ -65,9 +65,9 @@ router.get("/restockOrders/:id",
 					id: ro.id,
 					issueDate: ro.issueDate,
 					state: ro.state,
+					products: ro.products,
 					supplierId: ro.supplierId,
 					transportNote: ro.transportNote,
-					products: ro.products,
 					skuItems: ro.skuItems,
 				});
 			} else {
@@ -116,6 +116,7 @@ router.put("/restockOrder/:id/skuItems",
 });
 router.put("/restockOrder/:id/transportNote",
 	param("id").isInt(),
+	body("transportNote").exists(),
 	body("transportNote").isObject(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id or body");
@@ -131,6 +132,15 @@ router.delete("/restockOrder/:id",
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
 		RestockOrder_service.deleteRestockOrder(req.params.id).then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+});
+
+router.delete("/restockOrders",
+	(req, res) => {
+		RestockOrder_service.deleteRestockOrders().then(() => {
 			res.status(204).end();
 		}).catch((err) => {
 			res.status(500).send(err);
