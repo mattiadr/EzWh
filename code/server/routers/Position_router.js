@@ -20,10 +20,10 @@ router.get('/positions',
 
 /* POST */
 router.post('/position',
-	body("positionID").exists(),
-	body("aisleID").exists(),
-	body("row").exists(),
-	body("col").exists(),
+	body("positionID").isNumeric().isLength({min: 12, max: 12}),
+	body("aisleID").isNumeric().isLength({min: 4, max: 4}),
+	body("row").isNumeric().isLength({min: 4, max: 4}),
+	body("col").isNumeric().isLength({min: 4, max: 4}),
 	body("maxWeight").isInt(),
 	body("maxVolume").isInt(),
 	async (req, res) =>{
@@ -34,10 +34,10 @@ router.post('/position',
 
 /* PUT */
 router.put('/position/:positionID',
-	param("positionID").exists(),
-	body("newAisleID").exists(),
-	body("newRow").exists(),
-	body("newCol").exists(),
+	param("positionID").isNumeric().isLength({min: 12, max: 12}),
+	body("newAisleID").isNumeric().isLength({min: 4, max: 4}),
+	body("newRow").isNumeric().isLength({min: 4, max: 4}),
+	body("newCol").isNumeric().isLength({min: 4, max: 4}),
 	body("newMaxWeight").isInt(),
 	body("newMaxVolume").isInt(),
 	body("newOccupiedWeight").isInt(),
@@ -48,8 +48,8 @@ router.put('/position/:positionID',
 		return res.status(result.status).json(result.message);
 });
 router.put('/position/:positionID/changeID',
-	param("positionID").exists(),
-	body("newPositionID").exists(),
+	param("positionID").isNumeric().isLength({min: 12, max: 12}),
+	body("newPositionID").isNumeric().isLength({min: 12, max: 12}),
 	async (req, res) =>{
 		if (!validationResult(req).isEmpty() || req.body.newPositionID.length !== 12) return res.status(422).send("invalid param or body");
 		let result = await Position_service.updatePosition(req.params.positionID, req.body.newPositionID);
@@ -58,7 +58,7 @@ router.put('/position/:positionID/changeID',
 
 /* DELETE */
 router.delete('/position/:positionID',
-	param("positionID").exists(),
+	param("positionID").isNumeric().isLength({min: 12, max: 12}),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid positionID");
 		Position_service.deletePosition(req.params.positionID).then(() => {
