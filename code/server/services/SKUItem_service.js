@@ -57,6 +57,10 @@ class SKUItemService {
 	deleteSKUItem = (rfid) => {
 		return this.#skuItem_DAO.deleteSKUItem(rfid);
 	}
+
+	deleteSKUItems = () => {
+		return this.#skuItem_DAO.deleteSKUItemData();
+	}
 }
 
 module.exports = SKUItemService;

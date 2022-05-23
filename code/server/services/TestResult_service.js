@@ -14,7 +14,7 @@ class TestResultService {
 			const SKUItem = await this.#skuItem_DAO.selectSKUItemByRFID(rfid);
 			if (!SKUItem) return {status: 404, body: "skuitem not found"};
 			const testResults = await this.#testResult_DAO.selectTestResults(rfid);
-			return {status: 200, body: testResults.map((tr) => ({id: tr.id, idTestDescriptor: tr.idTestDescriptor, Date: tr.date, Result: tr.result}))};
+			return {status: 200, body: testResults.map((tr) => ({id: tr.id, idTestDescriptor: tr.idTestDescriptor, Date: tr.date, Result: Boolean(tr.result)}))};
 		} catch (e) {
 			return {status: 500, body: e};
 		}
@@ -26,7 +26,7 @@ class TestResultService {
 			if (!SKUItem) return {status: 404, body: "skuitem not found"};
 			const testResult = await this.#testResult_DAO.selectTestResultByID(rfid, id);
 			if (testResult) {
-				return {status:200, body: {id: testResult.id, idTestDescriptor: testResult.idTestDescriptor, Date: testResult.date, Result: testResult.result}}
+				return {status:200, body: {id: testResult.id, idTestDescriptor: testResult.idTestDescriptor, Date: testResult.date, Result: Boolean(testResult.result)}}
 			} else {
 				return {status: 404, body: "test result not found"};
 			}
@@ -69,7 +69,11 @@ class TestResultService {
 	
 	deleteTestResult = (rfid, id) => {
 		return this.#testResult_DAO.deleteTestResultByID(rfid, id);
-	}	
+	}
+
+	deleteTestResults = () => {
+		return this.#testResult_DAO.deleteTestResultData();
+	}
 }
 
 module.exports = TestResultService;

@@ -5,8 +5,8 @@ const TestResultService = require("../services/TestResult_service");
 
 const testR_db = require("../database/TestResult_DAO");
 const testD_db = require("../database/TestDescriptor_DAO");
-const sku_db = require("../database/SKU_DAO");
-const TestResult_service = new TestResultService(testR_db, testD_db, sku_db)
+const skuItem_db = require("../database/SKUItem_DAO");
+const TestResult_service = new TestResultService(testR_db, testD_db, skuItem_db);
 
 const router = express.Router();
 
@@ -64,5 +64,15 @@ router.delete("/skuitems/:rfid/testResult/:id",
 			res.status(503).send(err);
 		});
 });
+
+router.delete("/testResults", //TEMPORARY
+	(req, res) => {
+		TestResult_service.deleteTestResults().then(() => {
+			res.status(204).end();
+		}).catch((err) => {
+			res.status(500).send(err);
+		});
+	}
+)
 
 module.exports = router;
