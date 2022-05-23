@@ -296,11 +296,11 @@ describe("Test SKUItem API", () => {
 	});
 
 	/** DELETE **/
-	// describe("deleting SKUItem", () => {
-	// 	testDeleteSKUItemByRFID("12345678901234567890123456789014", 204);
-	// 	testDeleteSKUItemByRFID("12345678901234567890123456789015", 204);
-	// });
-	// describe("deleting invalid SKUItem", () => {
-	// 	testDeleteSKUItemByRFID("not a valid id", 422);
-	// });
+	describe("deleting SKUItem", () => {
+		testDeleteSKUItemByRFID("12345678901234567890123456789014", 204);
+		testDeleteSKUItemByRFID("12345678901234567890123456789015", 204);
+	});
+	describe("deleting invalid SKUItem", () => {
+		testDeleteSKUItemByRFID("not a valid id", 422);
+	});
 });
