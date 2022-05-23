@@ -1,3 +1,5 @@
+const dayjs = require("dayjs");
+
 class SKUItem{
 	#RFID; #SKUID; #available; #dateOfStock; #testResults;
 
@@ -12,7 +14,7 @@ class SKUItem{
 	getRFID() { return this.#RFID; }
 	getSKUId() { return this.#SKUID; }
 	getAvailable() { return this.#available; }
-	getDateOfStock() { return this.#dateOfStock; }
+	getDateOfStock() { return this.#dateOfStock ? dayjs(this.#dateOfStock).format("YYYY/MM/DD HH:mm") : null; }
 	getTestResults() { return this.#testResults; }
 
 	setRFID(newRFID) { this.#RFID = newRFID; }

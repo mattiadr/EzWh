@@ -30,7 +30,7 @@ class DatabaseConnection {
 		/** SKU Item **/
 		const createTableSKUItem = `CREATE TABLE IF NOT EXISTS SKUItem (
 			RFID varchar(50) NOT NULL,
-			SKUID varchar(12) NOT NULL,
+			SKUID INTEGER NOT NULL,
 			available boolean DEFAULT 0,
 			dateOfStock DATETIME,
 			PRIMARY KEY (RFID)
@@ -90,7 +90,7 @@ class DatabaseConnection {
 			id varchar(12) NOT NULL,
 			description varchar(100) NOT NULL,
 			price double NOT NULL,
-			SKUID varchar(12) NOT NULL,
+			SKUID INTEGER NOT NULL,
 			supplierId varchar(12) NOT NULL,
 			PRIMARY KEY (id)
 		);`;
@@ -110,7 +110,7 @@ class DatabaseConnection {
 		/** Restock Order & Item */
 		const createTableRestockOrderProduct = `CREATE TABLE IF NOT EXISTS RestockOrderProduct (
 			roid INTEGER NOT NULL,
-			skuid VARCHAR(12) NOT NULL,
+			skuid INTEGER NOT NULL,
 			quantity INTEGER NOT NULL,
 			PRIMARY KEY (roid, skuid)
 		);`;
@@ -119,7 +119,7 @@ class DatabaseConnection {
 		/** Restock Order & SKU Items **/
 		const createTableRestockOrderSKUItem = `CREATE TABLE IF NOT EXISTS RestockOrderSKUItem (
 			roid INTEGER NOT NULL,
-			skuid VARCHAR(12) NOT NULL,
+			skuid INTEGER NOT NULL,
 			rfid VARCHAR(32) NOT NULL,
 			PRIMARY KEY (roid, skuid, rfid)
 		);`;

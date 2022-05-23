@@ -36,16 +36,12 @@ exports.selectSKUItemByRFID = (rfid) => {
 
 exports.selectSKUItemBySKUID = (skuid) => {
 	return new Promise((resolve, reject) => {
-		const sql = `SELECT * FROM SKUItem WHERE SKUID = ? AND available = 1;`;
-		db.get(sql, [skuid], (err, row) => {
+		const sql = `SELECT * FROM SKUItem WHERE SKUID = ? AND available = ?;`;
+		db.all(sql, [skuid, 1], (err, rows) => {
 			if (err) {
 				reject(err.toString());
 			} else {
-				if (row) {
-					resolve(new SKUItem(row.RFID, row.SKUID, row.available, row.dateOfStock));
-				} else {
-					resolve(null);
-				}
+				resolve(rows.map((row) => new SKUItem(row.RFID, row.SKUID, row.available, row.dateOfStock)));
 			}
 		});
 	});
@@ -83,7 +79,7 @@ exports.updateSKUItem = (rfid, newSKUItem) => {
 exports.deleteSKUItem = (RFID) => {
 	return new Promise((resolve, reject) => {
 		const sql = `DELETE FROM SKUItem WHERE RFID=?;`;
-		this.db.run(sql, [RFID], (err) => {
+		db.run(sql, [RFID], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -96,7 +92,7 @@ exports.deleteSKUItem = (RFID) => {
 exports.deleteSKUItemData = () => {
 	return new Promise((resolve, reject) => {
 		const sql = `DELETE FROM SKUItem;`;
-		this.db.run(sql, [], (err) => {
+		db.run(sql, [], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {

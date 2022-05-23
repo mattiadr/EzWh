@@ -13,8 +13,15 @@ class SKUItemService {
 		return this.#skuItem_DAO.selectSKUItems();
 	}
 	
-	getSKUItemsBySKUID = (skuid) => {
-		return this.#skuItem_DAO.selectSKUItemBySKUID(skuid);
+	getSKUItemsBySKUID = async (skuid) => {
+		try {
+			const sku = await this.#sku_DAO.selectSKUbyID(skuid);
+			if (!sku) return {status: 404, body: "sku not found"};
+			const skuItems = await this.#skuItem_DAO.selectSKUItemBySKUID(skuid);
+			return {status: 200, body: skuItems.map((si) => ({RFID: si.getRFID(), SKUId: si.getSKUId(), Available: si.getAvailable(), DateOfStock: si.getDateOfStock()}))};
+		} catch (e) {
+			return {status: 500, body: e};
+		}
 	}
 	
 	getSKUItemByRFID = (rfid) => {

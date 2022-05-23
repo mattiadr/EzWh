@@ -1,6 +1,7 @@
 const express = require("express");
 const {body, param, validationResult} = require("express-validator");
 const dayjs = require("dayjs");
+const customParseFormat = require('dayjs/plugin/customParseFormat')
 
 const RestockOrderService = require("../services/RestockOrder_service");
 const {RestockOrderState} = require("../components/RestockOrder");
@@ -9,6 +10,7 @@ const ro_db = require("../database/RestockOrder_DAO");
 const RestockOrder_service = new RestockOrderService(ro_db);
 
 const router = express.Router();
+dayjs.extend(customParseFormat);
 
 const checkDate = (field) => {
 	return body(field).custom((value) => {
