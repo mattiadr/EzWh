@@ -48,6 +48,10 @@ class ItemService {
 	deleteItem = async (id) => {
 		return this.#item_DAO.deleteItemByID(id);
 	}
+
+	deleteItems = async () => {
+		return this.#item_DAO.deleteItemData();
+	}
 }
 
 module.exports = ItemService;

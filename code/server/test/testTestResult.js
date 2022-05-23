@@ -13,7 +13,7 @@ describe('test TestResult apis', () => {
         await agent.delete('/api/testResults'); //TEMPORARY
         await agent.delete('/api/testDescriptors'); //TEMPORARY
         await agent.delete('/api/skuitems'); //TEMPORARY
-        await agent.delete('/skus'); //TEMPORARI
+        await agent.delete('/api/skus'); //TEMPORARI
         await agent.post('/api/sku').send({ "description": "a new sku",
                                             "weight": 100, "volume": 50,
                                             "notes": "first SKU", "price": 10.99,
