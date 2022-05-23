@@ -11,7 +11,7 @@ exports.selectItems = () => {
             if (err) {
                 reject(err.toString());
             } else {
-                resolve(rows.map((r) => new Item(r.id, r.description, r.price, r.SKUID, r.supplierId)));
+                resolve(rows.map((r) => new Item(parseInt(r.id), r.description, r.price, r.SKUID, parseInt(r.supplierId))));
             }
         });
     });
@@ -25,7 +25,7 @@ exports.selectItemByID = (id) => {
                 reject(err.toString());
             } else {
                 if (row) {
-                    resolve(new Item(row.id, row.description, row.price, row.SKUID, row.supplierId));
+                    resolve(new Item(parseInt(row.id), row.description, row.price, row.SKUID, parseInt(row.supplierId)));
                 } else {
                     resolve(null);
                 }
@@ -42,7 +42,7 @@ exports.selectItemBySKUID = (skuid) => {
                 reject(err.toString());
             } else {
                 if (row) {
-                    resolve(new Item(row.id, row.description, row.price, row.SKUID, row.supplierId));
+                    resolve(new Item(parseInt(row.id), row.description, row.price, row.SKUID, parseInt(row.supplierId)));
                 } else {
                     resolve(null);
                 }
@@ -83,6 +83,19 @@ exports.deleteItemByID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM Item WHERE id = ?`;
         db.run(sql, [id], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+exports.deleteItemData = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE FROM Item`;
+        db.run(sql, [], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
