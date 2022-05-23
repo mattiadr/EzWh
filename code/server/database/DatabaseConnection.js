@@ -134,7 +134,7 @@ class DatabaseConnection {
 		);`;
 		this.db.run(createTableReturnOrder, (err) => err && console.log(err));
 
-		/** Return Order & Products */
+		/** Return Order & Item */
 		const createTableReturnOrderProduct = `CREATE TABLE IF NOT EXISTS ReturnOrderProduct (
 			reoid integer NOT NULL,
 			skuid INTEGER NOT NULL,
@@ -145,20 +145,21 @@ class DatabaseConnection {
 
 		/** Internal Order **/
 		const createTableInternalOrder = `CREATE TABLE IF NOT EXISTS InternalOrder (
-			internalOrderId INTEGER NOT NULL,
+			id INTEGER NOT NULL,
 			issueDate DATETIME NOT NULL,
-			state VARCHAR(10) NOT NULL,
+			state VARCHAR(16) NOT NULL,
 			customerId INTEGER NOT NULL,
-			PRIMARY KEY (internalOrderId)
+			PRIMARY KEY (id)
 		);`;
 		this.db.run(createTableInternalOrder, (err) => err && console.log(err));
 
 		/** Internal Order & Item */
 		const createTableInternalOrderProduct = `CREATE TABLE IF NOT EXISTS InternalOrderProduct (
-			internalOrderId integer NOT NULL,
-			ITEMID varchar(12) NOT NULL,
-			quantity integer NOT NULL,
-			PRIMARY KEY (internalOrderId, ITEMID)
+			ioid INTEGER NOT NULL,
+			skuid INTEGER NOT NULL,
+			quantity integer,
+			rfid varchar(32),
+			PRIMARY KEY (ioid, skuid, rfid)
 		);`;
 		this.db.run(createTableInternalOrderProduct, (err) => err && console.log(err));
 	}

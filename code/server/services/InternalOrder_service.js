@@ -1,5 +1,4 @@
-const InternalOrder = require("../components/InternalOrder");
-const InternalOrderProduct = require("../components/InternalOrderProduct");
+const {InternalOrder, InternalOrderState} = require("../components/InternalOrder");
 
 class InternalOrderService {
 	#internalOrder_DAO;
@@ -11,90 +10,50 @@ class InternalOrderService {
 	getInternalOrders = () => {
 		return this.#internalOrder_DAO.selectInternalOrders();
 	}
-	
-	getInternalOrdersIssued = () => {
-		return this.#internalOrder_DAO.selectInternalOrdersIssued();
+
+	getInternalOrdersByState = (state) => {
+		return this.#internalOrder_DAO.selectInternalOrdersByState(state);
 	}
-	
-	getInternalOrdersAccepted = () => {
-		return this.#internalOrder_DAO.selectInternalOrdersAccepted();
+
+	getInternalOrderByID = (id) => {
+		return this.#internalOrder_DAO.selectInternalOrderByID(id);
 	}
-	
-	getInternalOrderByID = () => {
-		return this.#internalOrder_DAO.selectInternalOrderByID();
-	}
-	
-	newInternalOrder = async (issueDate, state, customerId) => {
+
+	newInternalOrder = async (issueDate, customerId, products) => {
 		try {
-			await this.#internalOrder_DAO.insertInternalOrder(new InternalOrder(null, issueDate, state, customerId));
+			const correct = products.every((p) => typeof p.SKUId === "number" && typeof p.description === "string" && typeof p.price === "number" && typeof p.qty === "number");
+			if (!correct) return {status: 422, body: "bad products"};
+			await this.#internalOrder_DAO.insertInternalOrder(new InternalOrder(null, issueDate, InternalOrderState.ISSUED, customerId, products));
 			return {status: 201, body: ""};
 		} catch (e) {
 			return {status: 503, body: e};
 		}
 	}
-	
-	updateInternalOrder = async (id, newState) => {
+
+	updateInternalOrder = async (id, newState, products) => {
 		try {
+			if (!Object.values(InternalOrderState).includes(newState)) return {status: 422, body: "invalid state"};
 			const internalOrder = await this.#internalOrder_DAO.selectInternalOrderByID(id);
 			if (!internalOrder) return {status: 404, body: "id not found"};
+
+			if (newState === InternalOrderState.COMPLETED) {
+				if (!Array.isArray(products)) return {status: 422, body: "bad products"};
+				const correct = products.every((p) => typeof p.SkuID === "number" && typeof p.RFID === "string" && p.RFID.length === 32);
+				if (!correct) return {status: 422, body: "bad products"};
+				internalOrder.assignRFIDs(products);
+				await this.#internalOrder_DAO.updateInternalOrderProducts(internalOrder);
+			}
 			internalOrder.state = newState;
 			await this.#internalOrder_DAO.updateInternalOrder(internalOrder);
-			if (newState === "accepted" || newState === "ACCEPTED") {
-				return {status: 200, body: {state: internalOrder.state}};
-			} else if (newState === "completed" || newState === "COMPLETED") {
-				return {status: 200, body: {state: internalOrder.state}};
-			}
+			return {status: 200, body: ""};
 		} catch (e) {
+			console.log(e)
 			return {status: 503, body: e};
 		}
 	}
-	
+
 	deleteInternalOrder = (id) => {
 		return this.#internalOrder_DAO.deleteInternalOrder(id);
-	}
-	
-	/** Internal Order Product **/
-	getInternalOrderProductById = (internalOrderProductId) => {
-		return this.#internalOrder_DAO.selectInternalOrderProductByID(internalOrderProductId);
-	}
-	
-	getInternalOrderProducts = () => {
-		return this.#internalOrder_DAO.selectInternalOrderProducts();
-	}
-	
-	createInternalOrderProduct = async (internalOrderId,ITEMID,quantity) => {
-		try {
-			let newInternalOrderProduct = new InternalOrderProduct();
-			newInternalOrderProduct.internalOrderId = internalOrderId;
-			newInternalOrderProduct.ITEMID = ITEMID;
-			newInternalOrderProduct.quantity = quantity;
-			await this.#internalOrder_DAO.insertInternalOrderProduct(newInternalOrderProduct);
-			return { status: 201, body: {} };
-		} catch (e) {
-			return { status: 503, body: {}, message: e };
-		}
-	}
-	
-	updateInternalOrderProduct = async (internalOrderId,ITEMID,quantity = undefined) => {
-		try {
-			let internalOrderProduct = await this.#internalOrder_DAO.selectInternalOrderProductByID(internalOrderId);
-			if (!internalOrderProduct) return { status: 404, body: "internal order product not found" };
-			if (internalOrderId !== undefined && ITEMID !== undefined) {
-				internalOrderProduct.quantity = quantity;
-			} else {
-				internalOrderProduct.internalOrderId = internalOrderId;
-				internalOrderProduct.itemId = ITEMID;
-				internalOrderProduct.quantity = quantity;
-			}
-			await this.#internalOrder_DAO.updateInternalOrderProduct(internalOrderId, ITEMID, internalOrderProduct);
-			return { status: 200, body: "" };
-		} catch (e) {
-			return { status: 503, body: e };
-		}
-	}
-	
-	deleteInternalOrderProduct = (internalOrderProductID) => {
-		return this.#internalOrder_DAO.deleteInternalOrderProduct(internalOrderProductID);
 	}
 }
 
