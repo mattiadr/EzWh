@@ -311,7 +311,6 @@ function testGetInternalOrderByID(id, shouldHaveRFID, expectedStatus, expectedIn
 					res.should.have.status(expectedStatus);
 					if (expectedStatus === 200) {
 						res.should.be.json;
-						console.log(res.body, expectedInternalOrder)
 						compareObject(res.body, expectedInternalOrder, {
 							id: "number",
 							issueDate: "string",

@@ -215,7 +215,7 @@ function testGetSKUs(expectedStatus, expectedSKUs) {
 	});
 }
 
-function testGetSKUbyID(id, expectedStatus, expectedSKU) {
+function testGetSKUByID(id, expectedStatus, expectedSKU) {
 	it(`GET /api/skus/${id}`, (done) => {
 		agent.get(`/api/skus/${id}`)
 			.end((err, res) => {
@@ -287,6 +287,12 @@ function testDeleteSKUbyID(id, expectedStatus) {
 }
 
 describe("Test SKU API", () => {
+	/** INIT **/
+	before(async () => {
+		await agent.post("/api/position").send(position[0]);
+		await agent.post("/api/position").send(position[1]);
+	});
+
 	/** POST **/
 	describe("adding SKU", () => {
 		testCreateSKU(postSKUs[0], 201);
@@ -301,29 +307,27 @@ describe("Test SKU API", () => {
 	/** GET **/
 	describe("getting SKU", () => {
 		testGetSKUs(200, expectedSKUs);
-		testGetSKUbyID(1, 200, expectedSKUs[0]);
-		testGetSKUbyID(2, 200, expectedSKUs[1]);
+		testGetSKUByID(1, 200, expectedSKUs[0]);
+		testGetSKUByID(2, 200, expectedSKUs[1]);
 	});
 	describe("getting invalid SKU", () => {
-		testGetSKUbyID(6, 404); // sku not found
-		testGetSKUbyID("not a number", 422); // invalid id
+		testGetSKUByID(6, 404); // sku not found
+		testGetSKUByID("not a number", 422); // invalid id
 	});
 
 	/** PUT **/
 	describe("modifying SKU position", () => {
-		agent.post("/api/position").send(position[0]).end();
 		testModifySKUPosition(1, {position: position[0].positionID}, 200);
-		testGetSKUbyID(1, 200, positionSKU);
+		testGetSKUByID(1, 200, positionSKU);
 	});
 	describe("modifying invalid SKU position", () => {
-		agent.post("/api/position").send(position[1]).end();
 		testModifySKUPosition(6, {position: position[1].positionID}, 404); // sku not found
 		testModifySKUPosition(2, {position: 123412341234}, 404); // position not found
 		testModifySKUPosition(2, {position: position[0].positionID}, 422); // position already assigned
 	});
 	describe("modifying SKU", () => {
 		testModifySKU(1, modifyBody, 200);
-		testGetSKUbyID(1, 200, modifiedSKU);
+		testGetSKUByID(1, 200, modifiedSKU);
 	});
 	describe("modifying invalid SKU", () => {
 		testModifySKU(56, modifyBody, 404); // sku not found

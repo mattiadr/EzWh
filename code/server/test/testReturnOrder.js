@@ -264,17 +264,17 @@ function testDeleteReturnOrderByID(id, expectedStatus) {
 
 describe("Test ReturnOrder API", () => {
 	/** INIT **/
-	beforeEach(async () => {
-		agent.post("/api/restockOrder").send(restockOrders[0]).end();
-		agent.post("/api/restockOrder").send(restockOrders[1]).end();
-		agent.post("/api/sku").send(SKUs[0]).end();
-		agent.post("/api/sku").send(SKUs[1]).end();
-		agent.post("/api/sku").send(SKUs[2]).end();
-		agent.post("/api/sku").send(SKUs[3]).end();
-		agent.post("/api/item").send(items[0]).end();
-		agent.post("/api/item").send(items[1]).end();
-		agent.post("/api/item").send(items[2]).end();
-		agent.post("/api/item").send(items[3]).end();
+	before(async () => {
+		await agent.post("/api/restockOrder").send(restockOrders[0]);
+		await agent.post("/api/restockOrder").send(restockOrders[1]);
+		await agent.post("/api/sku").send(SKUs[0]);
+		await agent.post("/api/sku").send(SKUs[1]);
+		await agent.post("/api/sku").send(SKUs[2]);
+		await agent.post("/api/sku").send(SKUs[3]);
+		await agent.post("/api/item").send(items[0]);
+		await agent.post("/api/item").send(items[1]);
+		await agent.post("/api/item").send(items[2]);
+		await agent.post("/api/item").send(items[3]);
 	});
 
 	/** POST **/
