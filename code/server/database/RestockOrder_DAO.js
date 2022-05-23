@@ -184,3 +184,37 @@ exports.deleteRestockOrder = (id) => {
 		});
 	}));
 }
+
+exports.deleteRestockOrderData = () => {
+	return new Promise((resolve, reject) => {
+		// delete restock order from RestockOrderProduct
+		const sql = `DELETE FROM RestockOrderProduct;`;
+		db.run(sql, [], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}).then(() => new Promise((resolve, reject) => {
+		// delete restock order from RestockOrderSKUItem
+		const sql = `DELETE FROM RestockOrderSKUItem;`;
+		db.run(sql, [], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	})).then(() => new Promise((resolve, reject) => {
+		// delete restock order from RestockOrder
+		const sql = `DELETE FROM RestockOrder;`;
+		db.run(sql, [], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}));
+}

@@ -7,7 +7,7 @@ chai.should();
 const app = require('../server');
 var agent = chai.request.agent(app);
 
-describe('test TestResult apis', () => {
+describe('test Item apis', () => {
 
     before(async () => {
         await agent.delete('/api/items'); //TEMPORARY
