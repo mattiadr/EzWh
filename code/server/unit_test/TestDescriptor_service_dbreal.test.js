@@ -66,7 +66,7 @@ describe("set TestDescriptor", () => {
     });
 
     test('update TestDescriptor', async () => {
-        const Test1 = new TestDescriptor(1, '(updated) test descriptor 1', 'This test is described by...', 1);
+        const Test1 = new TestDescriptor(1, '(updated)test descriptor 1', 'This test is described by...', 1);
         const Test2 = new TestDescriptor(2, '(updated)test descriptor 2', 'This test is described by...', 4);
         const Test5 = new TestDescriptor(5, '(updated)test descriptor 5', 'This test is described by...', 2);
         

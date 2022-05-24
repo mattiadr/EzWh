@@ -82,24 +82,25 @@ async function testDeletePosition(positionID, aisleID, row, col, maxWeight, maxV
     });
 }
 
-describe("testDao_selectPositions", () => {
+describe("positionDao_selectPositions", () => {
     beforeEach(async () => {
-        await P_dao.deletePositionData(); // TODO
-        await P_dao.insertPosition(new Position(1, "AID01670", "K102", "G560", 800, 60, 560.50, 40.8));
-        await P_dao.insertPosition(new Position(2, "AID01990", "D108", "Z300", 800, 60, 430.50, 52.6));
+        await P_dao.deletePositionData(); 
+        await P_dao.insertPosition(new Position("800234543412","8002","3454",1000,1000,300,150));
+        await P_dao.insertPosition(new Position("80123454312","8012","3454","3412",1000,1000,300,150));
     });
 
-    testPositions([ new Position(1, "AID01670", "K102", "G560", 800, 60, 560.50, 40.8),
-        new Position(2, "AID01990", "D108", "Z300", 800, 60, 430.50, 52.6)]);
-    testPosition(1, "AID01670", "K102", "G560", 800, 60, 560.50, 40.8);
-    testPosition(2, "AID01990", "D108", "Z300", 800, 60, 430.50, 52.6);
+    testPositions([ new Position("800234543412","8002","3454",1000,1000,300,150),
+                            new Position("80123454312","8012","3454","3412",1000,1000,300,150)]);
+    testPosition("800234543412","8002","3454",1000,1000,300,150);
+    testPosition("80123454312","8012","3454","3412",1000,1000,300,150);
     testPositionByID(1);
-    
+    //testPosition("80223454312","8022","3454","3412",1000,1000,300,150); // -> this test will fail
+
 });
 
-describe('testDao_newPosition', () => {
+describe('positionDao_newPosition', () => {
     beforeEach(async () => {
-        await P_dao.deletePositionData(); // TODO
+        await P_dao.deletePositionData(); 
     });
 
     test('db is empty', async () => {
@@ -107,27 +108,27 @@ describe('testDao_newPosition', () => {
         expect(res.length).toStrictEqual(0);
     });
 
-    testNewPosition(1, "AID01670", "K102", "G560", 800, 60, 560.50, 40.8);
+    testNewPosition("800234543412","8002","3454","3412",1000,1000,300,150);
 });
 
-describe('testDao_updatePosition', () => {
+describe('positionDao_updatePosition', () => {
     beforeAll(async () => {
-        await P_dao.deletePositionData(); // TODO
-        await P_dao.insertPosition(new Position(1, "AID01670", "K102", "G560", 800, 60, 560.50, 40.8));
+        await P_dao.deletePositionData(); 
+        await P_dao.insertPosition(new Position("800234543412","8002","3454",1000,1000,300,150));
     });
 
-    testUpdatePosition(1, "AID01670", "K102", "G560", 800, 60, 635.50, 51.0);
+    testUpdatePosition("800234543412","8002","3454","3412",1000,1000,300,150);
 });
 
-describe("testDao_deletePosition", () => {
+describe("positionDao_deletePosition", () => {
     beforeEach(async () => {
         await P_dao.deletePositionData(); // TODO
-        await P_dao.insertPosition(new Position(1, "AID01670", "K102", "G560", 800, 60, 560.50, 40.8));
-        await P_dao.insertPosition(new Position(2, "AID01990", "D108", "Z300", 800, 60, 430.50, 52.6));
+        await P_dao.insertPosition(new Position("800234543412","8002","3454",1000,1000,300,150));
+        await P_dao.insertPosition(new Position("80123454312","8012","3454","3412",1000,1000,300,150));
     });
-    testDeletePosition(1, "AID01670", "K102", "G560", 800, 60, 560.50, 40.8);
-    testDeletePosition(2, "AID01990", "D108", "Z300", 800, 60, 430.50, 52.6);
-    //testDeletePosition(3, "AID04994", "F108", "J300", 800, 60, 100.50, 2.4); // -> this test will fail
+    testDeletePosition("800234543412","8002","3454",1000,1000,300,150);
+    testDeletePosition("80123454312","8012","3454","3412",1000,1000,300,150);
+    //testDeletePosition("80223454312","8022","3454","3412",1000,1000,300,150); // -> this test will fail
 });
 
 
