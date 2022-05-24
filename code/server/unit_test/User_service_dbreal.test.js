@@ -10,6 +10,13 @@ async function testUsers(expectedUsers) {
     });
 }
 
+async function testSuppliers(expectedUsers) {
+    test('get all Suppliers', async () => {
+        let res = await User_service.getUsersByRole("supplier");
+        expect(res).toEqual(expectedUsers);
+    });
+}
+
 async function testUser(id, name, surname, email, passwordHash, passwordSalt, role) {
     test('get User', async () => {
         let res = await User_service.getUserByID(id);
@@ -36,6 +43,23 @@ describe('get Users', () => {
     new User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","supplier")];
 
     testUsers(Users);
+    testUser(Users[0].id, Users[0].name, Users[0].surname, Users[0].email, Users[0].passwordHash, Users[0].passwordSalt, Users[0].role);
+    testUser(Users[1].id, Users[1].name, Users[1].surname, Users[1].email, Users[1].passwordHash, Users[1].passwordSalt, Users[1].role);
+    
+});
+
+describe('get Suppliers', () => {
+
+    beforeEach(async () => {
+        await U_dao.deleteUserData(); 
+        await U_dao.insertUser(new User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier"));
+        await U_dao.insertUser(new User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","supplier"));
+    });
+
+    const Users = [new User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier"),
+    new User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","supplier")];
+
+    testSuppliers(Users);
     testUser(Users[0].id, Users[0].name, Users[0].surname, Users[0].email, Users[0].passwordHash, Users[0].passwordSalt, Users[0].role);
     testUser(Users[1].id, Users[1].name, Users[1].surname, Users[1].email, Users[1].passwordHash, Users[1].passwordSalt, Users[1].role);
     
