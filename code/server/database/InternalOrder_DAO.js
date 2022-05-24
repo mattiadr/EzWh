@@ -127,6 +127,17 @@ exports.updateInternalOrderProducts = (internalOrder) => {
 
 exports.deleteInternalOrder = (id) => {
 	return new Promise((resolve, reject) => {
+		// delete return order from InternalOrderProduct
+		const sql = `DELETE FROM InternalOrderProduct WHERE ioid = ?`;
+		db.run(sql, [id], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}).then(() => new Promise((resolve, reject) => {
+		// delete return order from InternalOrder
 		const sql = `DELETE FROM InternalOrder WHERE id = ?`;
 		db.run(sql, [id], (err) => {
 			if (err) {
@@ -135,6 +146,5 @@ exports.deleteInternalOrder = (id) => {
 				resolve();
 			}
 		});
-	});
-	// TODO delete internal order product
+	}));
 }
