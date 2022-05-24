@@ -13,6 +13,9 @@ describe('test Restock Order apis', () => {
         await agent.delete('/api/items'); //TEMPORARY
         await agent.delete('/api/skus'); //TEMPORARY
         await agent.delete('/api/restockOrders'); //TEMPORARY
+        await agent.delete('/api/testDescriptors'); //TEMPORARY
+        await agent.delete('/api/skuitems'); //TEMPORARY
+        await agent.delete('/api/testResults'); //TEMPORARY
         await agent.post('/api/sku').send({ "description": "a new sku",
                                             "weight": 100, "volume": 50,
                                             "notes": "first SKU", "price": 10.99,
@@ -24,14 +27,28 @@ describe('test Restock Order apis', () => {
         await agent.post('/api/item').send({"id":1, "description" : "a product", 
                                             "price" : 10.99, "SKUId" : 1, "supplierId" : 2});
         await agent.post('/api/item').send({"id":2, "description" : "another product", 
-                                            "price" : 11.99, "SKUId" : 2, "supplierId" : 2});                                   
-
+                                            "price" : 11.99, "SKUId" : 2, "supplierId" : 2});
+        await agent.post('/api/testDescriptor').send({"name": "test descriptor 3", 
+                                                      "procedureDescription" : "This test is described by...", 
+                                                      "idSKU" : 2});
+        await agent.post('/api/skuitem').send({"RFID": "12345678901234567890123456789016", "SKUId": 2, "DateOfStock" : "2021/11/29 12:30"});                                    
+        await agent.post('/api/skuitems/testResult').send({"rfid":"12345678901234567890123456789016", "idTestDescriptor":1,
+                                                           "Date":"2021/11/28", "Result": false });
         
+    });
+
+    after(async () => {
+        await agent.delete('/api/items'); //TEMPORARY
+        await agent.delete('/api/skus'); //TEMPORARY
+        await agent.delete('/api/restockOrders'); //TEMPORARY
+        await agent.delete('/api/testDescriptors'); //TEMPORARY
+        await agent.delete('/api/skuitems'); //TEMPORARY
+        await agent.delete('/api/testResults'); //TEMPORARY
     });
 
     const products1 = [ {"SKUId": 1, "description": "a product", "price": 10.99, "qty": 30},
                         {"SKUId": 2, "description": "another product", "price": 11.99, "qty": 20}];
-    const products2 = [ {"SKUId": 1,"description": "a product", "price": 10.99, "qty": 10}];
+    const products2 = [ {"SKUId": 1, "description": "a product", "price": 10.99, "qty": 10}];
 
     newRestockOrder(201, "2021/11/29 09:33", products1, 1);
     newRestockOrder(422, "abc", products1, 1);
@@ -54,7 +71,7 @@ describe('test Restock Order apis', () => {
     updateStateRestockOrder(200, 1, "DELIVERY");
     updateTransportNoteRestockOrder(200, 1, {"deliveryDate": "2021/11/30"});
 
-    const skuitems = [{"SKUId":12,"rfid":"12345678901234567890123456789016"},{"SKUId":12,"rfid":"12345678901234567890123456789017"}];
+    const skuitems = [{"SKUId":1,"rfid":"12345678901234567890123456789016"},{"SKUId":2,"rfid":"12345678901234567890123456789017"}];
     updateSkuItemsRestockOrder(404, 3, skuitems);
     updateSkuItemsRestockOrder(422);
     updateSkuItemsRestockOrder(422, "ciao", skuitems);
@@ -67,8 +84,19 @@ describe('test Restock Order apis', () => {
                            {"id": 2, "issueDate": "2021/12/14 10:04", "state": "DELIVERED", "products": products2, "supplierId" : 2, "transportNote":{"deliveryDate": "Invalid Date"}, "skuItems" : skuitems}]
     
     getRestockOrders(200, restockOrders);
-
-    deleteRestockOrder(204, 2);
+    getRestockOrders(404, restockOrders, 3);
+    getRestockOrders(422, restockOrders, "abc");
+    getRestockOrders(200, restockOrders[0], 1);
+    getIssuedRestockOrders(200, []);
+    newRestockOrder(201, "2021/12/20 12:12", products2, 2);
+    getIssuedRestockOrders(200, [{"id": 3, "issueDate": "2021/12/20 12:12", "state": "ISSUED", "products": products2, "supplierId" : 2, "transportNote":{"deliveryDate": "Invalid Date"}, "skuItems" : []}]);
+    
+    getReturnedItemsOfRestockOrder(422, [skuitems[0]], 2);
+    updateStateRestockOrder(200, 2, "COMPLETEDRETURN");
+    getReturnedItemsOfRestockOrder(200, [skuitems[0]], 2);
+    
+    
+    deleteRestockOrder(204, 3);
     deleteRestockOrder(422, "abc");
 
 });
@@ -104,19 +132,49 @@ function newRestockOrder(expectedHTTPStatus, issueDate, products, supplierId) {
 }
 
 
-function getRestockOrders(expectedHTTPStatus, expectedOrders) {
+function getRestockOrders(expectedHTTPStatus, expectedOrders, id) {
     it('getting restock orders datas from the system', function (done) {
-        agent.get('/api/restockOrders')
+        if (id === undefined) {
+            agent.get('/api/restockOrders')
             .then(function (res) {
                 res.should.have.status(expectedHTTPStatus);
-                /*
-                console.log(res.status);
-                console.log(expectedOrders);
-                console.log("==================");
-                console.log(res.body);
-                console.log(expectedOrders[0] == res.body[0]);
-                console.log(expectedOrders[1] == res.body[1]);
-                */
+                if (res.status == 200) {
+                    JSON.stringify(res.body).should.equal(JSON.stringify(expectedOrders));
+                }
+                done();
+            });
+        } else {
+            agent.get('/api/restockOrders/' + id)
+            .then(function (res) {
+                res.should.have.status(expectedHTTPStatus);
+                if (res.status == 200) {
+                    JSON.stringify(res.body).should.equal(JSON.stringify(expectedOrders));
+                }
+                done();
+            });
+        }
+        
+    });
+}
+
+function getIssuedRestockOrders(expectedHTTPStatus, expectedOrders) {
+    it('getting issued restock orders datas from the system', function (done) {
+        agent.get('/api/restockOrdersIssued')
+            .then(function (res) {
+                res.should.have.status(expectedHTTPStatus);
+                if (res.status == 200) {
+                    JSON.stringify(res.body).should.equal(JSON.stringify(expectedOrders));
+                }
+                done();
+            });
+    });
+}
+
+function getReturnedItemsOfRestockOrder(expectedHTTPStatus, expectedItems, id) {
+    it('getting items to be returned of a restock order from the system', function (done) {
+        agent.get('/api/restockOrders/' + id + '/returnItems')
+            .then(function (res) {
+                res.should.have.status(expectedHTTPStatus);
                 if (res.status == 200) {
                     JSON.stringify(res.body).should.equal(JSON.stringify(expectedItems));
                 }

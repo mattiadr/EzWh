@@ -22,6 +22,11 @@ describe('test Item apis', () => {
                                             "availableQuantity": 25});
     });
 
+    after(async () => {
+        await agent.delete('/api/items'); //TEMPORARY
+        await agent.delete('/api/skus'); //TEMPORARY
+    });
+
     newItem(201, 12, 'new item', 10.99, 1, 2);
     newItem(404, 13, 'new item', 19.99, 3, 2);
     newItem(422);

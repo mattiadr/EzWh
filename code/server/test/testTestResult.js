@@ -13,7 +13,7 @@ describe('test TestResult apis', () => {
         await agent.delete('/api/testResults'); //TEMPORARY
         await agent.delete('/api/testDescriptors'); //TEMPORARY
         await agent.delete('/api/skuitems'); //TEMPORARY
-        await agent.delete('/api/skus'); //TEMPORARI
+        await agent.delete('/api/skus'); //TEMPORARY
         await agent.post('/api/sku').send({ "description": "a new sku",
                                             "weight": 100, "volume": 50,
                                             "notes": "first SKU", "price": 10.99,
@@ -27,6 +27,13 @@ describe('test TestResult apis', () => {
         await agent.post('/api/testDescriptor').send({ "name":"test descriptor 2",
                                                        "procedureDescription":"This test is described by...",
                                                        "idSKU" :1});
+    });
+    
+    after(async () => {
+        await agent.delete('/api/testResults'); //TEMPORARY
+        await agent.delete('/api/testDescriptors'); //TEMPORARY
+        await agent.delete('/api/skuitems'); //TEMPORARY
+        await agent.delete('/api/skus'); //TEMPORARY
     });
 
     newTestResult(201, '12345678901234567890123456789016', 1, '2021/11/28', true);
