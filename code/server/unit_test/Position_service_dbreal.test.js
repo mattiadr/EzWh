@@ -59,7 +59,7 @@ describe("set Position", () => {
         res = await Position_service.getPositionByID(Pos1.id);
         expect(res).toEqual(Pos1);
 
-        res = await Position_service.createTestDescriptor(Pos2.aisleID, Pos2.row, Pos2.col, Pos2.maxWeight, Pos2.maxVolume, Pos2.occupiedWeight, Pos2.occupiedVolume);
+        res = await Position_service.createPosition(Pos2.aisleID, Pos2.row, Pos2.col, Pos2.maxWeight, Pos2.maxVolume, Pos2.occupiedWeight, Pos2.occupiedVolume);
         expect(res.status).toEqual(404);
         res = await Position_service.getPositionByID(Pos2.id);
         expect(res).toBeNull();

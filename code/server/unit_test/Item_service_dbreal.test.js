@@ -22,7 +22,7 @@ async function testItem(id, description, price, SKUID, supplierId) {
 }
 
 // test case definition
-describe('get Positions', () => {
+describe('get Items', () => {
 
     beforeEach(async () => {
         await I_dao.deleteItemData(); 
@@ -56,7 +56,7 @@ describe("set Item", () => {
         res = await Item_service.getItemByID(Item1.id);
         expect(res).toEqual(Item1);
 
-        res = await Item_service.createTestDescriptor(Item2.description,Item2.price,Item2.SKUID,Item2.supplierId);
+        res = await Item_service.createItem(Item2.description,Item2.price,Item2.SKUID,Item2.supplierId);
         expect(res.status).toEqual(404);
         res = await Item_service.getItemByID(Item2.id);
         expect(res).toBeNull();
