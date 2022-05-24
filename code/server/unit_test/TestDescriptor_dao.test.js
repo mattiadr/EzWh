@@ -61,7 +61,6 @@ async function testDeleteTestDescriptor(id, name, procedureDescription, idSKU) {
         expect(res.name).toStrictEqual(name);
         expect(res.procedureDescription).toStrictEqual(procedureDescription);
         expect(res.idSKU).toStrictEqual(idSKU);
-
         await testD_dao.deleteTestDescriptorByID(id);
         res = await testD_dao.selectTestDescriptorByID(id);
         expect(res).toBeNull();

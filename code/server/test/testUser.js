@@ -13,6 +13,10 @@ describe('test user apis', () => {
         await agent.delete('/api/users'); //TEMPORARY
     });
 
+    after(async () => {
+        await agent.delete('/api/users'); //TEMPORARY
+    });
+
     newUser(201, 'user1@ezwh.com', 'John', 'Smith', 'testpassword', 'customer');
     newUser(201, 'michael.jordan@supplier.ezwh.com', 'Michael', 'Jordan', 'testpassword', 'supplier');
     newUser(409, 'michael.jordan@supplier.ezwh.com', 'Mich', 'Jo', 'testpassword', 'supplier');

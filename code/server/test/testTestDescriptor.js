@@ -18,6 +18,11 @@ describe('test Test Descriptor apis', () => {
                                             "availableQuantity": 50});
     });
 
+    after(async () => {
+        await agent.delete('/api/testDescriptors'); //TEMPORARY
+        await agent.delete('/api/skus'); //TEMPORARY
+    });
+
     newTestDescriptor(201, 'test descriptor 1', 'This test is described by...', 1);
     newTestDescriptor(201, 'test descriptor 2', 'This test is described by...', 1);
     newTestDescriptor(422);
