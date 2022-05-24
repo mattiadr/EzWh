@@ -68,14 +68,4 @@ router.delete("/testDescriptor/:id",
 		});
 });
 
-router.delete("/testDescriptors", //TEMPORARY
-	(req, res) => {
-		TestDescriptor_service.deleteTestDescriptors().then(() => {
-			res.status(204).end();
-		}).catch((err) => {
-			res.status(500).send(err);
-		});
-	}
-)
-
 module.exports = router;

@@ -265,6 +265,7 @@ function testDeleteReturnOrderByID(id, expectedStatus) {
 describe("Test ReturnOrder API", () => {
 	/** INIT **/
 	before(async () => {
+		await agent.delete("/api/resetDatabase");
 		await agent.post("/api/restockOrder").send(restockOrders[0]);
 		await agent.post("/api/restockOrder").send(restockOrders[1]);
 		await agent.post("/api/sku").send(SKUs[0]);

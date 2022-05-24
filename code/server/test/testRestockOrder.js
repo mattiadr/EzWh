@@ -10,12 +10,7 @@ var agent = chai.request.agent(app);
 describe('test Restock Order apis', () => {
 
     before(async () => {
-        await agent.delete('/api/items'); //TEMPORARY
-        await agent.delete('/api/skus'); //TEMPORARY
-        await agent.delete('/api/restockOrders'); //TEMPORARY
-        await agent.delete('/api/testDescriptors'); //TEMPORARY
-        await agent.delete('/api/skuitems'); //TEMPORARY
-        await agent.delete('/api/testResults'); //TEMPORARY
+        await agent.delete("/api/resetDatabase");
         await agent.post('/api/sku').send({ "description": "a new sku",
                                             "weight": 100, "volume": 50,
                                             "notes": "first SKU", "price": 10.99,
@@ -34,16 +29,6 @@ describe('test Restock Order apis', () => {
         await agent.post('/api/skuitem').send({"RFID": "12345678901234567890123456789016", "SKUId": 2, "DateOfStock" : "2021/11/29 12:30"});                                    
         await agent.post('/api/skuitems/testResult').send({"rfid":"12345678901234567890123456789016", "idTestDescriptor":1,
                                                            "Date":"2021/11/28", "Result": false });
-        
-    });
-
-    after(async () => {
-        await agent.delete('/api/items'); //TEMPORARY
-        await agent.delete('/api/skus'); //TEMPORARY
-        await agent.delete('/api/restockOrders'); //TEMPORARY
-        await agent.delete('/api/testDescriptors'); //TEMPORARY
-        await agent.delete('/api/skuitems'); //TEMPORARY
-        await agent.delete('/api/testResults'); //TEMPORARY
     });
 
     const products1 = [ {"SKUId": 1, "description": "a product", "price": 10.99, "qty": 30},

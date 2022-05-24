@@ -289,6 +289,7 @@ function testDeleteSKUbyID(id, expectedStatus) {
 describe("Test SKU API", () => {
 	/** INIT **/
 	before(async () => {
+		await agent.delete("/api/resetDatabase");
 		await agent.post("/api/position").send(position[0]);
 		await agent.post("/api/position").send(position[1]);
 	});

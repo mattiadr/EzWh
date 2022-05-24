@@ -65,14 +65,4 @@ router.delete("/skuitems/:rfid/testResult/:id",
 		});
 });
 
-router.delete("/testResults", //TEMPORARY
-	(req, res) => {
-		TestResult_service.deleteTestResults().then(() => {
-			res.status(204).end();
-		}).catch((err) => {
-			res.status(500).send(err);
-		});
-	}
-)
-
 module.exports = router;

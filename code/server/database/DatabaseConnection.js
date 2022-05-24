@@ -163,6 +163,47 @@ class DatabaseConnection {
 		);`;
 		this.db.run(createTableInternalOrderProduct, (err) => err && console.log(err));
 	}
+
+	static resetTable(tableName) {
+		return new Promise((resolve, reject) => {
+			const sql = `DELETE FROM ${tableName};`;
+			this.db.run(sql, [], (err) => {
+				if (err) {
+					console.log(`error while clearing table ${tableName}`);
+					console.log(err);
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+
+	static resetAllTables() {
+		const users = [
+			["John", "Smith", "user1@ezwh.com", "NyXsQCTQ+OaylB+Yi0mnlvhaelX2LqqfBwZ0A80QkNM=", "ELXfvDBtTWOcoN7my2w+T/HDXbyGJ3cVUWOHlWD3V4Y=", "customer"],
+			["Creed", "Bratton", "qualityEmployee1@ezwh.com", "jv6wZwuthjVVug0U4YYEKEEB5CKiZHftNIqPRcAOazA=", "+U3SJooCydj+o7rTf0MuVtVknWvQoxKqbtu84WvIkUw=", "qualityEmployee"],
+			["Dwight", "Schrute", "clerk1@ezwh.com", "TVy3LwcC6XQd+9OKRh2DmtAOHJsc1sdzcAMCIl4pK34=", "BkRa36JqhekN3VZNddj/MhRr3NbEeGSY97xPgpXuSFA=", "clerk"],
+			["Darryl", "Philbin", "deliveryEmployee1@ezwh.com", "B/BoESakTY2XTDk67bCz1dqSkD4hA/jm6eeUFsfsHKY=", "GFLU2eSrwPzb8UeA/+cATlgfMk4gxSbHIVjfiBW0jHE=", "deliveryEmployee"],
+			["Dunder", "Mifflin", "supplier1@ezwh.com", "1WSthO+irk3Va4fkGZP89o2R1/2FDzjTg21KRsIXmOM=", "qeNoimJcUht36I6c447WTDtYzKagKFzemVbVlmBXRno=", "supplier"],
+		];
+
+		return Promise.all(["InternalOrder", "InternalOrderProduct", "Item", "Position", "RestockOrder",
+			"RestockOrderProduct", "RestockOrderSKUItem", "ReturnOrder", "ReturnOrderProduct", "SKU", "SKUItem",
+			"TestDescriptor", "TestResult", "User"].map((t) => this.resetTable(t)))
+			.then(() => Promise.all(users.map((u) => new Promise((resolve, reject) => {
+				const sql = `INSERT INTO User(name, surname, email, passwordHash, passwordSalt, type) VALUES (?, ?, ?, ?, ?, ?);`;
+				this.db.run(sql, u, (err) => {
+					if (err) {
+						console.log(`error while inserting user ${u}`);
+						console.log(err);
+						reject(err);
+					} else {
+						resolve();
+					}
+				});
+			}))));
+	}
 }
 
 module.exports = DatabaseConnection

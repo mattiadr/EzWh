@@ -255,6 +255,7 @@ function testDeleteSKUItemByRFID(rfid, expectedStatus) {
 describe("Test SKUItem API", () => {
 	/** INIT **/
 	before(async () => {
+		await agent.delete("/api/resetDatabase");
 		await agent.post("/api/sku").send(postSKUs[0]);
 		await agent.post("/api/sku").send(postSKUs[1]);
 		await agent.post("/api/sku").send(postSKUs[2]);

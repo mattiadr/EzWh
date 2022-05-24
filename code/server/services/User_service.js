@@ -30,7 +30,7 @@ class UserService {
 			const user = await this.#user_DAO.selectUserByEmailAndType(email, type);
 		if (user) return {status: 409, body: "username already exists"};
 
-			const passwordSalt = crypto.randomBytes(256).toString("base64");
+			const passwordSalt = crypto.randomBytes(32).toString("base64");
 			const passwordHash = crypto.createHash("sha256")
 				.update(password, "utf8")
 				.update(passwordSalt)
