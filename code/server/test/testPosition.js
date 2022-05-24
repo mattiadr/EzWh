@@ -215,6 +215,11 @@ function testDeletePositionByID(id, expectedStatus) {
 }
 
 describe("Test Position API", () => {
+		/** INIT **/
+	before(async () => {
+		await agent.delete("/api/resetDatabase");
+	});
+
 	/** POST **/
 	describe("adding position", () => {
 		testCreatePosition(postPositions[0], 201);

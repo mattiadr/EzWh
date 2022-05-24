@@ -10,10 +10,7 @@ var agent = chai.request.agent(app);
 describe('test TestResult apis', () => {
 
     before(async () => {
-        await agent.delete('/api/testResults'); //TEMPORARY
-        await agent.delete('/api/testDescriptors'); //TEMPORARY
-        await agent.delete('/api/skuitems'); //TEMPORARY
-        await agent.delete('/api/skus'); //TEMPORARY
+        await agent.delete("/api/resetDatabase");
         await agent.post('/api/sku').send({ "description": "a new sku",
                                             "weight": 100, "volume": 50,
                                             "notes": "first SKU", "price": 10.99,
@@ -28,20 +25,13 @@ describe('test TestResult apis', () => {
                                                        "procedureDescription":"This test is described by...",
                                                        "idSKU" :1});
     });
-    
-    after(async () => {
-        await agent.delete('/api/testResults'); //TEMPORARY
-        await agent.delete('/api/testDescriptors'); //TEMPORARY
-        await agent.delete('/api/skuitems'); //TEMPORARY
-        await agent.delete('/api/skus'); //TEMPORARY
-    });
 
     newTestResult(201, '12345678901234567890123456789016', 1, '2021/11/28', true);
     newTestResult(404, '42348678911234567890123456789676', 1, '2021/11/28', true);
     newTestResult(404, '12345678901234567890123456789016', 3, '2021/11/28', true);
     newTestResult(201, '12345678901234567890123456789016', 2, '2021/11/28', true);
     newTestResult(422);
-    newTestResult(422, 5, "ada", 2011/05/08, true);
+    newTestResult(422, 5, "ada", "2011/05/08", true);
     newTestResult(201, '12345678901234567890123456789016', 1, '2021/12/03', false);
 
     const testsResRFID =  [{ id: 1, idTestDescriptor: 1, Date: '2021/11/28', Result: true},

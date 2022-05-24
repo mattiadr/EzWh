@@ -84,13 +84,4 @@ router.delete('/skuitems/:rfid',
 		});
 });
 
-router.delete('/skuitems',
-	async (req, res) => {
-		SKUItem_service.deleteSKUItems().then(() => {
-			res.status(204).end();
-		}).catch((err) => {
-			res.status(500).send(err);
-		});
-});
-
 module.exports = router;

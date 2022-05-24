@@ -10,8 +10,7 @@ var agent = chai.request.agent(app);
 describe('test Item apis', () => {
 
     before(async () => {
-        await agent.delete('/api/items'); //TEMPORARY
-        await agent.delete('/api/skus'); //TEMPORARY
+        await agent.delete("/api/resetDatabase");
         await agent.post('/api/sku').send({ "description": "a new sku",
                                             "weight": 100, "volume": 50,
                                             "notes": "first SKU", "price": 10.99,
@@ -20,11 +19,6 @@ describe('test Item apis', () => {
                                             "weight": 70, "volume": 30,
                                             "notes": "second SKU", "price": 29.99,
                                             "availableQuantity": 25});
-    });
-
-    after(async () => {
-        await agent.delete('/api/items'); //TEMPORARY
-        await agent.delete('/api/skus'); //TEMPORARY
     });
 
     newItem(201, 12, 'new item', 10.99, 1, 2);

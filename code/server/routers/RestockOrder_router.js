@@ -138,13 +138,4 @@ router.delete("/restockOrder/:id",
 		});
 });
 
-router.delete("/restockOrders",
-	(req, res) => {
-		RestockOrder_service.deleteRestockOrders().then(() => {
-			res.status(204).end();
-		}).catch((err) => {
-			res.status(500).send(err);
-		});
-});
-
 module.exports = router;
