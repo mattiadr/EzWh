@@ -7,7 +7,7 @@ chai.should();
 const app = require('../server');
 var agent = chai.request.agent(app);
 
-describe.only('test Restock Order apis', () => {
+describe('test Restock Order apis', () => {
 
     before(async () => {
         await agent.delete('/api/items'); //TEMPORARY
@@ -66,7 +66,7 @@ describe.only('test Restock Order apis', () => {
     const restockOrders = [{"id": 1, "issueDate": "2021/11/29 09:33", "state": "DELIVERY", "products": products1, "supplierId" : 1, "transportNote":{"deliveryDate": "2021/11/30"}, "skuItems" : []},
                            {"id": 2, "issueDate": "2021/12/14 10:04", "state": "DELIVERED", "products": products2, "supplierId" : 2, "transportNote":{"deliveryDate": "Invalid Date"}, "skuItems" : skuitems}]
     
-    //getRestockOrders(200, restockOrders);
+    getRestockOrders(200, restockOrders);
 
     deleteRestockOrder(204, 2);
     deleteRestockOrder(422, "abc");
@@ -109,10 +109,14 @@ function getRestockOrders(expectedHTTPStatus, expectedOrders) {
         agent.get('/api/restockOrders')
             .then(function (res) {
                 res.should.have.status(expectedHTTPStatus);
+                /*
                 console.log(res.status);
                 console.log(expectedOrders);
                 console.log("==================");
                 console.log(res.body);
+                console.log(expectedOrders[0] == res.body[0]);
+                console.log(expectedOrders[1] == res.body[1]);
+                */
                 if (res.status == 200) {
                     JSON.stringify(res.body).should.equal(JSON.stringify(expectedItems));
                 }
