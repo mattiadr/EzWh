@@ -70,13 +70,4 @@ router.delete("/items/:id",
 		});
 });
 
-router.delete("/items",
-	(req, res) => {
-		Item_service.deleteItems().then(() => {
-			res.status(204).end();
-		}).catch((err) => {
-			res.status(500).send(err);
-		});
-});
-
 module.exports = router;

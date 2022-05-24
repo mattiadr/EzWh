@@ -10,11 +10,7 @@ var agent = chai.request.agent(app);
 describe('test user apis', () => {
 
     before(async () => {
-        await agent.delete('/api/users'); //TEMPORARY
-    });
-
-    after(async () => {
-        await agent.delete('/api/users'); //TEMPORARY
+        await agent.delete("/api/resetDatabase");
     });
 
     newUser(201, 'user1@ezwh.com', 'John', 'Smith', 'testpassword', 'customer');

@@ -365,6 +365,7 @@ function testDeleteInternalOrderByID(id, expectedStatus) {
 describe("Test InternalOrder API", () => {
 	/** INIT **/
 	before(async () => {
+		await agent.delete("/api/resetDatabase");
 		await agent.post("/api/sku").send(SKUs[0]);
 		await agent.post("/api/sku").send(SKUs[1]);
 		await agent.post("/api/sku").send(SKUs[2]);

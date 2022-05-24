@@ -77,14 +77,4 @@ router.delete('/skus/:id',
 		});
 	});
 
-//TEMPORARY
-router.delete('/skus',
-	(req, res) => {
-		SKU_service.deleteSKUs().then(() => {
-			res.status(204).end();
-		}).catch((err) => {
-			res.status(500).send(err);
-		});
-	});
-
 module.exports = router;
