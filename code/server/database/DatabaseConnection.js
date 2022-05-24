@@ -181,11 +181,12 @@ class DatabaseConnection {
 
 	static resetAllTables() {
 		const users = [
-			["John", "Smith", "user1@ezwh.com", "NyXsQCTQ+OaylB+Yi0mnlvhaelX2LqqfBwZ0A80QkNM=", "ELXfvDBtTWOcoN7my2w+T/HDXbyGJ3cVUWOHlWD3V4Y=", "customer"],
-			["Creed", "Bratton", "qualityEmployee1@ezwh.com", "jv6wZwuthjVVug0U4YYEKEEB5CKiZHftNIqPRcAOazA=", "+U3SJooCydj+o7rTf0MuVtVknWvQoxKqbtu84WvIkUw=", "qualityEmployee"],
+			["Creed", "Bratton", "manager@ezwh.com", "jv6wZwuthjVVug0U4YYEKEEB5CKiZHftNIqPRcAOazA=", "+U3SJooCydj+o7rTf0MuVtVknWvQoxKqbtu84WvIkUw=", "manager"]
+			/*
 			["Dwight", "Schrute", "clerk1@ezwh.com", "TVy3LwcC6XQd+9OKRh2DmtAOHJsc1sdzcAMCIl4pK34=", "BkRa36JqhekN3VZNddj/MhRr3NbEeGSY97xPgpXuSFA=", "clerk"],
 			["Darryl", "Philbin", "deliveryEmployee1@ezwh.com", "B/BoESakTY2XTDk67bCz1dqSkD4hA/jm6eeUFsfsHKY=", "GFLU2eSrwPzb8UeA/+cATlgfMk4gxSbHIVjfiBW0jHE=", "deliveryEmployee"],
 			["Dunder", "Mifflin", "supplier1@ezwh.com", "1WSthO+irk3Va4fkGZP89o2R1/2FDzjTg21KRsIXmOM=", "qeNoimJcUht36I6c447WTDtYzKagKFzemVbVlmBXRno=", "supplier"],
+			*/
 		];
 
 		return Promise.all(["InternalOrder", "InternalOrderProduct", "Item", "Position", "RestockOrder",

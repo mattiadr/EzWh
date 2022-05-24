@@ -21,23 +21,23 @@ describe('test user apis', () => {
     newUser(422, 'john.snow@supplier.ezwh.com', 'John', 'Snow', 'less8', 'supplier');
     newUser(422, 'ciao007', "Jhon", 'Snow', 'testpassword', 'supplier');
     newUser(201, 'john.snow@supplier.ezwh.com', 'John', 'Snow', 'testpassword', 'supplier');
-    const users = [{ id: 1, name: 'John', surname: 'Smith', email: 'user1@ezwh.com', type: 'customer'},
-                   { id: 2, name: 'Michael', surname: 'Jordan', email: 'michael.jordan@supplier.ezwh.com', type: 'supplier'},
-                   { id: 3, name: 'John', surname: 'Snow', email: 'john.snow@supplier.ezwh.com', type: 'supplier'}]
+    const users = [{ id: 2, name: 'John', surname: 'Smith', email: 'user1@ezwh.com', type: 'customer'},
+                   { id: 3, name: 'Michael', surname: 'Jordan', email: 'michael.jordan@supplier.ezwh.com', type: 'supplier'},
+                   { id: 4, name: 'John', surname: 'Snow', email: 'john.snow@supplier.ezwh.com', type: 'supplier'}]
     getUsers(200, users);
-    const suppliers = [{ id: 2, name: 'Michael', surname: 'Jordan', email: 'michael.jordan@supplier.ezwh.com'},
-                       { id: 3, name: 'John', surname: 'Snow', email: 'john.snow@supplier.ezwh.com'}]
+    const suppliers = [{ id: 3, name: 'Michael', surname: 'Jordan', email: 'michael.jordan@supplier.ezwh.com'},
+                       { id: 4, name: 'John', surname: 'Snow', email: 'john.snow@supplier.ezwh.com'}]
     getSuppliers(200, suppliers);
-    userSession(200, 'customer', 1, 'user1@ezwh.com', "testpassword", "John", "Smith");
-    userSession(200, 'supplier', 2, 'michael.jordan@supplier.ezwh.com', "testpassword", "Michael", "Jordan");
+    userSession(200, 'customer', 2, 'user1@ezwh.com', "testpassword", "John", "Smith");
+    userSession(200, 'supplier', 3, 'michael.jordan@supplier.ezwh.com', "testpassword", "Michael", "Jordan");
     userSession(401, 'customer'); 
     userSession(401, 'supplier');
-    userSession(401, 'manager', 1, 'user1@ezwh.com', "testpassword", "John", "Smith");
-    userSession(401, 'clerk', 1, 'user1@ezwh.com', "testpassword", "John", "Smith");
-    userSession(401, 'qualityEmployee', 1, 'user1@ezwh.com', "testpassword", "John", "Smith");
-    userSession(401, 'deliveryEmployee', 1, 'user1@ezwh.com', "testpassword", "John", "Smith");
+    userSession(401, 'manager', 2, 'user1@ezwh.com', "testpassword", "John", "Smith");
+    userSession(401, 'clerk', 2, 'user1@ezwh.com', "testpassword", "John", "Smith");
+    userSession(401, 'qualityEmployee', 2, 'user1@ezwh.com', "testpassword", "John", "Smith");
+    userSession(401, 'deliveryEmployee', 2, 'user1@ezwh.com', "testpassword", "John", "Smith");
     newUser(201, 'maurisio@ezwh.com', 'Maurizio', 'Morisio', 'PoliTo2022', 'qualityEmployee');
-    userSession(401, 'qualityEmployee', 4, 'maurisio@ezwh.com', "testpassword", "Maurizio", "Morisio");
+    userSession(401, 'qualityEmployee', 5, 'maurisio@ezwh.com', "testpassword", "Maurizio", "Morisio");
     updateUserPermission(200, "user1@ezwh.com", "customer", "clerk");
     updateUserPermission(404, "user1@ezwh.com", "customer", "supplier");
     updateUserPermission(422, "user1@ezwh.com", "clerk", "manager");
