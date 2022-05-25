@@ -3,11 +3,11 @@ const crypto = require("crypto");
 const {User, UserRole} = require("../components/User");
 
 class UserService {
-    #user_DAO;
+	#user_DAO;
 
-    constructor(user_DAO) {
-        this.#user_DAO = user_DAO;
-    }
+	constructor(user_DAO) {
+		this.#user_DAO = user_DAO;
+	}
 
 	getCurrentUser() {
 		// TODO

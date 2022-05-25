@@ -5,9 +5,9 @@ const {RestockOrder, RestockOrderState} = require("../components/RestockOrder");
 class RestockOrderService {
 	#restockOrder_DAO;
 
-    constructor(restockOrder_DAO) {
-        this.#restockOrder_DAO = restockOrder_DAO;
-    }
+	constructor(restockOrder_DAO) {
+		this.#restockOrder_DAO = restockOrder_DAO;
+	}
 
 	getRestockOrders() {
 		return this.#restockOrder_DAO.selectRestockOrders();

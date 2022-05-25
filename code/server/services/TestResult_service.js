@@ -1,13 +1,13 @@
 const TestResult = require("../components/TestResult");
 
 class TestResultService {
-    #testResult_DAO; #testDescriptor_DAO; #skuItem_DAO;
+	#testResult_DAO; #testDescriptor_DAO; #skuItem_DAO;
 
-    constructor(testResult_DAO, testDescriptor_DAO, skuItem_DAO) {
-        this.#testResult_DAO = testResult_DAO;
+	constructor(testResult_DAO, testDescriptor_DAO, skuItem_DAO) {
+		this.#testResult_DAO = testResult_DAO;
 		this.#testDescriptor_DAO = testDescriptor_DAO;
 		this.#skuItem_DAO = skuItem_DAO;
-    }
+	}
 
 	async getTestResults(rfid) {
 		try {

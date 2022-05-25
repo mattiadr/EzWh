@@ -2,12 +2,12 @@ const TestDescriptor = require("../components/TestDescriptor");
 
 
 class TestDescriptorService {
-    #testDescriptor_DAO; #sku_DAO;
+	#testDescriptor_DAO; #sku_DAO;
 
-    constructor(testDescriptor_DAO, sku_DAO) {
+	constructor(testDescriptor_DAO, sku_DAO) {
 		this.#testDescriptor_DAO = testDescriptor_DAO;
 		this.#sku_DAO = sku_DAO;
-    }
+	}
 
 	getTestDescriptors() {
 		return this.#testDescriptor_DAO.selectTestDescriptors();

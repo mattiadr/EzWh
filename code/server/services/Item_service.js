@@ -5,9 +5,9 @@ class ItemService {
 	#sku_DAO;
 
 	constructor(item_DAO, sku_DAO) {
-        this.#item_DAO = item_DAO;
+		this.#item_DAO = item_DAO;
 		this.#sku_DAO = sku_DAO;
-    }
+	}
 
 	getItems() {
 		return this.#item_DAO.selectItems();

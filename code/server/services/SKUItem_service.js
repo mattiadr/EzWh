@@ -4,10 +4,10 @@ const SKUItem = require("../components/SKUItem");
 class SKUItemService {
 	#skuItem_DAO; #sku_DAO;
 
-    constructor(skuItem_DAO, sku_DAO) {
+	constructor(skuItem_DAO, sku_DAO) {
 		this.#skuItem_DAO = skuItem_DAO;
-        this.#sku_DAO = sku_DAO;
-    }
+		this.#sku_DAO = sku_DAO;
+	}
 
 	getSKUItems() {
 		return this.#skuItem_DAO.selectSKUItems();

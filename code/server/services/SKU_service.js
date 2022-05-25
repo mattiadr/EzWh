@@ -1,13 +1,13 @@
 const SKU = require("../components/SKU");
 
 class SkuService {
-    #sku_DAO; #testDescriptor_DAO; #position_DAO;
+	#sku_DAO; #testDescriptor_DAO; #position_DAO;
 
-    constructor(sku_DAO, testDescriptor_DAO, position_DAO) {
-        this.#sku_DAO = sku_DAO;
+	constructor(sku_DAO, testDescriptor_DAO, position_DAO) {
+		this.#sku_DAO = sku_DAO;
 		this.#testDescriptor_DAO = testDescriptor_DAO;
 		this.#position_DAO = position_DAO;
-    }
+	}
 
 	async getSKUs() {
 		try {
