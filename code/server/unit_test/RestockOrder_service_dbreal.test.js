@@ -12,7 +12,7 @@ async function testRestockOrders(expectedRestockOrders) {
 }
 
 async function testRestockOrdersIssued(expectedRestockOrders) {
-    test('get all RestockOrders', async () => {
+    test('get all issued RestockOrders', async () => {
         let res = await RestockOrder_service.getRestockOrdersByState("issued");
         expect(res).toEqual(expectedRestockOrders);
     });
@@ -123,7 +123,7 @@ describe("set RestockOrder", () => {
     test('update RestockOrder SKUItems', async () => { 
         const RestockOrder1 = new RestockOrder(null,"2021/11/20 09:33","issued",1,"2021/11/20 09:33",null);
         
-        skuItems = [new SKUItem(12, "12345678901234567890123456789016"), new SKUItem(12, "12345678901234567890123456789017")];
+        skuItems = [new SKUItem("12345678901234567890123456789016",12,null,null), new SKUItem("12345678901234567890123456789017",12,null,null)];
     
         let res = await RestockOrder_service.addSkuItemsToRestockOrder(RestockOrder1.id, skuItems);
         expect(res.status).toEqual(404);
