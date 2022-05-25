@@ -72,3 +72,17 @@ exports.deleteTestResultByID = (rfid, id) => {
 		});
 	});
 }
+
+
+exports.deleteTestResultData = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE * FROM TestResult`;
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}

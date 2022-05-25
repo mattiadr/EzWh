@@ -184,3 +184,16 @@ exports.deleteRestockOrder = (id) => {
 		});
 	}));
 }
+
+exports.deleteRestockOrderData = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE * FROM RestockOrder`;
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
