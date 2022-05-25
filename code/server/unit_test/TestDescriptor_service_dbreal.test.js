@@ -2,7 +2,7 @@ const TestDescriptor = require('../components/TestDescriptor');
 const SKU = require('../components/SKU');
 const TestDescriptorService = require('../services/TestDescriptor_service');
 const testD_dao = require('../database/TestDescriptor_DAO');
-const sku_dao = require('../database/SKU_dao');
+const sku_dao = require('../database/SKU_DAO');
 const TestDescriptor_service = new TestDescriptorService(testD_dao, sku_dao);
 
 async function testTestDescriptors(expectedTestDescriptors) {
