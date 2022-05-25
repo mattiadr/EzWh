@@ -2,12 +2,10 @@ const TestDescriptor = require("../components/TestDescriptor");
 const DatabaseConnection = require("./DatabaseConnection");
 
 
-const db = DatabaseConnection.getInstance();
-
 exports.selectTestDescriptors = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM TestDescriptor;`;
-        db.all(sql, [], (err, rows) => {
+        DatabaseConnection.db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -20,7 +18,7 @@ exports.selectTestDescriptors = () => {
 exports.selectTestDescriptorByID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM TestDescriptor WHERE id = ?;`;
-        db.get(sql, [id], (err, row) => {
+        DatabaseConnection.db.get(sql, [id], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -37,7 +35,7 @@ exports.selectTestDescriptorByID = (id) => {
 exports.selectTestDescriptorsIDBySKUID = (skuid) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT id FROM TestDescriptor WHERE idSKU = ?;`;
-        db.all(sql, [skuid], (err, rows) => {
+        DatabaseConnection.db.all(sql, [skuid], (err, rows) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -50,7 +48,7 @@ exports.selectTestDescriptorsIDBySKUID = (skuid) => {
 exports.insertTestDescriptor = (testDescriptor) => {
     return new Promise((resolve, reject) => {
         const sql = `INSERT INTO TestDescriptor(name, procedureDescription, idSKU) VALUES (?, ?, ?);`;
-        db.run(sql, [testDescriptor.name, testDescriptor.procedureDescription, testDescriptor.idSKU], (err) => {
+        DatabaseConnection.db.run(sql, [testDescriptor.name, testDescriptor.procedureDescription, testDescriptor.idSKU], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -63,7 +61,7 @@ exports.insertTestDescriptor = (testDescriptor) => {
 exports.updateTestDescriptor = (testDescriptor) => {
     return new Promise((resolve, reject) => {
         const sql = `UPDATE TestDescriptor SET name = ?, procedureDescription = ?, idSKU = ? WHERE id = ?`;
-        db.run(sql, [testDescriptor.name, testDescriptor.procedureDescription, testDescriptor.idSKU, testDescriptor.id], (err) => {
+        DatabaseConnection.db.run(sql, [testDescriptor.name, testDescriptor.procedureDescription, testDescriptor.idSKU, testDescriptor.id], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -76,7 +74,7 @@ exports.updateTestDescriptor = (testDescriptor) => {
 exports.deleteTestDescriptorByID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM TestDescriptor WHERE id = ?`;
-        db.run(sql, [id], (err) => {
+        DatabaseConnection.db.run(sql, [id], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -90,7 +88,7 @@ exports.deleteTestDescriptorByID = (id) => {
 exports.deleteTestDescriptorData = () => {
     return new Promise((resolve, reject) => {
         const sql = 'DELETE FROM TestDescriptor';
-        db.run(sql, [], function (err) {
+        DatabaseConnection.db.run(sql, [], function (err) {
             if (err) {
                 reject(err.toString());
             } else {

@@ -2,12 +2,10 @@ const DatabaseConnection = require("./DatabaseConnection");
 const Item = require("../components/Item");
 
 
-const db = DatabaseConnection.getInstance();
-
 exports.selectItems = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM Item;`;
-        db.all(sql, [], (err, rows) => {
+        DatabaseConnection.db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -20,7 +18,7 @@ exports.selectItems = () => {
 exports.selectItemByID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM Item WHERE id = ?;`;
-        db.get(sql, [id], (err, row) => {
+        DatabaseConnection.db.get(sql, [id], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -37,7 +35,7 @@ exports.selectItemByID = (id) => {
 exports.selectItemBySKUID = (skuid) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM Item WHERE SKUID = ?;`;
-        db.get(sql, [skuid], (err, row) => {
+        DatabaseConnection.db.get(sql, [skuid], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -54,7 +52,7 @@ exports.selectItemBySKUID = (skuid) => {
 exports.insertItem = (item) => {
     return new Promise((resolve, reject) => {
         const sql = `INSERT INTO Item(id, description, price, SKUID, supplierId) VALUES (?, ?, ?, ?, ?);`;
-        db.run(sql, [item.id, item.description, item.price, item.SKUID, item.supplierId], (err) => {
+        DatabaseConnection.db.run(sql, [item.id, item.description, item.price, item.SKUID, item.supplierId], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -69,7 +67,7 @@ exports.updateItem = (item) => {
         const sql = `UPDATE Item SET
                      description = ?, price = ?, SKUID = ?, supplierId = ?
                      WHERE id = ?;`;
-        db.run(sql, [item.description, item.price, item.SKUID, item.supplierId, item.id], (err) => {
+        DatabaseConnection.db.run(sql, [item.description, item.price, item.SKUID, item.supplierId, item.id], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -82,7 +80,7 @@ exports.updateItem = (item) => {
 exports.deleteItemByID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM Item WHERE id = ?`;
-        db.run(sql, [id], (err) => {
+        DatabaseConnection.db.run(sql, [id], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -96,7 +94,7 @@ exports.deleteItemByID = (id) => {
 exports.deleteItemData = () => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM Item`;
-        db.run(sql, [], (err) => {
+        DatabaseConnection.db.run(sql, [], (err) => {
             if (err) {
                 reject(err.toString());
             } else {

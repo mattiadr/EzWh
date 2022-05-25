@@ -2,12 +2,10 @@ const DatabaseConnection = require("./DatabaseConnection");
 const TestResult = require("../components/TestResult");
 
 
-const db = DatabaseConnection.getInstance();
-
 exports.selectTestResults = (rfid) => {
 	return new Promise((resolve, reject) => {
 		const sql = `SELECT * FROM TestResult WHERE rfid = ?;`;
-		db.all(sql, [rfid], (err, rows) => {
+		DatabaseConnection.db.all(sql, [rfid], (err, rows) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -20,7 +18,7 @@ exports.selectTestResults = (rfid) => {
 exports.selectTestResultByID = (rfid, id) => {
 	return new Promise((resolve, reject) => {
 		const sql = `SELECT * FROM TestResult WHERE rfid = ? AND id = ?;`;
-		db.get(sql, [rfid, id], (err, row) => {
+		DatabaseConnection.db.get(sql, [rfid, id], (err, row) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -37,7 +35,7 @@ exports.selectTestResultByID = (rfid, id) => {
 exports.insertTestResult = (testResult) => {
 	return new Promise((resolve, reject) => {
 		const sql = `INSERT INTO TestResult(idTestDescriptor, date, result, rfid) VALUES (?, ?, ?, ?);`;
-		db.run(sql, [testResult.idTestDescriptor, testResult.date, testResult.result, testResult.rfid], (err) => {
+		DatabaseConnection.db.run(sql, [testResult.idTestDescriptor, testResult.date, testResult.result, testResult.rfid], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -50,7 +48,7 @@ exports.insertTestResult = (testResult) => {
 exports.updateTestResult = (testResult) => {
 	return new Promise((resolve, reject) => {
 		const sql = `UPDATE TestResult SET idTestDescriptor = ?, date = ?, result = ? WHERE rfid = ? AND id = ?`;
-		db.run(sql, [testResult.idTestDescriptor, testResult.date, testResult.result, testResult.rfid, testResult.id], (err) => {
+		DatabaseConnection.db.run(sql, [testResult.idTestDescriptor, testResult.date, testResult.result, testResult.rfid, testResult.id], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -63,7 +61,7 @@ exports.updateTestResult = (testResult) => {
 exports.deleteTestResultByID = (rfid, id) => {
 	return new Promise((resolve, reject) => {
 		const sql = `DELETE FROM TestResult WHERE rfid = ? AND id = ?`;
-		db.run(sql, [rfid, id], (err) => {
+		DatabaseConnection.db.run(sql, [rfid, id], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -77,7 +75,7 @@ exports.deleteTestResultByID = (rfid, id) => {
 exports.deleteTestResultData = () => {
 	return new Promise((resolve, reject) => {
 		const sql = `DELETE FROM TestResult`;
-		db.run(sql, [], (err) => {
+		DatabaseConnection.db.run(sql, [], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {

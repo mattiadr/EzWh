@@ -2,12 +2,10 @@ const DatabaseConnection = require("./DatabaseConnection");
 const Position = require("../components/Position");
 
 
-const db = DatabaseConnection.getInstance();
-
 exports.selectPositions = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM Position;`;
-        db.all(sql, [], (err, rows) => {
+        DatabaseConnection.db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -20,7 +18,7 @@ exports.selectPositions = () => {
 exports.selectPositionByID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM Position WHERE posID = ?;`;
-        db.get(sql, [id], (err, row) => {
+        DatabaseConnection.db.get(sql, [id], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -38,7 +36,7 @@ exports.insertPosition = (newPosition) => {
     return new Promise((resolve, reject) => {
         const sql = `INSERT INTO Position(posID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume)
                      VALUES(?, ?, ?, ?, ?, ?, ?, ?);`;
-        db.run(sql, [newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(),
+        DatabaseConnection.db.run(sql, [newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(),
         newPosition.getMaxWeight(), newPosition.getMaxVolume(), newPosition.getOccupiedWeight(), newPosition.getOccupiedVolume()], (err) => {
             if (err) {
                 reject(err.toString());
@@ -54,7 +52,7 @@ exports.updatePosition = (oldPosID, newPosition) => {
         const sql = `UPDATE Position
                      SET posID = ?, aisleID = ?, row = ?, col = ?, maxWeight = ?, maxVolume = ?, occupiedWeight = ?, occupiedVolume = ?
                      WHERE posID = ?;`;
-        db.run(sql, [newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(),
+        DatabaseConnection.db.run(sql, [newPosition.getPositionID(), newPosition.getAisleID(), newPosition.getRow(), newPosition.getCol(),
         newPosition.getMaxWeight(), newPosition.getMaxVolume(), newPosition.getOccupiedWeight(), newPosition.getOccupiedVolume(),
             oldPosID], (err) => {
                 if (err) {
@@ -69,7 +67,7 @@ exports.updatePosition = (oldPosID, newPosition) => {
 exports.deletePosition = (posID) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM Position WHERE posID = ?;`;
-        db.run(sql, [posID], (err) => {
+        DatabaseConnection.db.run(sql, [posID], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -83,7 +81,7 @@ exports.deletePosition = (posID) => {
 exports.deletePositionData = () => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM Position`;
-        db.run(sql, [], (err) => {
+        DatabaseConnection.db.run(sql, [], (err) => {
             if (err) {
                 reject(err.toString());
             } else {

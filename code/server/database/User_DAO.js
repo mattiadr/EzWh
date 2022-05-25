@@ -2,12 +2,10 @@ const DatabaseConnection = require("./DatabaseConnection");
 const {User} = require("../components/User");
 
 
-const db = DatabaseConnection.getInstance();
-
 exports.selectUsers = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM User;`;
-        db.all(sql, [], (err, rows) => {
+        DatabaseConnection.db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -20,7 +18,7 @@ exports.selectUsers = () => {
 exports.selectUserByEmailAndType = (email, type) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM User WHERE email = ? AND type = ?;`;
-        db.get(sql, [email, type], (err, row) => {
+        DatabaseConnection.db.get(sql, [email, type], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -37,7 +35,7 @@ exports.selectUserByEmailAndType = (email, type) => {
 exports.insertUser = (user) => {
     return new Promise((resolve, reject) => {
         const sql = `INSERT INTO User(name, surname, email, passwordHash, passwordSalt, type) VALUES (?, ?, ?, ?, ?, ?);`;
-        db.run(sql, [user.name, user.surname, user.email, user.passwordHash, user.passwordSalt, user.role], (err) => {
+        DatabaseConnection.db.run(sql, [user.name, user.surname, user.email, user.passwordHash, user.passwordSalt, user.role], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -52,7 +50,7 @@ exports.updateUser = (user) => {
         const sql = `UPDATE User SET
                      name = ?, surname = ?, email = ?, passwordHash = ?, passwordSalt = ?, type = ?
                      WHERE id = ?`;
-        db.run(sql, [user.name, user.surname, user.email, user.passwordHash, user.passwordSalt, user.role, user.id], (err) => {
+        DatabaseConnection.db.run(sql, [user.name, user.surname, user.email, user.passwordHash, user.passwordSalt, user.role, user.id], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -65,7 +63,7 @@ exports.updateUser = (user) => {
 exports.deleteUserByID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM User WHERE id = ?`;
-        db.run(sql, [id], (err) => {
+        DatabaseConnection.db.run(sql, [id], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -79,7 +77,7 @@ exports.deleteUserByID = (id) => {
 exports.deleteUserData = () => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM User`;
-        db.run(sql, [], (err) => {
+        DatabaseConnection.db.run(sql, [], (err) => {
             if (err) {
                 reject(err.toString());
             } else {

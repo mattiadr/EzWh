@@ -4,15 +4,7 @@ const sqlite3 = require("sqlite3");
 class DatabaseConnection {
 	static db = null;
 
-	static getInstance() {
-		if (!this.db) {
-			this.db = new sqlite3.Database("./database/ezwh.db", (err) => err && console.log(err));
-			this.createTables();
-		}
-		return this.db;
-	}
-
-	static createTables() {
+	static async createConnection() {
 		/** SKU **/
 		const createTableSKU = `CREATE TABLE IF NOT EXISTS SKU (
 			SKUID INTEGER NOT NULL,
@@ -25,7 +17,6 @@ class DatabaseConnection {
 			availableQuantity integer NOT NULL,
 			PRIMARY KEY (SKUID)
 		);`;
-		this.db.run(createTableSKU, (err) => err && console.log(err));
 
 		/** SKU Item **/
 		const createTableSKUItem = `CREATE TABLE IF NOT EXISTS SKUItem (
@@ -35,7 +26,6 @@ class DatabaseConnection {
 			dateOfStock DATETIME,
 			PRIMARY KEY (RFID)
 		);`;
-		this.db.run(createTableSKUItem, (err) => err && console.log(err));
 
 		/** Position **/
 		const createTablePosition = `CREATE TABLE IF NOT EXISTS Position (
@@ -49,7 +39,6 @@ class DatabaseConnection {
 			occupiedVolume integer DEFAULT 0,
 			PRIMARY KEY(posID)
 		);`;
-		this.db.run(createTablePosition, (err) => err && console.log(err));
 
 		/** Test Descriptor **/
 		const createTableTestDescriptor = `CREATE TABLE IF NOT EXISTS TestDescriptor (
@@ -59,7 +48,6 @@ class DatabaseConnection {
 			idSKU INTEGER NOT NULL,
 			PRIMARY KEY (id)
 		);`;
-		this.db.run(createTableTestDescriptor, (err) => err && console.log(err));
 
 		/** Test Result **/
 		const createTableTestResult = `CREATE TABLE IF NOT EXISTS TestResult (
@@ -70,7 +58,6 @@ class DatabaseConnection {
 			rfid VARCHAR(32) NOT NULL,
 			PRIMARY KEY (id)
 		)`;
-		this.db.run(createTableTestResult, (err) => err && console.log(err));
 
 		/** User **/
 		const createTableUser = `CREATE TABLE IF NOT EXISTS User (
@@ -83,7 +70,6 @@ class DatabaseConnection {
 			type VARCHAR(32) NOT NULL,
 			PRIMARY KEY (id)
 		);`;
-		this.db.run(createTableUser, (err) => err && console.log(err));
 
 		/** Item **/
 		const createTableItem = `CREATE TABLE IF NOT EXISTS Item (
@@ -94,7 +80,6 @@ class DatabaseConnection {
 			supplierId varchar(12) NOT NULL,
 			PRIMARY KEY (id)
 		);`;
-		this.db.run(createTableItem, (err) => err && console.log(err));
 
 		/** Restock Order */
 		const createTableRestockOrder = `CREATE TABLE IF NOT EXISTS RestockOrder (
@@ -105,7 +90,6 @@ class DatabaseConnection {
 			deliveryDate VARCHAR(16),
 			PRIMARY KEY (id)
 		);`;
-		this.db.run(createTableRestockOrder, (err) => err && console.log(err));
 
 		/** Restock Order & Item */
 		const createTableRestockOrderProduct = `CREATE TABLE IF NOT EXISTS RestockOrderProduct (
@@ -114,7 +98,6 @@ class DatabaseConnection {
 			quantity INTEGER NOT NULL,
 			PRIMARY KEY (roid, skuid)
 		);`;
-		this.db.run(createTableRestockOrderProduct, (err) => err && console.log(err));
 
 		/** Restock Order & SKU Items **/
 		const createTableRestockOrderSKUItem = `CREATE TABLE IF NOT EXISTS RestockOrderSKUItem (
@@ -123,7 +106,6 @@ class DatabaseConnection {
 			rfid VARCHAR(32) NOT NULL,
 			PRIMARY KEY (roid, skuid, rfid)
 		);`;
-		this.db.run(createTableRestockOrderSKUItem, (err) => err && console.log(err));
 
 		/** Return Order **/
 		const createTableReturnOrder = `CREATE TABLE IF NOT EXISTS ReturnOrder (
@@ -132,7 +114,6 @@ class DatabaseConnection {
 			restockOrderId INTEGER NOT NULL,
 			PRIMARY KEY (id)
 		);`;
-		this.db.run(createTableReturnOrder, (err) => err && console.log(err));
 
 		/** Return Order & Item */
 		const createTableReturnOrderProduct = `CREATE TABLE IF NOT EXISTS ReturnOrderProduct (
@@ -141,7 +122,6 @@ class DatabaseConnection {
 			rfid VARCHAR(32),
 			PRIMARY KEY (reoid, skuid)
 		);`;
-		this.db.run(createTableReturnOrderProduct, (err) => err && console.log(err));
 
 		/** Internal Order **/
 		const createTableInternalOrder = `CREATE TABLE IF NOT EXISTS InternalOrder (
@@ -151,7 +131,6 @@ class DatabaseConnection {
 			customerId INTEGER NOT NULL,
 			PRIMARY KEY (id)
 		);`;
-		this.db.run(createTableInternalOrder, (err) => err && console.log(err));
 
 		/** Internal Order & Item */
 		const createTableInternalOrderProduct = `CREATE TABLE IF NOT EXISTS InternalOrderProduct (
@@ -161,7 +140,28 @@ class DatabaseConnection {
 			rfid varchar(32),
 			PRIMARY KEY (ioid, skuid, rfid)
 		);`;
-		this.db.run(createTableInternalOrderProduct, (err) => err && console.log(err));
+
+		return new Promise((resolve, reject) => {
+			this.db = new sqlite3.Database("./database/ezwh.db", (err) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		}).then(() => Promise.all([createTableSKU, createTableSKUItem, createTablePosition, createTableTestDescriptor,
+			createTableTestResult, createTableUser, createTableItem, createTableRestockOrder,
+			createTableRestockOrderProduct, createTableRestockOrderSKUItem, createTableReturnOrder,
+			createTableReturnOrderProduct, createTableInternalOrder, createTableInternalOrderProduct]
+			.map((sql) => new Promise((resolve, reject) => {
+				this.db.run(sql, (err) => {
+					if (err) {
+						reject(err);
+					} else {
+						resolve();
+					}
+				});
+		}))));
 	}
 
 	static resetTable(tableName) {

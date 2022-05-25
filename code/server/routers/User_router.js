@@ -28,6 +28,7 @@ router.get("/users",
 		User_service.getUsers().then((users) => {
 			res.status(200).json(users.map((u) => ({id: u.id, name: u.name, surname: u.surname, email: u.email, type: u.role})));
 		}).catch((err) => {
+			console.log(err)
 			res.status(500).send(err);
 		});
 });

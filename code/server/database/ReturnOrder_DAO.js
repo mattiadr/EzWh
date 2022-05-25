@@ -1,6 +1,5 @@
 const DatabaseConnection = require("./DatabaseConnection");
 const ReturnOrder = require("../components/ReturnOrder");
-const db = DatabaseConnection.getInstance();
 
 
 const selectProductsIntoReturnOrder = (returnOrder) => {
@@ -9,7 +8,7 @@ const selectProductsIntoReturnOrder = (returnOrder) => {
 		if (!returnOrder) resolve(null);
 
 		const sql = `SELECT ReturnOrderProduct.skuid, description, price, rfid FROM ReturnOrderProduct, Item WHERE ReturnOrderProduct.skuid = Item.SKUID AND reoid = ?;`;
-		db.all(sql, [returnOrder.id], (err, rows) => {
+		DatabaseConnection.db.all(sql, [returnOrder.id], (err, rows) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -23,7 +22,7 @@ const selectProductsIntoReturnOrder = (returnOrder) => {
 exports.selectReturnOrders = () => {
 	return new Promise((resolve, reject) => {
 		const sql = `SELECT * FROM ReturnOrder;`;
-		db.all(sql, [], (err, rows) => {
+		DatabaseConnection.db.all(sql, [], (err, rows) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -36,7 +35,7 @@ exports.selectReturnOrders = () => {
 exports.selectReturnOrderByID = (returnOrderId) => {
 	return new Promise((resolve, reject) => {
 		const sql = `SELECT * FROM ReturnOrder WHERE id = ?;`;
-		db.get(sql, [returnOrderId], (err, row) => {
+		DatabaseConnection.db.get(sql, [returnOrderId], (err, row) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -53,7 +52,7 @@ exports.selectReturnOrderByID = (returnOrderId) => {
 exports.insertReturnOrder = (returnOrder) => {
 	return new Promise((resolve, reject) => {
 		const sql = `INSERT INTO ReturnOrder(returnDate, restockOrderId) VALUES (?, ?);`;
-		db.run(sql, [returnOrder.returnDate, returnOrder.restockOrderId], function (err) {
+		DatabaseConnection.db.run(sql, [returnOrder.returnDate, returnOrder.restockOrderId], function (err) {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -64,7 +63,7 @@ exports.insertReturnOrder = (returnOrder) => {
 	}).then(() => Promise.all(returnOrder.products.map((p) => new Promise((resolve, reject) => {
 		// create a promise for each ReturnOrderProduct insertion
 		const sql = `INSERT INTO ReturnOrderProduct(reoid, skuid, rfid) VALUES (?, ?, ?);`;
-		db.run(sql, [returnOrder.id, p.SKUId, p.RFID], (err) => {
+		DatabaseConnection.db.run(sql, [returnOrder.id, p.SKUId, p.RFID], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -78,7 +77,7 @@ exports.deleteReturnOrder = (returnOrderId) => {
 	return new Promise((resolve, reject) => {
 		// delete return order from ReturnOrderProduct
 		const sql = `DELETE FROM ReturnOrderProduct WHERE reoid = ?`;
-		db.run(sql, [returnOrderId], (err) => {
+		DatabaseConnection.db.run(sql, [returnOrderId], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -88,7 +87,7 @@ exports.deleteReturnOrder = (returnOrderId) => {
 	}).then(() => new Promise((resolve, reject) => {
 		// delete return order from ReturnOrder
 		const sql = `DELETE FROM ReturnOrder WHERE id = ?`;
-		db.run(sql, [returnOrderId], (err) => {
+		DatabaseConnection.db.run(sql, [returnOrderId], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -103,7 +102,7 @@ exports.deleteReturnOrderData = () => {
 	return new Promise((resolve, reject) => {
 		// delete return order from ReturnOrderProduct
 		const sql = `DELETE FROM ReturnOrderProduct;`;
-		db.run(sql, [], (err) => {
+		DatabaseConnection.db.run(sql, [], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -113,7 +112,7 @@ exports.deleteReturnOrderData = () => {
 	}).then(() => new Promise((resolve, reject) => {
 		// delete return order from ReturnOrder
 		const sql = `DELETE FROM ReturnOrder;`;
-		db.run(sql, [], (err) => {
+		DatabaseConnection.db.run(sql, [], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {

@@ -16,9 +16,18 @@ const DatabaseConnection = require("./database/DatabaseConnection");
 // init express
 const app = new express();
 const port = 3001;
-DatabaseConnection.getInstance(); // make sure tables are created at server startup
 
 app.use(express.json());
+
+// make sure tables are created at server startup
+async function initDatabase(req, res, next) {
+	if (!DatabaseConnection.db) {
+		await DatabaseConnection.createConnection();
+		await DatabaseConnection.resetAllTables();
+	}
+	next();
+}
+app.use(initDatabase);
 
 // set up routers
 app.use("/api", SKU_router);

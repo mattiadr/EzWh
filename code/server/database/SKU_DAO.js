@@ -2,12 +2,10 @@ const SKU = require("../components/SKU");
 const DatabaseConnection = require("./DatabaseConnection");
 
 
-const db = DatabaseConnection.getInstance();
-
 exports.selectSKUs = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM SKU;`;
-        db.all(sql, [], (err, rows) => {
+        DatabaseConnection.db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -20,7 +18,7 @@ exports.selectSKUs = () => {
 exports.selectSKUbyID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM SKU WHERE SKUID = ?;`;
-        db.get(sql, [id], (err, row) => {
+        DatabaseConnection.db.get(sql, [id], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -38,7 +36,7 @@ exports.insertSKU = (newSKU) => {
     return new Promise((resolve, reject) => {
         const sql = `INSERT INTO SKU(description, weight, volume, price, notes, positionId, availableQuantity)
                      VALUES(?, ?, ?, ?, ?, ? , ?);`;
-        db.run(sql, [newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity()], (err) => {
+        DatabaseConnection.db.run(sql, [newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity()], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -53,7 +51,7 @@ exports.updateSKU = (newSKU) => {
         const sql = `UPDATE SKU
                      SET description = ?, weight = ?, volume = ?, price = ?, notes = ?, positionId = ?, availableQuantity = ?
                      WHERE SKUID=?;`;
-        db.run(sql, [newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity(), newSKU.getId()], (err) => {
+        DatabaseConnection.db.run(sql, [newSKU.getDescription(), newSKU.getWeight(), newSKU.getVolume(), newSKU.getPrice(), newSKU.getNotes(), newSKU.getPosition(), newSKU.getAvailableQuantity(), newSKU.getId()], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -66,7 +64,7 @@ exports.updateSKU = (newSKU) => {
 exports.deleteSKU = (SKUid) => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM SKU WHERE SKUID = ?;`;
-        db.run(sql, [SKUid], (err) => {
+        DatabaseConnection.db.run(sql, [SKUid], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -79,7 +77,7 @@ exports.deleteSKU = (SKUid) => {
 exports.checkIfPositionOccupied = (positionID) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM SKU WHERE positionId = ?;`;
-        db.get(sql, [positionID], (err, row) => {
+        DatabaseConnection.db.get(sql, [positionID], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -93,7 +91,7 @@ exports.checkIfPositionOccupied = (positionID) => {
 exports.deleteSKUData = () => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM SKU;`;
-        db.run(sql, [], (err) => {
+        DatabaseConnection.db.run(sql, [], (err) => {
             if (err) {
                 reject(err.toString());
             } else {

@@ -2,12 +2,10 @@ const DatabaseConnection = require("./DatabaseConnection");
 const SKUItem = require("../components/SKUItem");
 
 
-const db = DatabaseConnection.getInstance();
-
 exports.selectSKUItems = () => {
 	return new Promise((resolve, reject) => {
 		const sql = `SELECT * FROM SKUItem;`;
-		db.all(sql, [], (err, rows) => {
+		DatabaseConnection.db.all(sql, [], (err, rows) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -20,7 +18,7 @@ exports.selectSKUItems = () => {
 exports.selectSKUItemByRFID = (rfid) => {
 	return new Promise((resolve, reject) => {
 		const sql = `SELECT * FROM SKUItem WHERE RFID = ?;`;
-		db.get(sql, [rfid], (err, row) => {
+		DatabaseConnection.db.get(sql, [rfid], (err, row) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -37,7 +35,7 @@ exports.selectSKUItemByRFID = (rfid) => {
 exports.selectSKUItemBySKUID = (skuid) => {
 	return new Promise((resolve, reject) => {
 		const sql = `SELECT * FROM SKUItem WHERE SKUID = ? AND available = ?;`;
-		db.all(sql, [skuid, 1], (err, rows) => {
+		DatabaseConnection.db.all(sql, [skuid, 1], (err, rows) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -51,7 +49,7 @@ exports.insertSKUItem = (newSKUItem) => {
 	return new Promise((resolve, reject) => {
 		const sql = `INSERT INTO SKUItem(RFID, SKUID, available, dateOfStock)
 						 VALUES(?, ?, ?, ?);`;
-		db.run(sql, [newSKUItem.getRFID(), newSKUItem.getSKUId(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock()], (err) => {
+		DatabaseConnection.db.run(sql, [newSKUItem.getRFID(), newSKUItem.getSKUId(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock()], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -66,7 +64,7 @@ exports.updateSKUItem = (rfid, newSKUItem) => {
 		const sql = `UPDATE SKUItem
 					 SET RFID = ?, available = ?, dateOfStock = ?
 					 WHERE RFID=?;`;
-		db.run(sql, [newSKUItem.getRFID(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock(), rfid], (err) => {
+		DatabaseConnection.db.run(sql, [newSKUItem.getRFID(), newSKUItem.getAvailable(), newSKUItem.getDateOfStock(), rfid], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -79,7 +77,7 @@ exports.updateSKUItem = (rfid, newSKUItem) => {
 exports.deleteSKUItem = (RFID) => {
 	return new Promise((resolve, reject) => {
 		const sql = `DELETE FROM SKUItem WHERE RFID=?;`;
-		db.run(sql, [RFID], (err) => {
+		DatabaseConnection.db.run(sql, [RFID], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -93,7 +91,7 @@ exports.deleteSKUItem = (RFID) => {
 exports.deleteSKUItemData = () => {
 	return new Promise((resolve, reject) => {
 		const sql = `DELETE FROM SKUItem;`;
-		db.run(sql, [], (err) => {
+		DatabaseConnection.db.run(sql, [], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
