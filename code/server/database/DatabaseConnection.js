@@ -186,6 +186,7 @@ class DatabaseConnection {
 			["Dwight", "Schrute", "clerk1@ezwh.com", "TVy3LwcC6XQd+9OKRh2DmtAOHJsc1sdzcAMCIl4pK34=", "BkRa36JqhekN3VZNddj/MhRr3NbEeGSY97xPgpXuSFA=", "clerk"],
 			["Darryl", "Philbin", "deliveryEmployee1@ezwh.com", "B/BoESakTY2XTDk67bCz1dqSkD4hA/jm6eeUFsfsHKY=", "GFLU2eSrwPzb8UeA/+cATlgfMk4gxSbHIVjfiBW0jHE=", "deliveryEmployee"],
 			["Dunder", "Mifflin", "supplier1@ezwh.com", "1WSthO+irk3Va4fkGZP89o2R1/2FDzjTg21KRsIXmOM=", "qeNoimJcUht36I6c447WTDtYzKagKFzemVbVlmBXRno=", "supplier"],
+			["Mana", "Ger", "manager1@ezwh.com", "n/BvDaH5PnbquWV2yOLONE7pa07uD0+Dxj4W0C67n+c=", "h/rqGUKuEBaSa7Es1UfRzjfIwq7UmiOPpXSw9ol27Xs=", "manager"]
 		];
 
 		return Promise.all(["InternalOrder", "InternalOrderProduct", "Item", "Position", "RestockOrder",

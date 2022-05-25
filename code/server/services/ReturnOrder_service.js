@@ -10,15 +10,15 @@ class ReturnOrderService {
 		this.#restockOrder_DAO = restockOrder_DAO;
 	}
 
-	getReturnOrders = () => {
+	getReturnOrders() {
 		return this.#returnOrder_DAO.selectReturnOrders();
 	}
 
-	getReturnOrderByID = (id) => {
+	getReturnOrderByID(id) {
 		return this.#returnOrder_DAO.selectReturnOrderByID(id);
 	}
 
-	newReturnOrder = async (returnDate, products, restockOrderId) => {
+	async newReturnOrder(returnDate, products, restockOrderId) {
 		try {
 			const restockOrder = await this.#restockOrder_DAO.selectRestockOrderByID(restockOrderId);
 			if (!restockOrder) return {status: 404, body: "restock order not found"};
@@ -31,7 +31,7 @@ class ReturnOrderService {
 		}
 	}
 
-	deleteReturnOrder = (id) => {
+	deleteReturnOrder(id) {
 		return this.#returnOrder_DAO.deleteReturnOrder(id);
 	}
 }

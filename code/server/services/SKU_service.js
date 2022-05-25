@@ -1,15 +1,15 @@
 const SKU = require("../components/SKU");
 
 class SkuService {
-    #sku_DAO; #testDescriptor_DAO; #position_DAO;
+	#sku_DAO; #testDescriptor_DAO; #position_DAO;
 
-    constructor(sku_DAO, testDescriptor_DAO, position_DAO) {
-        this.#sku_DAO = sku_DAO;
+	constructor(sku_DAO, testDescriptor_DAO, position_DAO) {
+		this.#sku_DAO = sku_DAO;
 		this.#testDescriptor_DAO = testDescriptor_DAO;
 		this.#position_DAO = position_DAO;
-    }
+	}
 
-	getSKUs = async () => {
+	async getSKUs() {
 		try {
 			let skus = await this.#sku_DAO.selectSKUs();
 			for (let sku of skus) {
@@ -22,7 +22,7 @@ class SkuService {
 		}
 	}
 	
-	getSKUbyId = async (id) => {
+	async getSKUbyId(id) {
 		try {
 			let sku = await this.#sku_DAO.selectSKUbyID(id);
 			if (!sku) return {status: 404, body: "sku not found"};
@@ -34,7 +34,7 @@ class SkuService {
 		}
 	}
 	
-	createSKU = async (description, weight, volume, notes, price, quantity) => {
+	async createSKU(description, weight, volume, notes, price, quantity) {
 		try {
 			let newSKU = new SKU(null, description, weight, volume, price, notes, quantity);
 			await this.#sku_DAO.insertSKU(newSKU);
@@ -44,7 +44,7 @@ class SkuService {
 		}
 	}
 	
-	updateSKU = async (id, positionId , newDescription = undefined, newWeight = undefined, newVolume = undefined, newNotes = undefined, newPrice = undefined, newAvailableQuantity = undefined) => {
+	async updateSKU(id, positionId , newDescription = undefined, newWeight = undefined, newVolume = undefined, newNotes = undefined, newPrice = undefined, newAvailableQuantity = undefined) {
 		try {
 			const sku = await this.#sku_DAO.selectSKUbyID(id);
 			if (!sku) return {status: 404, body: "sku not found"};
@@ -88,14 +88,9 @@ class SkuService {
 		}
 	}
 	
-	deleteSKU = (id) => {
+	deleteSKU(id) {
 		return this.#sku_DAO.deleteSKU(id);
 	}
-
-	deleteSKUs = () =>{
-		return this.#sku_DAO.deleteSKUData();
-	}
-	
 }
 
 module.exports = SkuService;

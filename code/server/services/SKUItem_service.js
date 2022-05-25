@@ -4,16 +4,16 @@ const SKUItem = require("../components/SKUItem");
 class SKUItemService {
 	#skuItem_DAO; #sku_DAO;
 
-    constructor(skuItem_DAO, sku_DAO) {
+	constructor(skuItem_DAO, sku_DAO) {
 		this.#skuItem_DAO = skuItem_DAO;
-        this.#sku_DAO = sku_DAO;
-    }
+		this.#sku_DAO = sku_DAO;
+	}
 
-	getSKUItems = () => {
+	getSKUItems() {
 		return this.#skuItem_DAO.selectSKUItems();
 	}
 	
-	getSKUItemsBySKUID = async (skuid) => {
+	async getSKUItemsBySKUID(skuid) {
 		try {
 			const sku = await this.#sku_DAO.selectSKUbyID(skuid);
 			if (!sku) return {status: 404, body: "sku not found"};
@@ -24,11 +24,11 @@ class SKUItemService {
 		}
 	}
 	
-	getSKUItemByRFID = (rfid) => {
+	getSKUItemByRFID(rfid) {
 		return this.#skuItem_DAO.selectSKUItemByRFID(rfid);
 	}
 	
-	createSKUItem = async (rfid, skuid, dateOfStock) => {
+	async createSKUItem(rfid, skuid, dateOfStock) {
 		let date;
 		if (dateOfStock != null && !(date = dayjs(dateOfStock, ["YYYY/MM/DD HH:mm", "YYYY/MM/DD"])).isValid()) {
 			return { status: 422, body: "Date isn't in correct format" };
@@ -43,7 +43,7 @@ class SKUItemService {
 		}
 	}
 	
-	updateSKUItem = async (rfid, newRFID, newAvailable, newDateOfStock) => {
+	async updateSKUItem(rfid, newRFID, newAvailable, newDateOfStock) {
 		let date;
 		if (newDateOfStock != null && !(date = dayjs(newDateOfStock, ["YYYY/MM/DD HH:mm", "YYYY/MM/DD"])).isValid()) {
 			return { status: 422, body: "Date isn't in correct format" };
@@ -61,12 +61,8 @@ class SKUItemService {
 		}
 	}
 	
-	deleteSKUItem = (rfid) => {
+	deleteSKUItem(rfid) {
 		return this.#skuItem_DAO.deleteSKUItem(rfid);
-	}
-
-	deleteSKUItems = () => {
-		return this.#skuItem_DAO.deleteSKUItemData();
 	}
 }
 

@@ -5,23 +5,23 @@ const {RestockOrder, RestockOrderState} = require("../components/RestockOrder");
 class RestockOrderService {
 	#restockOrder_DAO;
 
-    constructor(restockOrder_DAO) {
-        this.#restockOrder_DAO = restockOrder_DAO;
-    }
+	constructor(restockOrder_DAO) {
+		this.#restockOrder_DAO = restockOrder_DAO;
+	}
 
-	getRestockOrders = () => {
+	getRestockOrders() {
 		return this.#restockOrder_DAO.selectRestockOrders();
 	}
 
-	getRestockOrdersByState = (state) => {
+	getRestockOrdersByState(state) {
 		return this.#restockOrder_DAO.selectRestockOrdersByState(state);
 	}
 
-	getRestockOrderByID = (id) => {
+	getRestockOrderByID(id) {
 		return this.#restockOrder_DAO.selectRestockOrderByID(id);
 	}
 
-	getRestockOrderByIDReturnItems = async (id) => {
+	async getRestockOrderByIDReturnItems(id) {
 		try {
 			const restockOrder = await this.#restockOrder_DAO.selectRestockOrderByID(id);
 			if (!restockOrder) return {status: 404, body: "restock order not found"};
@@ -36,7 +36,7 @@ class RestockOrderService {
 		}
 	}
 
-	createRestockOrder = async (issueDate, supplierId, products) => {
+	async createRestockOrder(issueDate, supplierId, products) {
 		try {
 			const restockOrder = new RestockOrder(null, issueDate, RestockOrderState.ISSUED, supplierId, null, products);
 			await this.#restockOrder_DAO.insertRestockOrder(restockOrder);
@@ -47,7 +47,7 @@ class RestockOrderService {
 		}
 	}
 
-	updateRestockOrderState = async (id, newState) => {
+	async updateRestockOrderState(id, newState) {
 		try {
 			if (!Object.values(RestockOrderState).includes(newState)) return {status: 422, body: "invalid state"};
 			const restockOrder = await this.#restockOrder_DAO.selectRestockOrderByID(id);
@@ -61,7 +61,7 @@ class RestockOrderService {
 		}
 	}
 
-	addSkuItemsToRestockOrder = async (id, skuItems) => {
+	async addSkuItemsToRestockOrder(id, skuItems) {
 		try {
 			const restockOrder = await this.#restockOrder_DAO.selectRestockOrderByID(id);
 			if (!restockOrder) return {status: 404, body: "restock order not found"};
@@ -76,7 +76,7 @@ class RestockOrderService {
 		}
 	}
 
-	updateRestockOrderTransportNote = async (id, deliveryDate) => {
+	async updateRestockOrderTransportNote(id, deliveryDate) {
 		try {
 			const restockOrder = await this.#restockOrder_DAO.selectRestockOrderByID(id);
 			if (!restockOrder) return {status: 404, body: "restock order not found"};
@@ -96,12 +96,8 @@ class RestockOrderService {
 		}
 	}
 
-	deleteRestockOrder = (id) => {
+	deleteRestockOrder(id) {
 		return this.#restockOrder_DAO.deleteRestockOrder(id);
-	}
-
-	deleteRestockOrders = () => {
-		return this.#restockOrder_DAO.deleteRestockOrderData();
 	}
 }
 

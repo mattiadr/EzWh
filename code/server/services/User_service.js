@@ -3,26 +3,26 @@ const crypto = require("crypto");
 const {User, UserRole} = require("../components/User");
 
 class UserService {
-    #user_DAO;
+	#user_DAO;
 
-    constructor(user_DAO) {
-        this.#user_DAO = user_DAO;
-    }
+	constructor(user_DAO) {
+		this.#user_DAO = user_DAO;
+	}
 
-	getCurrentUser = () => {
+	getCurrentUser() {
 		// TODO
 		return {};
 	}
 
-	getUsers = () => {
+	getUsers() {
 		return this.#user_DAO.selectUsers().then((users) => users.filter((u) => u.role !== UserRole.MANAGER));
 	}
 
-	getUsersByRole = (role) => {
+	getUsersByRole(role) {
 		return this.#user_DAO.selectUsers().then((users) => users.filter((u) => u.role === role));
 	}
 
-	createUser = async (email, name, surname, password, type) => {
+	async createUser(email, name, surname, password, type) {
 		const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
 		if (!allowedTypes.includes(type)) return {status: 422, body: "type does not exist"};
 
@@ -44,7 +44,7 @@ class UserService {
 		}
 	}
 
-	session = async (email, password, role) => {
+	async session(email, password, role) {
 		try {
 			const user = await this.#user_DAO.selectUserByEmailAndType(email, role);
 			if (user && user.checkPassword(password)) {
@@ -58,12 +58,12 @@ class UserService {
 		}
 	}
 
-	logout = () => {
+	logout() {
 		// TODO
 		return true;
 	}
 
-	updateUserRights = async (email, oldType, newType) => {
+	async updateUserRights(email, oldType, newType) {
 		const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
 		if (!allowedTypes.includes(oldType) || !allowedTypes.includes(newType)) return {status: 422, body: "invalid type"};
 
@@ -78,23 +78,13 @@ class UserService {
 		}
 	}
 
-	deleteUser = async (email, type) => {
+	async deleteUser(email, type) {
 		const allowedTypes = ["customer", "qualityEmployee", "clerk", "deliveryEmployee", "supplier"];
 		if (!allowedTypes.includes(type)) return {status: 422, body: "invalid type"};
 
 		try {
 			const user = await this.#user_DAO.selectUserByEmailAndType(email, type);
 			if (user) await this.#user_DAO.deleteUserByID(user.id);
-			return {status: 204, body: ""};
-		} catch (e) {
-			return {status: 503, body: e};
-		}
-	}
-
-	//TEMPORARY
-	deleteUsers = async () => {
-		try {
-			await this.#user_DAO.deleteUserData();
 			return {status: 204, body: ""};
 		} catch (e) {
 			return {status: 503, body: e};

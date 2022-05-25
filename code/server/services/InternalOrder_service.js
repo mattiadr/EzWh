@@ -7,19 +7,19 @@ class InternalOrderService {
 		this.#internalOrder_DAO = internalOrder_DAO;
 	}
 
-	getInternalOrders = () => {
+	getInternalOrders() {
 		return this.#internalOrder_DAO.selectInternalOrders();
 	}
 
-	getInternalOrdersByState = (state) => {
+	getInternalOrdersByState(state) {
 		return this.#internalOrder_DAO.selectInternalOrdersByState(state);
 	}
 
-	getInternalOrderByID = (id) => {
+	getInternalOrderByID(id) {
 		return this.#internalOrder_DAO.selectInternalOrderByID(id);
 	}
 
-	newInternalOrder = async (issueDate, customerId, products) => {
+	async newInternalOrder(issueDate, customerId, products) {
 		try {
 			const correct = products.every((p) => typeof p.SKUId === "number" && typeof p.description === "string" && typeof p.price === "number" && typeof p.qty === "number");
 			if (!correct) return {status: 422, body: "bad products"};
@@ -30,7 +30,7 @@ class InternalOrderService {
 		}
 	}
 
-	updateInternalOrder = async (id, newState, products) => {
+	async updateInternalOrder(id, newState, products) {
 		try {
 			if (!Object.values(InternalOrderState).includes(newState)) return {status: 422, body: "invalid state"};
 			const internalOrder = await this.#internalOrder_DAO.selectInternalOrderByID(id);
@@ -52,7 +52,7 @@ class InternalOrderService {
 		}
 	}
 
-	deleteInternalOrder = (id) => {
+	deleteInternalOrder(id) {
 		return this.#internalOrder_DAO.deleteInternalOrder(id);
 	}
 }

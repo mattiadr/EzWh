@@ -5,19 +5,19 @@ class ItemService {
 	#sku_DAO;
 
 	constructor(item_DAO, sku_DAO) {
-        this.#item_DAO = item_DAO;
+		this.#item_DAO = item_DAO;
 		this.#sku_DAO = sku_DAO;
-    }
+	}
 
-	getItems = () => {
+	getItems() {
 		return this.#item_DAO.selectItems();
 	}
 
-	getItemByID = (id) => {
+	getItemByID(id) {
 		return this.#item_DAO.selectItemByID(id);
 	}
 
-	createItem = async (id, description, price, skuid, supplierId) => {
+	async createItem(id, description, price, skuid, supplierId) {
 		try {
 			const SKU = await this.#sku_DAO.selectSKUbyID(skuid);
 			if (!SKU) return {status: 404, body: "sku not found"};
@@ -32,7 +32,7 @@ class ItemService {
 		}
 	}
 
-	updateItem = async (id, description, price) => {
+	async updateItem(id, description, price) {
 		try {
 			const item = await this.#item_DAO.selectItemByID(id);
 			if (!item) return {status: 404, body: "item not found"};
@@ -45,12 +45,8 @@ class ItemService {
 		}
 	}
 
-	deleteItem = async (id) => {
+	async deleteItem(id) {
 		return this.#item_DAO.deleteItemByID(id);
-	}
-
-	deleteItems = async () => {
-		return this.#item_DAO.deleteItemData();
 	}
 }
 

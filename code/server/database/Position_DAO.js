@@ -78,16 +78,3 @@ exports.deletePosition = (posID) => {
         });
     });
 }
-
-exports.deletePositionData = () => {
-    return new Promise((resolve, reject) => {
-        const sql = `DELETE FROM Position`;
-        db.run(sql, [], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        });
-    });
-}
