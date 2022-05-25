@@ -85,3 +85,16 @@ exports.deleteTestDescriptorByID = (id) => {
         });
     });
 }
+
+exports.deleteTestDescriptorData = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE * FROM TestDescriptor`;
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}

@@ -97,3 +97,17 @@ exports.deleteReturnOrder = (returnOrderId) => {
 		});
 	}));
 }
+
+
+exports.deleteReturnOrderData = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE * FROM ReturnOrder`;
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}

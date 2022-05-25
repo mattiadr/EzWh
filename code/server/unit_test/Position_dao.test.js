@@ -93,7 +93,6 @@ describe("positionDao_selectPositions", () => {
                             new Position("80123454312","8012","3454","3412",1000,1000,300,150)]);
     testPosition("800234543412","8002","3454",1000,1000,300,150);
     testPosition("80123454312","8012","3454","3412",1000,1000,300,150);
-    testPositionByID(1);
     //testPosition("80223454312","8022","3454","3412",1000,1000,300,150); // -> this test will fail
 
 });

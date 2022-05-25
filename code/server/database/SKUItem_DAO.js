@@ -88,3 +88,17 @@ exports.deleteSKUItem = (RFID) => {
 		});
 	});
 }
+
+
+exports.deleteSKUItemData = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE * FROM SKUItem`;
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
