@@ -15,7 +15,17 @@
   },
   "scripts": {
     "preapiTest": "node dbinit.js",
-    "apiTest": "./node_modules/.bin/mocha test --exit",
-    "test": "jest"
-  }
+    "apiTest": "mocha test --exit",
+    "test": "jest",
+    "start": "node server.js"
+  },
+  "name": "server",
+  "description": "- Open a terminal\r - Open the code/server folder\r - Input ```npm install```\r - Input ```node server.js```\r - This message will be shown: Server listening at http://localhost:3001\r - Do not close the terminal window, otherwise the server will be shut down",
+  "version": "1.0.0",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC"
 }

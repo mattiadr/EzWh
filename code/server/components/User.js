@@ -43,5 +43,5 @@ class User {
 	}
 }
 
-module.exports.UserRole = UserRole;
-module.exports.User = User;
+//module.exports.UserRole = UserRole;
+module.exports = User;

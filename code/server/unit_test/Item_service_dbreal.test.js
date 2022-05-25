@@ -34,8 +34,8 @@ describe('get Items', () => {
     new Item(2,"another item",12.99,2,1)];
 
     testItems(Items);
-    testItem(Items[0].id, Items[0].description, Items[0].price, Items[0].price, Items[0].SKUID, Items[0].supplierId);
-    testItem(Items[1].id, Items[1].description, Items[1].price, Items[1].price, Items[1].SKUID, Items[1].supplierId);
+    testItem(Items[0].id, Items[0].description, Items[0].price, Items[0].SKUID, Items[0].supplierId);
+    testItem(Items[1].id, Items[1].description, Items[1].price, Items[1].SKUID, Items[1].supplierId);
     
 });
 
