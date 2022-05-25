@@ -4,7 +4,7 @@ const sqlite3 = require("sqlite3");
 class DatabaseConnection {
 	static db = null;
 
-	static async createConnection() {
+	static createConnection() {
 		/** SKU **/
 		const createTableSKU = `CREATE TABLE IF NOT EXISTS SKU (
 			SKUID INTEGER NOT NULL,
@@ -164,8 +164,10 @@ class DatabaseConnection {
 		}))));
 	}
 
-	static resetTable(tableName) {
-		return new Promise((resolve, reject) => {
+	static resetAllTables() {
+		return Promise.all(["InternalOrder", "InternalOrderProduct", "Item", "Position", "RestockOrder",
+			"RestockOrderProduct", "RestockOrderSKUItem", "ReturnOrder", "ReturnOrderProduct", "SKU", "SKUItem",
+			"TestDescriptor", "TestResult", "User"].map((tableName) => new Promise((resolve, reject) => {
 			const sql = `DELETE FROM ${tableName};`;
 			this.db.run(sql, [], (err) => {
 				if (err) {
@@ -176,10 +178,10 @@ class DatabaseConnection {
 					resolve();
 				}
 			});
-		});
+		})));
 	}
 
-	static resetAllTables() {
+	static createDefaultUsers() {
 		const users = [
 			["John", "Smith", "user1@ezwh.com", "NyXsQCTQ+OaylB+Yi0mnlvhaelX2LqqfBwZ0A80QkNM=", "ELXfvDBtTWOcoN7my2w+T/HDXbyGJ3cVUWOHlWD3V4Y=", "customer"],
 			["Creed", "Bratton", "qualityEmployee1@ezwh.com", "jv6wZwuthjVVug0U4YYEKEEB5CKiZHftNIqPRcAOazA=", "+U3SJooCydj+o7rTf0MuVtVknWvQoxKqbtu84WvIkUw=", "qualityEmployee"],
@@ -189,21 +191,10 @@ class DatabaseConnection {
 			["Mana", "Ger", "manager1@ezwh.com", "n/BvDaH5PnbquWV2yOLONE7pa07uD0+Dxj4W0C67n+c=", "h/rqGUKuEBaSa7Es1UfRzjfIwq7UmiOPpXSw9ol27Xs=", "manager"]
 		];
 
-		return Promise.all(["InternalOrder", "InternalOrderProduct", "Item", "Position", "RestockOrder",
-			"RestockOrderProduct", "RestockOrderSKUItem", "ReturnOrder", "ReturnOrderProduct", "SKU", "SKUItem",
-			"TestDescriptor", "TestResult", "User"].map((t) => this.resetTable(t)))
-			.then(() => Promise.all(users.map((u) => new Promise((resolve, reject) => {
-				const sql = `INSERT INTO User(name, surname, email, passwordHash, passwordSalt, type) VALUES (?, ?, ?, ?, ?, ?);`;
-				this.db.run(sql, u, (err) => {
-					if (err) {
-						console.log(`error while inserting user ${u}`);
-						console.log(err);
-						reject(err);
-					} else {
-						resolve();
-					}
-				});
-			}))));
+		return Promise.all(users.map((u) => new Promise((resolve, reject) => {
+			const sql = `INSERT INTO User(name, surname, email, passwordHash, passwordSalt, type) VALUES (?, ?, ?, ?, ?, ?);`;
+			this.db.run(sql, u, () => resolve());
+		})));
 	}
 }
 

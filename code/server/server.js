@@ -23,7 +23,7 @@ app.use(express.json());
 async function initDatabase(req, res, next) {
 	if (!DatabaseConnection.db) {
 		await DatabaseConnection.createConnection();
-		await DatabaseConnection.resetAllTables();
+		await DatabaseConnection.createDefaultUsers();
 	}
 	next();
 }
@@ -47,7 +47,7 @@ app.use("/api", Item_router);
  */
 app.delete("/api/resetDatabase",
 	(req, res) => {
-		DatabaseConnection.resetAllTables().then(() => {
+		DatabaseConnection.resetAllTables().then(() => DatabaseConnection.createDefaultUsers()).then(() => {
 			res.status(200).end();
 		}).catch((err) => {
 			res.status(500).send(err);

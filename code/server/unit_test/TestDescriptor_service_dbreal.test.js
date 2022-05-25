@@ -5,7 +5,6 @@ const TestDescriptorService = require('../services/TestDescriptor_service');
 const testD_dao = require('../database/TestDescriptor_DAO');
 const sku_dao = require('../database/SKU_DAO');
 const TestDescriptor_service = new TestDescriptorService(testD_dao, sku_dao);
-const DatabaseConnection = require("../database/DatabaseConnection");
 
 async function testTestDescriptors(expectedTestDescriptors) {
     test('get all Test Descriptors', async () => {
@@ -29,6 +28,7 @@ describe('get testDescriptors', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
 		await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {
@@ -50,6 +50,7 @@ describe("set TestDescriptor", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
 		await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {
@@ -104,6 +105,7 @@ describe("delete TestDescriptor", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
 		await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {

@@ -3,14 +3,15 @@ const SKU = require('../components/SKU');
 const TestDescriptorService = require('../services/TestDescriptor_service');
 const testD_dao = require('../mock_database/mock_TestDescriptor_dao');
 const sku_dao = require('../mock_database/mock_SKU_dao');
-const TestDescriptor_service = new TestDescriptorService(testD_dao, sku_dao);
 const DatabaseConnection = require("../database/DatabaseConnection");
+const TestDescriptor_service = new TestDescriptorService(testD_dao, sku_dao);
 
 // test case definition
 describe('get testDescriptors', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(() => {
         testD_dao.selectTestDescriptors.mockReset();
@@ -58,6 +59,7 @@ describe("set TestDescriptor", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(() => {
         sku_dao.selectSKUbyID.mockReset();
@@ -111,6 +113,7 @@ describe("delete TestDescriptor", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(() => {
         testD_dao.deleteTestDescriptorByID.mockReset();
