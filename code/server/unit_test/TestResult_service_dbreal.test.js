@@ -6,8 +6,8 @@ const TestResultService = require('../services/TestResult_service');
 
 const testR_dao = require('../database/TestResult_DAO');
 const testD_dao = require('../database/TestDescriptor_DAO');
-const skuItem_dao = require('../database/SKUItem_DAO');
-const TestResult_service = new TestResultService(testR_dao, testD_dao, skuItem_dao);
+const SI_dao = require('../database/SKUItem_dao');
+const TestResult_service = new TestResultService(testR_dao, testD_dao, SI_dao);
 
 async function testTestResults(rfid,expectedTestResults) {
     test('get all Test Results', async () => {
@@ -34,7 +34,7 @@ describe('get Test Results', () => {
     beforeEach(async () => {
         await testR_dao.deleteTestResultData();
         await testD_dao.insertTestDescriptor(new TestDescriptor(12, 'test descriptor 1', 'This test is described by...', 1))
-        await skuItem_dao.insertSKUItem(new SKUItem("12345678901234567890123456789014", 1, 0, "2021/11/29 12:30"))
+        await SI_dao.insertSKUItem(new SKUItem("12345678901234567890123456789014", 1, 0, "2021/11/29 12:30"))
         await testR_dao.insertTestResult(new TestResult(1, 12, "2021/11/29", false, "12345678901234567890123456789014"));
         await testR_dao.insertTestResult(new TestResult(2, 12, "2021/11/29", false, "12345678901234567890123456789014"));
     });
@@ -53,11 +53,11 @@ describe("set Test Result", () => {
     beforeEach(async () => {
         await testR_dao.deleteTestResultData();
         await testD_dao.deleteTestDescriptorData();
-        await skuItem_dao.deleteSKUItemData();
+        await SI_dao.deleteSKUItemData();
         await testR_dao.insertTestResult(new TestResult(1, 12, "2021/11/29", false, "12345678901234567890123456789014"));
         await testR_dao.insertTestResult(new TestResult(2, 12, "2021/11/29", false, "12345678901234567890123456789014"));
         await testD_dao.insertTestDescriptor(new TestDescriptor(12, 'test descriptor 1', 'This test is described by...', 1))
-        await skuItem_dao.insertSKUItem(new SKUItem ("12345678901234567890123456789014", 1, 0, "2021/11/29 12:30"));
+        await SI_dao.insertSKUItem(new SKUItem ("12345678901234567890123456789014", 1, 0, "2021/11/29 12:30"));
     });
 
     test('new Test Result', async () => {
