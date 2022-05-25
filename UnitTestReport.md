@@ -1468,9 +1468,12 @@ Version:
 
 | Unit name | Jest test case |
 |--|--|
-|||
-|||
-||||
+|testdescriptor (DAO)|get all Test Descriptors|
+|testdescriptor (DAO)|get Test Descriptor|
+|testdescriptor (DAO)|get all Test Descriptors BY SKUID|
+|testdescriptor (DAO)|create new TestDescriptor|
+|testdescriptor (DAO)|update a TestDescriptor|
+|testdescriptor (DAO)|delete Test Descriptor|
 
 ### Code coverage report
 
