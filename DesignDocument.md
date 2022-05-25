@@ -52,505 +52,436 @@ The back end is implemented using node.js developing applications.
 
 # Low level design
 
-![](images/ClassDiagram.svg)
+## Notes on the class diagram
 
-<details>
-    <summary>Show Source</summary>
+For the purpose of achieving better visual clarity the following changes have been made
+- the diagram has been broken in two parts and the components have been isolated
+- the connections between the components and the respective DAO, service and router has been omitted
+- trivial getters and setters have not been included
 
+```plantuml
+class server
+
+package routers {
+    class SKU_router
+    class SKUItem_router
+    class Position_router
+    class TestDescriptor_router
+    class TestResult_router
+    class User_router
+    class RestockOrder_router
+    class ReturnOrder_router
+    class InternalOrder_router
+    class Item_router
+}
+
+package services {
+	class SKU_service {
+		- sku_DAO : SKU_DAO
+		- testDescriptor_DAO : TestDescriptor_DAO
+		- position_DAO : Position_DAO
+		__
+		+ constructor(sku_DAO : SKU_DAO, testDescriptor_DAO : TestDescriptor_DAO, position_DAO : Position_DAO)
+		+ getSKUs() : {status: Integer, body: Object}
+		+ getSKUbyId(id : Integer) : {status: Integer, body: Object}
+		+ createSKU(description : String, weight : Float, volume : Float, notes : String, price : Float, quantity : Integer) : {status: Integer, body: Object}
+		+ updateSKU(id : Integer, positionId : String, newDescription : String, newWeight : Float, newVolume : Float, newNotes : String, newPrice : Float, newAvailableQuantity : Integer) : {status: Integer, body: Object}
+		+ deleteSKU(id : Integer) : Promise
+	}
+	class SKUItem_service {
+		- skuItem_DAO : SKUItem_DAO
+		- sku_DAO : SKU_DAO
+		__
+		+ constructor(skuItem_DAO : SKUItem_DAO, sku_DAO : SKU_DAO)
+		+ getSKUItems() : Promise<Array<SKUItem>>
+		+ getSKUItemsBySKUID(skuid : Integer) : {status: Integer, body: Object}
+		+ getSKUItemByRFID(rfid : String) : Promise<SKUItem>
+		+ createSKUItem(rfid : String, skuid : Integer, dateOfStock : String) : {status: Integer, body: Object}
+		+ updateSKUItem(rfid : String, newRFID : String, newAvailable : Integer, newDateOfStock : String) : {status: Integer, body: Object}
+		+ deleteSKUItem(rfid : String) : Promise
+	}
+	class Position_service {
+		- position_DAO : Position_DAO
+		__
+		+ constructor(position_DAO : Position_DAO)
+		+ getPositions() : Promise<Array<Position>>
+		+ createPosition(positionID : String, aisleID : String, row : String, col : String, maxWeight : Float, maxVolume : Float) : {status: Integer, body: Object}
+		+ updatePosition(posID : String, newPositionID : String, newAisleID : String, newRow : String, newCol : String, newMaxWeight : Float, newMaxVolume : Float, newOccupiedWeight : Float, newOccupiedVolume : Float) : {status: Integer, body: Object}
+		+ deletePosition(posID : String) : Promise
+	}
+	class TestDescriptor_service {
+		- testDescriptor_DAO : TestDescriptor_DAO
+		- sku_DAO : SKU_DAO
+		__
+		+ constructor(testDescriptor_DAO : TestDescriptor_DAO, sku_DAO : SKU_DAO)
+		+ getTestDescriptors() : Promise<Array<TestDescripto>>
+		+ getTestDescriptorByID(id : Integer) : Promise<TestDescriptor>
+		+ createTestDescriptor(name : String, procedureDescription : String, idSKU : Integer) : {status: Integer, body: Object}
+		+ updateTestDescriptor(id : Integer,  : String, newProcedureDescription : String, newIdSKU : Integer) : {status: Integer, body: Object}
+		+ deleteTestDescriptor(id : Integer) : Promise
+	}
+	class TestResult_service {
+		- testResult_DAO : TestResult_DAO
+		- testDescriptor_DAO : TestDescriptor_DAO
+		- skuItem_DAO : SKUItem_DAO
+		__
+		+ constructor(testResult_DAO : TestResult_DAO, testDescriptor_DAO : TestDescriptor_DAO, skuItem_DAO : SKUItem_DAO)
+		+ getTestResults(rfid : String) : {status: Integer, body: Object}
+		+ getTestResultByID(rfid : String, id : Integer) : {status: Integer, body: Object}
+		+ createTestResult(rfid : String, idTestDescriptor : Integer, date : String, result : Boolean) : {status: Integer, body: Object}
+		+ updateTestResult(rfid : String, id : Integer, newIdTestDescriptor : Integer, newDate : String, newResult : Boolean) : {status: Integer, body: Object}
+		+ deleteTestResult(rfid : String, id : Integer) : Promise
+	}
+	class User_service {
+		- user_DAO : User_DAO
+		__
+		+ constructor(user_DAO : User_DAO)
+		+ getCurrentUser() : Object
+		+ getUsers() : Promise<Array<User>>
+		+ getUsersByRole(role : String) : Promise<Array<User>>
+		+ createUser(email : String, name : String, surname : String, password : String, type : String) : {status: Integer, body: Object}
+		+ session(email : String, password : String, role : String) : {status: Integer, body: Object}
+		+ logout() : void
+		+ updateUserRights(email : String, oldType : String, newType : String) : {status: Integer, body: Object}
+		+ deleteUser(email : String, type : String) : {status: Integer, body: Object}
+	}
+	class RestockOrder_service {
+		- restockOrder_DAO : RestockOrder_DAO
+		__
+		+ constructor(restockOrder_DAO : RestockOrder_DAO)
+		+ getRestockOrders() : Promise<Array<RestockOrder>>
+		+ getRestockOrdersByState(state : String) : Promise<Array<RestockOrder>>
+		+ getRestockOrderByID(id : Integer) : Promise<RestockOrder>
+		+ getRestockOrderByIDReturnItems(id : Integer)  : {status: Integer, body: Object}
+		+ createRestockOrder(issueDate : String, supplierId : Integer, products : Array<Object>) : {status: Integer, body: Object}
+		+ updateRestockOrderState(id : Integer, newState : String) : {status: Integer, body: Object}
+		+ addSkuItemsToRestockOrder(id : Integer, skuItems : Array<Object>) : {status: Integer, body: Object}
+		+ updateRestockOrderTransportNote(id : Integer, deliveryDate : String) : {status: Integer, body: Object}
+		+ deleteRestockOrder(id : Integer) : Promise
+	}
+	class ReturnOrder_service {
+		- returnOrder_DAO : ReturnOrder_DAO
+		- restockOrder_DAO : RestockOrder_DAO
+		__
+		+ constructor(returnOrder_DAO : ReturnOrder_DAO, restockOrder_DAO : RestockOrder_DAO)
+		+ getReturnOrders() : Promise<Array<ReturnOrder>>
+		+ getReturnOrderByID(id : Integer) : Promise<ReturnOrder>
+		+ newReturnOrder(returnDate : String, products : Array<Object>, restockOrderId : Integer) : {status: Integer, body: Object}
+		+ deleteReturnOrder(id : Integer) : Promise
+	}
+	class InternalOrder_service {
+		- internalOrder_DAO : InternalOrder_DAO
+		__
+		+ constructor(internalOrder_DAO : InternalOrder_DAO)
+		+ getInternalOrders() : Promise<Array<InternalOrder>>
+		+ getInternalOrdersByState(state : String) : Promise<Array<InternalOrder>>
+		+ getInternalOrderByID(id : Integer) : Promise<InternalOrder>
+		+ newInternalOrder(issueDate : String, customerId : Integer, products : Array<Object>) : {status: Integer, body: Object}
+		+ updateInternalOrder(id : Integer, newState : String, products : Array<Object>) : {status: Integer, body: Object}
+		+ deleteInternalOrder(id : Integer) : Promise
+	}
+	class Item_service {
+		- item_DAO : Item_DAO
+		- sku_DAO : SKU_DAO
+		__
+		+ constructor(item_DAO : Item_DAO, sku_DAO : SKU_DAO)
+		+ getItems() : Promise<Array<Item>>
+		+ getItemByID(id : Integer) : Promise<Item>
+		+ createItem(id : Integer, description : String, price : Float, skuid : Integer, supplierId : Integer) : {status: Integer, body: Object}
+		+ updateItem(id : Integer, description : String, price : Float) : {status: Integer, body: Object}
+		+ deleteItem(id : Integer) : Promise
+	}
+}
+
+package database {
+	class DatabaseConnection {
+		- db : sqlite3.Database
+		__
+		+ createTables() : void
+		+ resetTable(tableName : String) : Promise
+		+ resetAllTables() : Promise
+	}
+	class SKU_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectSKUs() : Promise<Array<SKU>>
+		+ selectSKUbyID(id : Integer) : Promise<SKU>
+		+ insertSKU(newSKU : SKU) : Promise
+		+ updateSKU(newSKU : SKU) : Promise
+		+ deleteSKU(SKUid : Integer) : Promise
+		+ deleteSKUData() : Promise
+		+ checkIfPositionOccupie(positionID :  String) : Promise
+	}
+	class SKUItem_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectSKUItems() : Promise
+		+ selectSKUItemByRFID(rfid : String) : Promise<Array<SKUItem>>
+		+ selectSKUItemBySKUID(skuid : Integer) : Promise<SKUItem>
+		+ insertSKUItem(newSKUItem : SKUItem) : Promise
+		+ updateSKUItem(rfid : String, newSKUItem : SKUItem) : Promise
+		+ deleteSKUItem(RFID : String) : Promise
+		+ deleteSKUItemData() : Promise
+	}
+	class Position_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectPositions() : Promise<Array<Position>>
+		+ selectPositionByID(id : String) : Promise<Position>
+		+ insertPosition(newPosition : Position) : Promise
+		+ updatePosition(oldPosID : String, newPosition : Position) : Promise
+		+ deletePosition(posID : String) : Promise
+		+ deletePositionData() : Promise
+	}
+	class TestDescriptor_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectTestDescriptors() : Promise<Array<TestDescriptor>>
+		+ selectTestDescriptorByID(id : Integer) : Promise<TestDescriptor>
+		+ selectTestDescriptorsIDBySKUID(skuid : Integer) : Promise<Array<TestDescriptors>>
+		+ insertTestDescriptor(testDescriptor : TestDescriptor) : Promise
+		+ updateTestDescriptor(testDescriptor : TestDescriptor) : Promise
+		+ deleteTestDescriptorByID(id : Integer) : Promise
+		+ deleteTestDescriptorData() : Promise
+	}
+	class TestResult_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectTestResults(rfid : String) : Promise<Array<TestResult>>
+		+ selectTestResultByID(rfid : String, id : Integer) : Promise<TestResult>
+		+ insertTestResult(testResult : TestResult) : Promise
+		+ updateTestResult(testResult : TestResult) : Promise
+		+ deleteTestResultByID(rfid : String, id : Integer) : Promise
+		+ deleteTestResultData() : Promise
+	}
+	class Item_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectItems() : Promise<Array<Item>>
+		+ selectItemByID(id : String) : Promise<item>
+		+ selectItemBySKUID(skuid : Integer) : Promise<item>
+		+ insertItem(item : Item) : Promise
+		+ updateItem(item : Item) : Promise
+		+ deleteItemByID(id : String) : Promise
+		+ deleteItemData() : Promise
+	}
+	class RestockOrder_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectProductsIntoRestockOrder(restockOrder : RestockOrder) : Promise<RestockOrder>
+		+ selectSKUItemsIntoRestockOrder(restockOrder : RestockOrder) : Promise<RestockOrder>
+		+ selectRestockOrders() : Promise<Array<RestockOrder>>
+		+ selectRestockOrdersByState(state : String) : Promise<Array<RestockOrder>>
+		+ selectRestockOrderByID(id : Integer) : Promise<RestockOrder>
+		+ selectRestockOrderByIDReturnItems(id : Integer) : Promise<RestockOrder>
+		+ insertRestockOrder(restockOrder : RestockOrder) : Promise
+		+ insertRestockOrderSKUItems(roid : Integer, skuItems : Array<SKUItem>)
+		+ updateRestockOrder(restockOrder : RestockOrder) : Promise
+		+ deleteRestockOrder(id : Integer) : Promise
+		+ deleteRestockOrderData() : Promise
+	}
+	class ReturnOrder_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectProductsIntoReturnOrder(returnOrder : ReturnOrder) : Promise<ReturnOrder>
+		+ selectReturnOrders() : Promise<Array<ReturnOrder>>
+		+ selectReturnOrderByID(returnOrderId : Integer) : Promise<ReturnOrder>
+		+ insertReturnOrder(returnOrder : ReturnOrder) : Promise
+		+ deleteReturnOrder(returnOrderId : Integer) : Promise
+	}
+	class InternalOrder_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectProductsIntoInternalOrder(internalOrder : InternalOrder) : Promise<InternalOrder>
+		+ selectInternalOrders() : Promise<Array<InternalOrder>>
+		+ selectInternalOrdersByState(state : String) : Promise<Array<InternalOrder>>
+		+ selectInternalOrderByID(id : Integer) : Promise<InternalOrder>
+		+ insertInternalOrder(internalOrder : InternalOrder) : Promise
+		+ updateInternalOrder(internalOrder : InternalOrder) : Promise
+		+ updateInternalOrderProducts(internalOrder : InternalOrder) : Promise
+		+ deleteInternalOrder(id : Integer) : Promise
+	}
+	class User_DAO {
+		- db : DatabaseConnection
+		__
+		+ selectUsers() : Promise<Array<User>>
+		+ selectUserByEmailAndType(email : String, type : String) : Promise<User>
+		+ insertUser(user : Users) : Promise
+		+ updateUser(user : User) : Promise
+		+ deleteUserByID(id : Integer) : Promise
+		+ deleteUserData() : Promise
+	}
+}
+
+server -- SKU_router
+server -- SKUItem_router
+server -- Position_router
+server -- TestDescriptor_router
+server -- TestResult_router
+server -- User_router
+server -- RestockOrder_router
+server -- ReturnOrder_router
+server -- InternalOrder_router
+server -- Item_router
+
+SKU_router -- SKU_service
+SKUItem_router -- SKUItem_service
+Position_router -- Position_service
+TestDescriptor_router -- TestDescriptor_service
+TestResult_router -- TestResult_service
+User_router -- User_service
+RestockOrder_router -- RestockOrder_service
+ReturnOrder_router -- ReturnOrder_service
+InternalOrder_router -- InternalOrder_service
+Item_router -- Item_service
+
+SKU_service -- SKU_DAO
+SKU_service -- TestDescriptor_DAO
+SKU_service -- Position_DAO
+SKUItem_service -- SKUItem_DAO
+SKUItem_service -- SKU_DAO
+Position_service -- Position_DAO
+TestDescriptor_service -- TestDescriptor_DAO
+TestDescriptor_service -- SKU_DAO
+TestResult_service -- TestResult_DAO
+TestResult_service -- TestDescriptor_DAO
+TestResult_service -- SKUItem_DAO
+User_service -- User_DAO
+RestockOrder_service -- RestockOrder_DAO
+ReturnOrder_service -- ReturnOrder_DAO
+ReturnOrder_service -- RestockOrder_DAO
+InternalOrder_service -- InternalOrder_DAO
+Item_service -- Item_DAO
+Item_service -- SKU_DAO
+
+SKU_DAO -- DatabaseConnection
+SKUItem_DAO -- DatabaseConnection
+Position_DAO -- DatabaseConnection
+TestDescriptor_DAO -- DatabaseConnection
+TestResult_DAO -- DatabaseConnection
+User_DAO -- DatabaseConnection
+RestockOrder_DAO -- DatabaseConnection
+ReturnOrder_DAO -- DatabaseConnection
+InternalOrder_DAO -- DatabaseConnection
+Item_DAO -- DatabaseConnection
 ```
-class EzWh {
-    - warehouse : Warehouse
-    __
-    + main(): void
+
+```plantuml
+left to right direction
+
+package components {
+	class SKU {
+		- id
+		- description
+		- weight
+		- volume
+		- price
+		- notes
+		- availableQuantity
+		- position
+		- testDescriptors
+		- itemsID
+	}
+	class SKUItem {
+		- RFID
+		- SKUID
+		- available
+		- dateOfStock
+		- testResults
+	}
+	class Item {
+		- id
+		- description
+		- price
+		- SKUID
+		- supplierId
+	}
+	class Position {
+		- positionID
+		- aisleID
+		- row
+		- col
+		- maxWeight
+		- maxVolume
+		- occupiedWeight
+		- occupiedVolume
+	}
+	enum UserRole {
+		+ administrator
+		+ manager
+		+ clerk
+		+ qualityEmployee
+		+ deliveryEmployee
+		+ customer
+		+ supplier
+	}
+	class User {
+		- id
+		- name
+		- surname
+		- email
+		- passwordHash
+		- passwordSalt
+		- role
+		__
+		+ checkPassword(password : String) : Boolean
+	}
+	enum RestockOrderState {
+		+ ISSUED
+		+ DELIVERY
+		+ DELIVERED
+		+ TESTED
+		+ COMPLETEDRETURN
+		+ COMPLETED
+	}
+	class RestockOrder {
+		- id
+		- issueDate
+		- state
+		- supplierId
+		- deliveryDate
+		- products
+		- skuItems
+		__
+		+ addSKUItems(skuItems : Array<Object>) : void
+	}
+	class ReturnOrder {
+		- id
+		- returnDate
+		- restockOrderId
+		- products
+	}
+	enum InternalOrderState {
+		+ ISSUED
+		+ ACCEPTED
+		+ REFUSED
+		+ CANCELED
+		+ COMPLETED
+	}
+	class InternalOrder {
+		- id
+		- issueDate
+		- state
+		- customerId
+		- products
+		__
+		+ assignRFIDs(rfids : Array<Object>) : void
+	}
+	class TestDescriptor {
+		- id
+		- name
+		- procedureDescription
+		- idSKU
+	}
+	class TestResult {
+		- id
+		- idTestDescriptor
+		- date
+		- result
+		- rfid
+	}
 }
 
-enum UserChange {
-    EMAIL
-    PASSWORD
-    ROLE
-}
-
-enum SKUChange {
-    DESCRIPTION
-    WEIGHT
-    VOLUME
-    PRICE
-    NOTE
-    POSITION
-}
-
-enum PositionChange {
-    AISLE
-    ROW
-    COL
-    MAXWEIGHT
-    MAXVOLUME
-    SKU
-}
-
-enum TestDescriptorChange {
-    NAME
-    DESCRIPTION
-}
-
-class Warehouse {
-    - db_help : DatabaseHelper
-    - user_sessions : List<UserSession>
-    __
-    + getSKUs() : List<SKU>
-    + getSKUbyId(id : String) : SKU
-    + getSKUbyDescription(Description : String) : SKU
-    + createSKU(description : String, weight : double, volume : double, note : string, price : double, quantity : Integer) : void
-    + deleteSKU(id : String) : void
-    + updateSKU(id : String, which : SKUChange, new_value : Object) : void
-    ..
-    + getSKUItems() : List<SKUItem>
-    + getSKUItemsBySKU(SKUid : String) : List<SKUItem>
-    + getSKUItemByRFID(rfid : String) : SKUItem
-    + getSKUItemByRestockOrderid(restockOrderId : String) : List<SKUItem>
-    + createSKUItem(rfid : String, SKUid: String, dateOfStock: String) : void
-    + deleteSKUItems(rfid : String) : void
-    ..
-    + getItems() : List<Item>
-    + getItemById(id : String) : Item
-    + createItem(id: String, description : String, price: double, SKUid: String, supplierID: String) : void
-    + modifyItemSupllier(id : String, supplierID) : void
-    + deleteItem(id : Integer) : void
-    ..
-    + getTestResults(rfid : String) : List<TestResult>
-    + getTestResultByID(rfid : String, testID : String) : TestResult
-    + createTestResult(rfid: String, idTestDescriptor : String, date : String, result : Boolean) : void
-    + updateTestResult(rfid : String, id : String, newIDTestDescriptor : String, newDate : String, newResult : Boolean) : void
-    + deleteTestResult(rfid : String, id : String) : void
-    ..
-    + getPositions() : List<Position>
-    + getPositionById(id : String) : Position
-    + createPosition(id : String, aisle : Integer, row : Integer, Col : Integer, maxWeight : double, maxVolume : double) : void
-    + updatePosition(id : String, which : PositionChange, new_value : Object) : void
-    + deletePosition(positionID : String) : void
-    ..
-    + getTestDescriptors() : List<TestDescriptor>
-    + getTestDescriptorById(id : Integer) : TestDescriptor
-    + createTestDescriptor(id : Integer, name : String, description : String) : void
-    + updateTestDescriptor(id : Integer, which: TestDescriptorChange, new_value : String)
-    + deleteTestDescriptor(id : Integer) : void
-    ..
-    + getSuppliers() : List<Supplier>
-    + frequentSuppliers() : List <Supplier>
-    + recentSuppliers() : List <Supplier>
-    ..
-    + getRestockOrders() : List<RestockOrder>
-    + getRestockOrdersByStatus(status : RestockStatus) : List<RestockOrder>
-    + getRestockOrderById(id : String) : RestockOrder
-    + getRestockOrdersReturnItems(id : String) : List<SKUItem>
-    + createRestockOrder(supplierID : String, issueDate : String, products : Map<Item,Integer>) : RestockOrder
-    + updateRestockOrderState(id : String, status : RestockStatus) : void
-    + addSKUItemToRestockOrder(id: String, SKU_list : List<String>, RFID_list : List<String>) : void
-    + addTransportNoteToRestockOrder(id : String, transportNote : String) : void
-    + deleteRestockOrder(id : String) : void
-    ..
-    + getReturnOrders() : List<ReturnOrders>
-    + getReturnOrderById(id : String) : ReturnOrder
-    + createReturnOrder(returnDate: String, products : List<SKUItem>, RestockOrderId : String) : void
-    + deleteReturnOrder(id : Integer) : void
-    ..
-    + getInternalOrder() : List<InternalOrder>
-    + getinternalOrderByStatus(status : InternalStatus) : List<RestockOrder>
-    + getInternalOrderById(id : String) : InternalOrder
-    + getInternalOrderSKUs(id : String) : List<SKU>
-    ~ initInternalOrder(id : String, date: String, customerId : String, from : String, priority : String) : void
-    + addSKUToInternalOrder(InternalOrderId: String, itemId: String, quantity: Integer) : void
-    + removeSKUToInternalOrder(InternalOrderId: String, itemId: String) : void
-    + setInternalOrderIssued(id : String) : void
-    + updateStatusInternalOrder(id : String, status : InternalStatus) : void
-    + updateQuantityInternalOrder(id : String, SKUid: String, newQuantity: Integer) : void
-    + deleteInternalOrder(id : String) : void
-    + highPriorityInternalOrders() : List<InternalOrder>
-    ..
-    + getUsers() : List<User>
-    + getUserbyId(id : String) : User
-    + getUsersByRole(role : UserRole) : List<Role>
-    + createUser(userId : String, name: String, surname : String, email : String, pass: String, role : UserRole) : void
-    + deleteUser(userId : String) : void
-    + updateUser(userId : String, which : UserChange, new_value : Object) : void
-    ..
-    + managerSession(username : String, password : String) : UserSession
-    + customerSession(username : String, password : String) : UserSession
-    + supplierSession(username : String, password : String) : UserSession
-    + clerkSession(username : String, password : String) : UserSession
-    + qualityEmployeeSession(username : String, password : String) : UserSession
-    + deliveryEmployeeSession(username : String, password : String) : UserSession
-    + logout(session : UserSession) : void
-}
-
-class SKU {
-    - id : String
-    - description : String
-    - weight : Double
-    - volume : Double
-    - price : Double
-    - notes : String
-    - position : Position
-    - availableQuantity : Integer
-    - testDescriptors : List<Integer>
-    - itemsID : List<String>
-    - sku_itemsID : List<String>
-    __
-    + SKU(id : String, description : String, weight : Double, volume : Double, price : Double, notes : String, availableQuantity : Integer) : SKU
-    ..
-    + getId() : String
-    + getDescription() : String
-    + getWeight() : Double
-    + getVolume() : Double
-    + getPrice() : Double
-    + getNotes() : String
-    + getPosition() : Position
-    + getAvailableQuantity() : Integer
-    + getTestDescriptors() : List<Integer>
-    + getItemsID() : List<String>
-    + getSkuItemsID() : List<String>
-    ..
-    + setDescription(newDescription : String) : void
-    + setWeight(newWeight : Double) : void
-    + setVolume(newVolume : Double) : void
-    + setPrice(newPrice : Double) : void
-    + setNotes(newNotes : String) : void
-    + setAvailableQuantity(newAvailableQuantity : Integer) : void
-    + addQuantity(sumQuantity : Integer) : void
-    + subQuantity(subQuantity : Integer) : void
-    + setPosition(position : Position) : void
-    + addTest(newTestID: Integer) : void
-    + addItemID(itemID : String) : void
-    + addSkuItemID(skuItemID : String) : void
-    + extractHeadSKUItem() : String
-}
-
-class SKUItem {
-    - RFID : String
-    - SKUId : String
-    - available : Boolean
-    - dateOfStock : String
-    - testResults : List<Testresult>
-    __
-    + SKUItem(RFID : String, SKUId : String, available : Boolean, dateOfStock : String) : SKUItem
-    ..
-    + getRFID() : String
-    + getSKUId() : String
-    + getAvailable() : Boolean
-    + getDateOfStock() : String
-    + getTestResults() :  List<Testresult>
-    ..
-    + setRFID(newRFID : String) : void
-    + setDateOfStock(newDateOfStock : String) : void
-    + setAvailable(newAvailable : Boolean) : void
-    + addTestResults(newTestResults : TestResult) : void
-}
-
-class Supplier {
-    - ID : String
-    - name : String
-    - restockOrders : List<String>
-    - items : List<String>
-    __
-    + Supplier(ID : String, name : String) : Supplier
-    ..
-    + getID() : void
-    + getName() : void
-    + getListRestockOrder() : List<String>
-    + getListItems() : List<String>
-    ..
-    + setName() : void
-    + addItem(String itemID) : void
-    + addOrder(String OrderID) : void
-}
-
-class Item {
-    - id : String
-    - description : String
-    - price : Double
-    - SKUId : String
-    - supplierId : Integer
-    __
-    + Item(id : String, description : String, price : Double, SKUId : String, supplierId : Integer) : Item
-    ..
-    + getId() : String
-    + getDescription() : String
-    + getPrice() : Double
-    + getSKUId() : Integer
-    + getSupplierId() : Integer
-    ..
-    + setDescription(newDescription : String) : void
-    + setPrice(newPrice : Double) : void
-}
-
-class Position {
-    - positionID : String
-    - aisleID : String
-    - row : String
-    - col : String
-    - maxWeight : Double
-    - maxVolume : Double
-    - occupiedWeight : Double
-    - occupiedVolume : Double
-    - SKUid : String
-    __
-    + Position(positionID : String, aisleID : String, row : String, col : String, maxWeight : Double, maxVolume : Double, occupiedWeight : Double, occupiedVolume : Double) : Position
-    ..
-    + getPositionID() : String
-    + getAisleID() : String
-    + getRow() : String
-    + getCol() : String
-    + getMaxWeight() : Double
-    + getMaxVolume() : Double
-    + getOccupiedWeight() : Double
-    + getOccupiedVolume() : Double
-    ..
-    + setAisleID(newAisleID : String) : void
-    + setRow(newRow : String) : void
-    + setCol(newCol : String) : void
-    + setMaxWeight(newMaxWeight : Double) : void
-    + setMaxVolume(newMaxVolume : Double) : void
-    + setOccupiedWeight(newOccupiedWeight : Integer) : void
-    + addOccupiedWeight(weight : Integer) : void
-    + subOccupiedWeight(weight : Integer) : void
-    + setOccupiedVolume(newOccupiedVolume : Integer) : void
-    + addOccupiedVolume(volume : Integer) : void
-    + subOccupiedVolume(volume : Integer) : void
-    + setPosition(newPositionID : String) : void
-    + setSKU(newSKUid : String) : void
-}
-
-enum UserRole {
-    ADMINISTRATOR
-    MANAGER
-    CLERK
-    QUALITY CHECKER
-    DELIVERY
-    CUSTOMER
-    SUPPLIER
-}
-
-class User {
-    - id : String
-    - name : String
-    - surname : String
-    - email : String
-    - password : String
-    - role: UserRole
-    __
-    + User(id : String, name : String, surname : String, email : String, password : String, role: UserRole) : User
-    ..
-    + getId() : String
-    + getName() : String
-    + getSurname() : String
-    + getEmail() : String
-    + getPassword() : String
-    + getRole() : UserRole
-    ..
-    + setRole(role : UserRole) : void
-    + changeEmail(newEmail : String) : void
-    + changePassword(newPassword: String) : void
-}
-
-enum StateRestock {
-    ISSUED
-    DELIVERY
-    DELIVERED
-    TESTED
-    COMPLETEDRETURN
-    COMPLETED
-}
-
-class RestockOrder {
-    - id : Integer
-    - issueDate : String
-    - state : StateRestock
-    - products : Map<Item,Integer>
-    - supplierId : Integer
-    - transportNote : TransportNote
-    - skuItems : List<SKUItem>
-    __
-    + RestockOrder(id : Integer, issueDate : String, state : StateRestock, products : List<Item>, supplierId : Integer, transportNote : TransportNote) : RestockOrder
-    ..
-    + getId() : Integer
-    + getIssueDate() : String
-    + getState() : StateRestock
-    + getProducts() : Map<Item,Integer>
-    + getSupplierId() : Integer
-    + getTransportNote() : TransportNote
-    + getSkuItems() : List<SKUItem>
-    + getQuantityBySKUid(SKUid : String) : Integer
-    ..
-    + setState(newState : StateRestock) : void
-    + setSKUItems(SKUItems : List<SKUItem>) : void
-    + setTransportNote(newTransportNote : TransportNote) : void
-    + setSupplier(supplierID : String) : void
-    + addItem(itemID : String, quantity : Integer) : void
-    + removeItem(itemID : String, quantity : Integer) : void
-    + modifyQuantity(itemID : String, newQuantity : Integer) : void
-}
-
-class TransportNote {
-    - shipmentDate : String
-    __
-    + TransportNote(shipmentDate : String) : TransportNote
-    ..
-    + getShipmentDate() : String
-}
-
-class ReturnOrder {
-    - id : Integer
-    - returnDate : String
-    - sku_items : List<String>
-    - RestockOrderId : Integer
-    __
-    + ReturnOrder(id : Integer, returnDate : String, RestockOrderId : Integer) : ReturnOrder
-    ..
-    + getId() : Integer
-    + getReturnDate() : String
-    + getSku_items() : List<String>
-    + getRestockOrderId() : Integer
-    ..
-    + addSKUItem(SKUId: String) : void
-    + deleteSKUItem(SKUId: String) : void
-}
-
-enum InternalStatus {
-    ISSUED
-    ACCEPTED
-    REFUSED
-    CANCELED
-    COMPLETED
-}
-
-class InternalOrder {
-    - id : String
-    - issueDate : String
-    - products : Map<SKU, Integer>
-    - state : InternalStatus
-    - customerId : String
-    - from : String
-    - priority : String
-    __
-    + InternalOrder(id : String, issueDate : String, state : InternalStatus, customerId : String, from : String, priority : String) : InternalOrder
-    ..
-    + getId() : String
-    + getReturnDate() : String
-    + getProducts() : Map<SKU, Integer>
-    + getSKUsId() : List<SKU>
-    + getQuantityBySKYId(SKUid : String) : Integer
-    + getState() : InternalStatus
-    + getCustomerId() : String
-    + getFrom() : String
-    ..
-    + setState(newState : InternalStatus) : void
-    + setProducts(products : Map<SKU, Integer>) : void
-    + addItem(SKUid : String, quantity : Integer) : void
-    + removeItem(SKUid : String, quantity : Integer) : void
-    + modifyQuantity(SKUid : String, newQuantity : Integer) : void
-}
-
-class TestDescriptor {
-    - id : Integer
-    - name : String
-    - procedureDescription : String
-    - idSKU : Integer
-    __
-    + TestDescriptor(id : Integer, name : String, procedureDescription : String, idSKU : Integer) : TestDescriptor
-    ..
-    + getId() : Integer
-    + getName() : String
-    + getProcedureDescription() : String
-    + getIdSKU() : Integer
-    ..
-    + setName(newName : String) : void
-    + setProcedureDescription(newProcedureDescription : String) : void
-    + setIdSKU(newIdSKU : Integer) : void
-}
-
-class TestResult {
-    - id : Integer
-    - idTestDescriptor : Integer
-    - date : String
-    - result : Boolean
-    __
-    + TestResult(id : Integer, idTestDescriptor : Integer, date : String, result : Boolean) : TestResult
-    ..
-    + getId() : Integer
-    + getIdTestDescriptor() : Integer
-    + getDate() : String
-    + getResult() : Boolean
-    ..
-    + setIdTestDescriptor(newIdTestDescriptor : Integer) : void
-    + setDate(newDate : String) : void
-    + setResult(newResult : Boolean) : void
-}
-
-class DatabaseHelper {
-    - DataBaseName : String
-    __
-    + createConnection() : Connection
-    + createTables() : void
-    + reset() : void
-    + getDateOfStock() : String
-    ..
-    + loadSKU() : Map <String,SKU>
-    + loadSKUItem() : Map <String,SKUItem>
-    + loadTestResult() : Map <Integer,TestResult>
-    + loadPosition() : Map <String,Position>
-    + loadTestDescriptor() : Map <Integer,TetsDescriptor>
-    + loadSupplier() : Map <String,Supplier>
-    + loadUser() : Map <String,User>
-    + loadRestockOrder() : Map <String,RestockOrder>
-    + loadReturnOrder() : Map <String,ReturnOrder>
-    + loadInternalOrder() : Map <String,InternalOrder>
-    + loadItem() : Map <String,Item>
-    ..
-    + storeSKU(Object : SKU) : void
-    + storeSKUItem(Object : SKUItem) : void
-    + storeTestResult(Object : TestResult) : void
-    + storePosition(Object : Position) : void
-    + storeTestDescriptor(Object : TestDescriptor) : void
-    + storeSupplier(Object : Supplier) : void
-    + storeUser(Object : User) : void
-    + storeRestockOrder(Object : RestockOrder) : void
-    + storeReturnOrder(Object : ReturnOrder) : void
-    + storeInternalOrder(Object : InternalOrder) : void
-    + storeItem(Object : Item) : void
-    ..
-    + updateSKU(Object : SKU) : void
-    + updateSKUItem(Object : SKUItem) : void
-    + updateTestResult(Object : TestResult) : void
-    + updatePosition(Object : Position) : void
-    + updateTestDescriptor(Object : TestDescriptor) : void
-    + updateSupplier(Object : Supplier) : void
-    + updateUser(Object : User) : void
-    + updateRestockOrder(Object : RestockOrder) : void
-    + updateReturnOrder(Object : ReturnOrder) : void
-    + updateInternalOrder(Object : InternalOrder) : void
-    + updateItem(Object : Item) : void
-}
-
-class UserSession {
-    - current_user : User
-    __
-    + UserSession(current_user : User) : UserSession
-    ..
-    + getCurrentUser() : User
-}
-
-Warehouse -- EzWh
-DatabaseHelper <|-- Warehouse : db
-Warehouse o-- "*" SKU
-Warehouse o-- "*" SKUItem
-Warehouse o-- "*" Position
-Warehouse o-- "*" TestDescriptor
-Warehouse o-- "*" User
-Warehouse o-- "*" RestockOrder
-Warehouse o-- "*" ReturnOrder
-Warehouse o-- "*" InternalOrder
-Warehouse o-- "*" Item
-Warehouse o-- "1" UserSession
 
 SKU -- Position
 SKU "*" -- "*" TestDescriptor
@@ -559,31 +490,26 @@ SKUItem "*" -- SKU
 SKUItem "*" -- "0..1" Position
 
 Item "*" -- SKU
-Item "*" -- Supplier
 
 TestDescriptor "1" -- "*" TestResult
 
 TestResult "*" -- SKUItem
 
-RestockOrder -- StateRestock
+RestockOrder -- RestockOrderState
 RestockOrder "*" -- "*" Item
-RestockOrder "*" -- Supplier
-RestockOrder -- TransportNote
 RestockOrder -- "*" SKUItem
 
 ReturnOrder "0..1" -- "*" SKUItem
 ReturnOrder "0..1" -- RestockOrder
 
-InternalOrder -- InternalStatus
+InternalOrder -- InternalOrderState
 InternalOrder -- "*" SKUItem
 InternalOrder "*" -- "*" SKU
 InternalOrder "*" -- User
 
-User <|-- Supplier
 User -- UserRole
 ```
 
-</details>
 
 # Verification traceability matrix
 
