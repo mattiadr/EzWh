@@ -15,7 +15,7 @@
   },
   "scripts": {
     "apiTest": "mocha test --exit",
-    "test": "jest",
+    "test": "jest --runInBand",
     "start": "node server.js"
   },
   "name": "server",
