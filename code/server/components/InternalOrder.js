@@ -18,17 +18,17 @@ class InternalOrder {
 		this.#products = products;
 	}
 
-	getId() { return this.#id; }
-	getIssueDate() { return this.#issueDate; }
-	getState() { return this.#state; }
-	getCustomerId() { return this.#customerId; }
-	getProducts() { return this.#products; }
+	get id() { return this.#id; }
+	get issueDate() { return this.#issueDate; }
+	get state() { return this.#state; }
+	get customerId() { return this.#customerId; }
+	get products() { return this.#products; }
 
-	setId(id) { this.#id = id; }
-	setIssueDate(issueDate) { this.#issueDate = issueDate; }
-	setState(state) { this.#state = state; }
-	setCustomerId(customerId) { this.#customerId = customerId; }
-	setProducts(products) { this.#products = products; }
+	set id(id) { this.#id = id; }
+	set issueDate(issueDate) { this.#issueDate = issueDate; }
+	set state(state) { this.#state = state; }
+	set customerId(customerId) { this.#customerId = customerId; }
+	set products(products) { this.#products = products; }
 
 	assignRFIDs(rfids) {
 		const grouped = {};

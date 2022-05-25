@@ -94,9 +94,8 @@ describe("set InternalOrder", () => {
     });
 
     test('update InternalOrder', async () => {
-        const InternalOrder1 = new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",null,1);
-        InternalOrder1.setProducts(products1);
-        const InternalOrder2 = new InternalOrder.InternalOrder("2021/11/30 19:33","completed",null,2);       
+        const InternalOrder1 = new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products1,1);
+        const InternalOrder2 = new InternalOrder.InternalOrder("2021/11/30 19:33","completed",products2,2);       
         const InternalOrder3 = new InternalOrder.InternalOrder("2021/11/31 22:33","issued",[],1);
         
         let res = await InternalOrder_service.updateInternalOrder(InternalOrder1.issueDate,InternalOrder1.state,InternalOrder1.customerId,InternalOrder1.products);
