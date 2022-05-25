@@ -103,7 +103,7 @@ exports.deleteReturnOrderData = () => {
 	return new Promise((resolve, reject) => {
 		// delete return order from ReturnOrderProduct
 		const sql = `DELETE FROM ReturnOrderProduct;`;
-		db.run(sql, [returnOrderId], (err) => {
+		db.run(sql, [], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
@@ -113,7 +113,7 @@ exports.deleteReturnOrderData = () => {
 	}).then(() => new Promise((resolve, reject) => {
 		// delete return order from ReturnOrder
 		const sql = `DELETE FROM ReturnOrder;`;
-		db.run(sql, [returnOrderId], (err) => {
+		db.run(sql, [], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
