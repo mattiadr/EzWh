@@ -35,12 +35,12 @@ describe('get Users', () => {
 
     beforeEach(async () => {
         await U_dao.deleteUserData(); 
-        await U_dao.insertUser(new User.User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier"));
-        await U_dao.insertUser(new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","supplier"));
+        await U_dao.insertUser(new User.User(1,"John","Snow","john.snow@supplier.ezwh.com",null,null,"supplier"));
+        await U_dao.insertUser(new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com",null,null,"supplier"));
     });
 
-    const Users = [new User.User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier"),
-    new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","supplier")];
+    const Users = [new User.User(1,"John","Snow","john.snow@supplier.ezwh.com",null,null,"supplier"),
+    new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com",null,null,"supplier")];
 
     testUsers(Users);
     testUser(Users[0].id, Users[0].name, Users[0].surname, Users[0].email, Users[0].passwordHash, Users[0].passwordSalt, Users[0].role);
@@ -52,12 +52,12 @@ describe('get Suppliers', () => {
 
     beforeEach(async () => {
         await U_dao.deleteUserData(); 
-        await U_dao.insertUser(new User.User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier"));
-        await U_dao.insertUser(new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","supplier"));
+        await U_dao.insertUser(new User.User(1,"John","Snow","john.snow@supplier.ezwh.com",null,null,"supplier"));
+        await U_dao.insertUser(new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com",null,null,"supplier"));
     });
 
-    const Users = [new User.User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier"),
-    new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","supplier")];
+    const Users = [new User.User(1,"John","Snow","john.snow@supplier.ezwh.com",null,null,"supplier"),
+    new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com",null,null,"supplier")];
 
     testSuppliers(Users);
     testUser(Users[0].id, Users[0].name, Users[0].surname, Users[0].email, Users[0].passwordHash, Users[0].passwordSalt, Users[0].role);
@@ -69,13 +69,13 @@ describe("set User", () => {
 
     beforeEach(async () => {
         await U_dao.deleteUserData(); 
-        await U_dao.insertUser(new User.User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier"));
-        await U_dao.insertUser(new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","supplier"));
+        await U_dao.insertUser(new User.User(1,"John","Snow","john.snow@supplier.ezwh.com",null,null,"supplier"));
+        await U_dao.insertUser(new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com",null,null,"supplier"));
     });
 
     test('new User', async () => {
-        const User1 = new User.User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier");
-        const User2 = new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","supplier");
+        const User1 = new User.User(1,"John","Snow","john.snow@supplier.ezwh.com",null,null,"supplier");
+        const User2 = new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com",null,null,"supplier");
 
         let res = await User_service.createUser(User1.name,User1.surname,User1.email,User1.passwordHash,User1.passwordSalt,User1.role);
         expect(res.status).toEqual(201);
@@ -89,9 +89,9 @@ describe("set User", () => {
     });
 
     test('update User', async () => {
-        const User1 = new User.User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier");
-        const User2 = new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com","clerk");       
-        const User3 = new User(3,"Seymour","Skinner","seymour.skinner@clerk.ezwh.com","clerk");
+        const User1 = new User.User(1,"John","Snow","john.snow@supplier.ezwh.com",null,null,"supplier");
+        const User2 = new User.User(2,"Michael","Jordan","michael.jordan@supplier.ezwh.com",null,null,"clerk");       
+        const User3 = new User(3,"Seymour","Skinner","seymour.skinner@clerk.ezwh.com",null,null,"clerk");
         
         let res = await User_service.updateUser(User1.name,User1.surname,User1.email,User1.passwordHash,User1.passwordSalt,User1.role);
         expect(res.status).toEqual(200);
@@ -115,7 +115,7 @@ describe("set User", () => {
 describe("delete User", () => {
     beforeEach(async () => {
         await U_dao.deleteUserData();
-        await U_dao.insertUser(new User.User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier"));
+        await U_dao.insertUser(new User.User(1,"John","Snow","john.snow@supplier.ezwh.com",null,null,"supplier"));
     });
     test('delete User', async () => {
         const idPos = 1;
