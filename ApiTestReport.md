@@ -115,11 +115,19 @@ Item_DAO <-- DatabaseConnection
 
 # Integration approach
 
-    <Write here the integration sequence you adopted, in general terms (top down, bottom up, mixed) and as sequence
-    (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)> 
-    <Some steps may  correspond to unit testing (ex step1 in ex above), presented in other document UnitTestReport.md>
-    <One step will  correspond to API testing>
-    
+    The approach for performing integration tests is Top Down.
+
+     • Step 1, A+B+C:
+     Start from a server router and test all his API with Integration Tests among classes A,B and C with:
+     A: *_dao Class;
+     B: *_service Class;
+     C: *_router of the server.
+
+     • Step 2, A+B:
+     Other Integration Tests (but in the Unit Test folder) between class A: *_dao Class, and B: *_service Class.
+
+     • Step 3, A: 
+     Complete testing with persistance unit tests of some Class A: *_DAO.integration tests between A;
 
 #  Integration Tests
 
@@ -130,21 +138,46 @@ Item_DAO <-- DatabaseConnection
 ## Step 1
 | Classes  | mock up used |Jest test cases |
 |--|--|--|
-||||
+| SKU_router + SKU_service + SKU_DAO | None | None |
+| SKUItem_router + SKUItem_service + SKUItem_DAO | None | None |
+| Position_router + Position_service + Position_DAO | None | None |
+| TestDescriptor_router + TestDescriptor_service + TestDescriptor_DAO | None | None |
+| TestResult_router + TestResult_service + TestResult_DAO | None | None |
+| Item_router + Item_service + Item_DAO | None | None |
+| RestockOrder_router + RestockOrder_service + RestockOrder_DAO | None | None |
+| ReturnOrder_router + ReturnOrder_service + ReturnOrder_DAO | None | None |
+| InternalOrder_router + InternalOrder_service + InternalOrder_DAO | None | None |
+| User_router + User_service + User_DAO | None | None |
 
 
 ## Step 2
 | Classes  | mock up used |Jest test cases |
 |--|--|--|
-||||
+| SKU_service + SKU_DAO | None | SKU_service_dbreal.test |
+| SKUItem_service + SKUItem_DAO | None | SKUitem_service_dbreal.test |
+| Position_service + Position_DAO | None | Position_service_dbreal.test |
+| TestDescriptor_service + TestDescriptor_DAO | None | TestDescriptor_service_dbreal.test |
+| TestResult_service + TestResult_DAO | None | TestResult_service_dbreal.test |
+| Item_service + Item_DAO | None | Item_service_dbreal.test |
+| RestockOrder_service + RestockOrder_DAO | None | RestockOrder_service_dbreal.test |
+| ReturnOrder_service + ReturnOrder_DAO | None | ReturnOrder_service_dbreal.test |
+| InternalOrder_service + InternalOrder_DAO | None | InternalOrder_service_dbreal.test |
+| User_service + User_DAO | None | User_service_dbreal.test |
 
 
-## Step n 
-
-   
+## Step 3 
 | Classes  | mock up used |Jest test cases |
 |--|--|--|
-||||
+| SKU_DAO | None | SKU_dao.test |
+| SKUItem_DAO | None | SKUitem_dao.test |
+| Position_DAO | None | Position_dao.test |
+| TestDescriptor_DAO | None | TestDescriptor_dao.test |
+| TestResult_DAO | None | TestResult_dao.test |
+| Item_DAO | None | Item_dao.test |
+| RestockOrder_DAO | None | RestockOrder_dao.test |
+| ReturnOrder_DAO | None | ReturnOrder_dao.test |
+| InternalOrder_DAO | None | InternalOrder_dao.test |
+| User_DAO | None | User_dao.test |
 
 
 # Coverage of Scenarios and FR
