@@ -1,10 +1,10 @@
 const SKUItem = require('../components/SKUItem');
 const SKU = require('../components/SKU')
 const SKUItemService = require('../services/SKUItem_service');
-
-const skuItem_dao = require('../database/SKUItem_DAO')
-const sku_dao = require('../database/SKU_DAO')
-const SKUItem_service = new SKUItemService(skuItem_dao, sku_dao)
+const skuItem_dao = require('../database/SKUItem_DAO');
+const sku_dao = require('../database/SKU_DAO');
+const SKUItem_service = new SKUItemService(skuItem_dao, sku_dao);
+const DatabaseConnection = require("../database/DatabaseConnection");
 
 async function testSKUItems(expectedSKUItems){
   test('get all SKU Item', async () => {

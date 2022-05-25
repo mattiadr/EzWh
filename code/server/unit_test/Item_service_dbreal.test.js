@@ -2,6 +2,7 @@ const Item = require('../components/Item');
 const ItemService = require('../services/Item_service');
 const I_dao = require('../database/Item_DAO');
 const Item_service = new ItemService(I_dao);
+const DatabaseConnection = require("../database/DatabaseConnection");
 
 async function testItems(expectedItems) {
     test('get all Items', async () => {
@@ -76,7 +77,7 @@ describe("set Item", () => {
         res = await Item_service.updateItem(Item2.id,Item2.description,Item2.price,Item2.SKUID,Item2.supplierId);
         expect(res.status).toEqual(200)
         res = await Item_service.getItemByID(Item2.id);
-        expect(res).toEqual({});
+        expect(res).toEqual(Item2);
 
         res = await Item_service.updateItem(Item3.id,Item3.aisleID, Item3.row, Item3.col, Item3.maxWeight, Item3.maxVolume, Item3.occupiedWeight, Item3.occupiedVolume);
         expect(res.status).toEqual(404);

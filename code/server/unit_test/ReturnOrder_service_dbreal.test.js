@@ -2,8 +2,9 @@ const ReturnOrder = require('../components/ReturnOrder');
 const RestockOrder = require('../components/RestockOrder');
 const Item = require('../components/Item');
 const ReturnOrderService = require('../services/ReturnOrder_service');
-const returnOrder_dao = require('../database/ReturnOrder_DAO')
-const restockOrder_DAO = require('../database/RestockOrder_DAO')
+const returnOrder_dao = require('../database/ReturnOrder_DAO');
+const restockOrder_DAO = require('../database/RestockOrder_DAO');
+const DatabaseConnection = require("../database/DatabaseConnection");
 
 const ReturnOrder_service = new ReturnOrderService(returnOrder_dao, restockOrder_DAO)
 

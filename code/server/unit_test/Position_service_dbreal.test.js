@@ -2,6 +2,7 @@ const Position = require('../components/Position');
 const PositionService = require('../services/Position_service');
 const P_dao = require('../database/Position_DAO');
 const Position_service = new PositionService(P_dao);
+const DatabaseConnection = require("../database/DatabaseConnection");
 
 async function testPositions(expectedPositions) {
     test('get all Positions', async () => {

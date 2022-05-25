@@ -2,6 +2,7 @@ const User = require('../components/User');
 const UserService = require('../services/User_service');
 const U_dao = require('../database/User_DAO');
 const User_service = new UserService(U_dao);
+const DatabaseConnection = require("../database/DatabaseConnection");
 
 async function testUsers(expectedUsers) {
     test('get all Users', async () => {

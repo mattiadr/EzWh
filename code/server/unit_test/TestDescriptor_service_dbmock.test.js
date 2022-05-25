@@ -4,6 +4,7 @@ const TestDescriptorService = require('../services/TestDescriptor_service');
 const testD_dao = require('../mock_database/mock_TestDescriptor_dao');
 const sku_dao = require('../mock_database/mock_SKU_dao');
 const TestDescriptor_service = new TestDescriptorService(testD_dao, sku_dao);
+const DatabaseConnection = require("../database/DatabaseConnection");
 
 // test case definition
 describe('get testDescriptors', () => {

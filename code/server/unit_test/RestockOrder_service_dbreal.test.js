@@ -3,6 +3,7 @@ const skuItem = require('../components/SKUItem');
 const RestockOrderService = require('../services/RestockOrder_service');
 const RKO_dao = require('../database/RestockOrder_DAO');
 const RestockOrder_service = new RestockOrderService(RKO_dao);
+const DatabaseConnection = require("../database/DatabaseConnection");
 
 async function testRestockOrders(expectedRestockOrders) {
     test('get all RestockOrders', async () => {

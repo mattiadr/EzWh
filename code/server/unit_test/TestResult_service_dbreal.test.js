@@ -1,13 +1,12 @@
 const TestResult = require('../components/TestResult');
 const TestDescriptor = require('../components/TestDescriptor');
 const SKUItem = require('../components/SKUItem');
-
 const TestResultService = require('../services/TestResult_service');
-
 const testR_dao = require('../database/TestResult_DAO');
 const testD_dao = require('../database/TestDescriptor_DAO');
 const SI_dao = require('../database/SKUItem_dao');
 const TestResult_service = new TestResultService(testR_dao, testD_dao, SI_dao);
+const DatabaseConnection = require("../database/DatabaseConnection");
 
 async function testTestResults(rfid,expectedTestResults) {
     test('get all Test Results', async () => {

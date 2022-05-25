@@ -3,6 +3,7 @@ const Item = require('../components/Item');
 const InternalOrderService = require('../services/InternalOrder_service');
 const IO_dao = require('../database/InternalOrder_DAO');
 const InternalOrder_service = new InternalOrderService(IO_dao);
+const DatabaseConnection = require("../database/DatabaseConnection");
 
 products =[{"SKUId":12,"description":"a product","price":10.99,"qty":2},
 {"SKUId":180,"description":"another product","price":11.99,"qty":3}];
