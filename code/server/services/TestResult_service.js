@@ -9,7 +9,7 @@ class TestResultService {
 		this.#skuItem_DAO = skuItem_DAO;
     }
 
-	getTestResults = async (rfid) => {
+	async getTestResults(rfid) {
 		try {
 			const SKUItem = await this.#skuItem_DAO.selectSKUItemByRFID(rfid);
 			if (!SKUItem) return {status: 404, body: "skuitem not found"};
@@ -20,7 +20,7 @@ class TestResultService {
 		}
 	}
 	
-	getTestResultByID = async (rfid, id) => {
+	async getTestResultByID(rfid, id) {
 		try {
 			const SKUItem = await this.#skuItem_DAO.selectSKUItemByRFID(rfid);
 			if (!SKUItem) return {status: 404, body: "skuitem not found"};
@@ -35,7 +35,7 @@ class TestResultService {
 		}
 	}
 	
-	createTestResult = async (rfid, idTestDescriptor, date, result) => {
+	async createTestResult(rfid, idTestDescriptor, date, result) {
 		try {
 			const SKUItem = await this.#skuItem_DAO.selectSKUItemByRFID(rfid);
 			if (!SKUItem) return {status: 404, body: "skuitem not found"};
@@ -48,7 +48,7 @@ class TestResultService {
 		}
 	}
 	
-	updateTestResult = async (rfid, id, newIdTestDescriptor, newDate, newResult) => {
+	async updateTestResult(rfid, id, newIdTestDescriptor, newDate, newResult) {
 		try {
 			const SKUItem = await this.#skuItem_DAO.selectSKUItemByRFID(rfid);
 			if (!SKUItem) return {status: 404, body: "skuitem not found"};
@@ -67,7 +67,7 @@ class TestResultService {
 		}
 	}
 	
-	deleteTestResult = (rfid, id) => {
+	deleteTestResult(rfid, id) {
 		return this.#testResult_DAO.deleteTestResultByID(rfid, id);
 	}
 }

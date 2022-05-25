@@ -9,15 +9,15 @@ class TestDescriptorService {
 		this.#sku_DAO = sku_DAO;
     }
 
-	getTestDescriptors = () => {
+	getTestDescriptors() {
 		return this.#testDescriptor_DAO.selectTestDescriptors();
 	}
 	
-	getTestDescriptorByID = (id) => {
+	getTestDescriptorByID(id) {
 		return this.#testDescriptor_DAO.selectTestDescriptorByID(id);
 	}
 	
-	createTestDescriptor = async (name, procedureDescription, idSKU) => {
+	async createTestDescriptor(name, procedureDescription, idSKU) {
 		try {
 			const SKU = await this.#sku_DAO.selectSKUbyID(idSKU);
 			if (!SKU) return {status: 404, body: "sku not found"};
@@ -28,7 +28,7 @@ class TestDescriptorService {
 		}
 	}
 	
-	updateTestDescriptor = async (id, newName, newProcedureDescription, newIdSKU) => {
+	async updateTestDescriptor(id, newName, newProcedureDescription, newIdSKU) {
 		try {
 			const testDescriptor = await this.#testDescriptor_DAO.selectTestDescriptorByID(id);
 			if (!testDescriptor) return {status: 404, body: "id not found"};
@@ -45,7 +45,7 @@ class TestDescriptorService {
 		}
 	}
 	
-	deleteTestDescriptor = (id) => {
+	deleteTestDescriptor(id) {
 		return this.#testDescriptor_DAO.deleteTestDescriptorByID(id);
 	}
 }

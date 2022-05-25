@@ -7,11 +7,11 @@ class PositionService {
 		this.#position_DAO = position_DAO;
 	}
 
-	getPositions = () => {
+	getPositions() {
 		return this.#position_DAO.selectPositions();
 	}
 	
-	createPosition = async (positionID, aisleID, row, col, maxWeight, maxVolume) => {
+	async createPosition(positionID, aisleID, row, col, maxWeight, maxVolume) {
 		if (positionID.slice(0, 4) !== aisleID || positionID.slice(4, 8) !== row || positionID.slice(8, 12) !== col)
 			return { status: 422, body: "ID isn't coherent with other params"};
 		try {
@@ -23,7 +23,7 @@ class PositionService {
 		}
 	}
 	
-	updatePosition = async (posID, newPositionID, newAisleID = undefined, newRow = undefined, newCol = undefined, newMaxWeight = undefined, newMaxVolume = undefined, newOccupiedWeight = undefined, newOccupiedVolume = undefined) => {
+	async updatePosition(posID, newPositionID, newAisleID = undefined, newRow = undefined, newCol = undefined, newMaxWeight = undefined, newMaxVolume = undefined, newOccupiedWeight = undefined, newOccupiedVolume = undefined) {
 		try {
 			let position = await this.#position_DAO.selectPositionByID(posID);
 			if (!position) return { status: 404, body: "position not found" };
@@ -50,7 +50,7 @@ class PositionService {
 		}
 	}
 	
-	deletePosition = (posID) => {
+	deletePosition(posID) {
 		return this.#position_DAO.deletePosition(posID);
 	}
 
