@@ -39,8 +39,8 @@ describe('get InternalOrders', () => {
 
     beforeEach(async () => {
         await IO_dao.deleteInternalOrderData(); 
-        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products1,1));
-        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/30 19:33","completed",products2,1));
+        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder(1,"2021/11/29 09:33","accepted",products1,1));
+        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder(2,"2021/11/30 19:33","completed",products2,1));
     });
 
     const InternalOrders = [new InternalOrder.InternalOrder(1,"2021/11/29 09:33","accepted",products1,1),

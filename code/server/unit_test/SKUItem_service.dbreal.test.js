@@ -8,14 +8,14 @@ const SKUItem_service = new SKUItemService(skuItem_dao, sku_dao)
 
 async function testSKUItems(expectedSKUItems){
   test('get all SKU Item', async () => {
-    let res = await skuItem_dao.selectSKUItems();
+    let res = await SKUItem_service.getSKUItems();
     expect(res).toEqual(expectedSKUItems);
   })
 }
 
 async function testSKUItem(RFID, SKUID, available, dateOfStock){
   test('get SKU Item', async () => {
-    let res = await skuItem_dao.getSKUItemByRFID(RFID);
+    let res = await SKUItem_service.getSKUItemByRFID(RFID);
     expect(res.RFID).toStrictEqual(RFID);
     expect(res.SKUID).toStrictEqual(SKUID);
     expect(res.available).toStrictEqual(available);
@@ -26,9 +26,9 @@ async function testSKUItem(RFID, SKUID, available, dateOfStock){
 // test case definition
 describe("get SKU Items", () => {
   beforeEach(async () => {
-    await skuItem_dao.deleteSKUItem();
-    await skuItem_dao.insertSKU(new SKUItem("12345678901234567890123456789014", 1, 0, "2021/11/29 12:30"));
-    await skuItem_dao.insertSKU(new SKUItem("12345678901234567890123456789015", 2, 1, "2021/11/30 12:31"));
+    await skuItem_dao.deleteSKUItemData();
+    await skuItem_dao.insertSKUItem(new SKUItem("12345678901234567890123456789014", 1, 0, "2021/11/29 12:30"));
+    await skuItem_dao.insertSKUItem(new SKUItem("12345678901234567890123456789015", 2, 1, "2021/11/30 12:31"));
   });
 
   const SKUItems = [new SKUItem("12345678901234567890123456789014", 1, 0, "2021/11/29 12:30"), 

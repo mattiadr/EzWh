@@ -1,9 +1,7 @@
 const ReturnOrder = require('../components/ReturnOrder');
 const RestockOrder = require('../components/RestockOrder');
 const Item = require('../components/Item');
-
 const ReturnOrderService = require('../services/ReturnOrder_service');
-
 const returnOrder_dao = require('../database/ReturnOrder_DAO')
 const restockOrder_DAO = require('../database/RestockOrder_DAO')
 
@@ -16,7 +14,7 @@ products2 = [new Item(null,"a product",10.99,12,null), new Item(null,"another pr
 
 async function testReturnOrders(expectedReturnOrders){
   test('get all Return Orders', async () => {
-    let res = await returnOrder_dao.selectReturnOrders();
+    let res = await ReturnOrder_service.getReturnOrders();
     expect(res).toEqual(expectedReturnOrders);
   })
 }

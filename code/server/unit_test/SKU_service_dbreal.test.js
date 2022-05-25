@@ -16,7 +16,7 @@ async function testSKUs(expectedSKUs){
 
 async function testSKU(id, description, weight, volume, price, notes, positionId, availableQuantity){
   test('get SKU', async () => {
-    let res = await sku_dao.getSKUbyId(id);
+    let res = await SKU_service.getSKUbyId(id);
     expect(res.id).toStrictEqual(id);
     expect(res.description).toStrictEqual(description);
     expect(res.weight).toStrictEqual(weight);
