@@ -74,16 +74,3 @@ exports.deleteUserByID = (id) => {
         });
     });
 }
-
-exports.deleteUserData = () => {
-    return new Promise((resolve, reject) => {
-        const sql = `DELETE FROM User`;
-        db.run(sql, [], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        });
-    });
-}

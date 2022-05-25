@@ -99,10 +99,6 @@ class RestockOrderService {
 	deleteRestockOrder = (id) => {
 		return this.#restockOrder_DAO.deleteRestockOrder(id);
 	}
-
-	deleteRestockOrders = () => {
-		return this.#restockOrder_DAO.deleteRestockOrderData();
-	}
 }
 
 module.exports = RestockOrderService;

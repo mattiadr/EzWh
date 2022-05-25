@@ -76,19 +76,6 @@ exports.deleteSKU = (SKUid) => {
     });
 }
 
-exports.deleteSKUData = () => {
-    return new Promise((resolve, reject) => {
-        const sql = `DELETE FROM SKU;`;
-        db.run(sql, [], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        });
-    });
-}
-
 exports.checkIfPositionOccupied = (positionID) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM SKU WHERE positionId = ?;`;

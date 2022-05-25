@@ -70,10 +70,6 @@ class TestResultService {
 	deleteTestResult = (rfid, id) => {
 		return this.#testResult_DAO.deleteTestResultByID(rfid, id);
 	}
-
-	deleteTestResults = () => {
-		return this.#testResult_DAO.deleteTestResultData();
-	}
 }
 
 module.exports = TestResultService;

@@ -16,7 +16,7 @@ const DatabaseConnection = require("./database/DatabaseConnection");
 // init express
 const app = new express();
 const port = 3001;
-const db = DatabaseConnection.getInstance();
+DatabaseConnection.getInstance(); // make sure tables are created at server startup
 
 app.use(express.json());
 

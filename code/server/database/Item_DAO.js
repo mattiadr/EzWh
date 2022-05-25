@@ -91,16 +91,3 @@ exports.deleteItemByID = (id) => {
         });
     });
 }
-
-exports.deleteItemData = () => {
-    return new Promise((resolve, reject) => {
-        const sql = `DELETE FROM Item`;
-        db.run(sql, [], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve();
-            }
-        });
-    });
-}

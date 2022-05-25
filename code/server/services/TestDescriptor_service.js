@@ -48,12 +48,6 @@ class TestDescriptorService {
 	deleteTestDescriptor = (id) => {
 		return this.#testDescriptor_DAO.deleteTestDescriptorByID(id);
 	}
-
-	//TEMPORARY
-	deleteTestDescriptors = () =>{
-		return this.#testDescriptor_DAO.deleteTestDescriptorData();
-	}
-	
 }
 
 module.exports = TestDescriptorService;
