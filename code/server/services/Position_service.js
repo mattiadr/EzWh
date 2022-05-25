@@ -10,6 +10,10 @@ class PositionService {
 	getPositions() {
 		return this.#position_DAO.selectPositions();
 	}
+
+	getPositionByID(id) {
+		return this.#position_DAO.selectPositionByID(id);
+	}
 	
 	async createPosition(positionID, aisleID, row, col, maxWeight, maxVolume) {
 		if (positionID.slice(0, 4) !== aisleID || positionID.slice(4, 8) !== row || positionID.slice(8, 12) !== col)

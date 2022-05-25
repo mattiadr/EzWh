@@ -31,7 +31,10 @@ async function testReturnOrder(id, returnDate, restockOrderId, products){
 
 // test case definition
 describe('get Return Order', () => {
-
+  beforeAll(async () => {
+    await DatabaseConnection.createConnection();
+    await DatabaseConnection.resetAllTables();
+});
     beforeEach(async () => {
         await returnOrder_dao.deleteReturnOrderData(); 
         await returnOrder_dao.insertReturnOrder(new ReturnOrder(1, "2021/11/29 09:33", 1,products1));
@@ -47,7 +50,10 @@ describe('get Return Order', () => {
 });
 
 describe("set Return Order", () => {
-
+  beforeAll(async () => {
+    await DatabaseConnection.createConnection();
+    await DatabaseConnection.resetAllTables();
+});
     beforeEach(async () => {
         await returnOrder_dao.deleteReturnOrderData(); 
         await returnOrder_dao.insertReturnOrder(new ReturnOrder(1, "2021/11/29 09:33", 1,products1));
@@ -71,14 +77,17 @@ describe("set Return Order", () => {
 });
 
 describe("delete Return Order", () => {
-    beforeEach(async () => {
+  beforeAll(async () => {
+    await DatabaseConnection.createConnection();
+    await DatabaseConnection.resetAllTables();
+});  
+  beforeEach(async () => {
         await returnOrder_dao.deleteReturnOrderData();
         await returnOrder_dao.insertReturnOrder(new ReturnOrder(1, "2021/11/29 09:33", 1,products1));
     });
     test('delete Return Order', async () => {
         const id = 1;
         let res = await ReturnOrder_service.deleteReturnOrder(id);
-        expect(res).toEqual(true);
         res = await ReturnOrder_service.getReturnOrderByID(id);
         expect(res).toBeNull();
 

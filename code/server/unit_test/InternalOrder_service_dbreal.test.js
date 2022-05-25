@@ -4,10 +4,8 @@ const InternalOrderService = require('../services/InternalOrder_service');
 const IO_dao = require('../database/InternalOrder_DAO');
 const InternalOrder_service = new InternalOrderService(IO_dao);
 
-products1 = [new Item(null,"a product",10.99,12,null), new Item(null,"another product",11.99,180,null)];
-// where do I put the quantity?
-products2 = [new Item(null,"a product",10.99,12,null), new Item(null,"another product",11.99,180,null)];
-// where do I put the RFID? 
+products =[{"SKUId":12,"description":"a product","price":10.99,"qty":2},
+{"SKUId":180,"description":"another product","price":11.99,"qty":3}];
 
 async function testInternalOrders(expectedInternalOrders) {
     test('get all InternalOrders', async () => {
@@ -39,12 +37,12 @@ describe('get InternalOrders', () => {
 
     beforeEach(async () => {
         await IO_dao.deleteInternalOrderData(); 
-        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder(1,"2021/11/29 09:33","accepted",products1,1));
-        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder(2,"2021/11/30 19:33","completed",products2,1));
+        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder(1,"2021/11/29 09:33","accepted",products,1));
+        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder(2,"2021/11/30 19:33","completed",products,1));
     });
-
-    const InternalOrders = [new InternalOrder.InternalOrder(1,"2021/11/29 09:33","accepted",products1,1),
-    new InternalOrder.InternalOrder(2,"2021/11/30 19:33","completed",products2,1)];
+    
+    const InternalOrders = [new InternalOrder.InternalOrder(1,"2021/11/29 09:33","accepted",products,1),
+    new InternalOrder.InternalOrder(2,"2021/11/30 19:33","completed",products,1)];
 
     testInternalOrders(InternalOrders);
     testInternalOrder(InternalOrders[0].id, InternalOrders[0].issueDate, InternalOrders[0].state, InternalOrders[0].customerId, InternalOrders[0].products);
@@ -57,12 +55,12 @@ describe('get InternalOrders Issued', () => {
 
     beforeEach(async () => {
         await IO_dao.deleteInternalOrderData(); 
-        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products1,1));
-        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/30 19:33","completed",products2,1));
+        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products,1));
+        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/30 19:33","completed",products,1));
     });
-
-    const InternalOrders = [new InternalOrder.InternalOrder(1,"2021/11/29 09:33","accepted",products1,1),
-    new InternalOrder.InternalOrder(2,"2021/11/30 19:33","completed",products2,1)];
+ 
+    const InternalOrders = [new InternalOrder.InternalOrder(1,"2021/11/29 09:33","accepted",products,1),
+    new InternalOrder.InternalOrder(2,"2021/11/30 19:33","completed",products,1)];
 
     testInternalOrdersIssued(InternalOrders);
     testInternalOrder(InternalOrders[0].id, InternalOrders[0].issueDate, InternalOrders[0].state, InternalOrders[0].customerId, InternalOrders[0].products);
@@ -74,13 +72,14 @@ describe("set InternalOrder", () => {
 
     beforeEach(async () => {
         await IO_dao.deleteInternalOrderData(); 
-        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products1,1));
-        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/30 19:33","completed",products2,1));
+        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products,1));
+        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/30 19:33","completed",products,1));
     });
 
-    test('new InternalOrder.InternalOrder', async () => {
-        const InternalOrder1 = new InternalOrder.InternalOrder1("2021/11/29 09:33","accepted",products1,1);
-        const InternalOrder2 = new InternalOrder.InternalOrder2("2021/11/30 19:33","completed",products2,1);
+    test('new InternalOrder', async () => {
+
+        const InternalOrder1 = new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products,1);
+        const InternalOrder2 = new InternalOrder.InternalOrder("2021/11/30 19:33","completed",products,1);
 
         let res = await InternalOrder_service.createInternalOrder(InternalOrder1.issueDate,InternalOrder1.state,InternalOrder1.customerId,InternalOrder1.products);
         expect(res.status).toEqual(201);
@@ -94,9 +93,9 @@ describe("set InternalOrder", () => {
     });
 
     test('update InternalOrder', async () => {
-        const InternalOrder1 = new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products1,1);
-        const InternalOrder2 = new InternalOrder.InternalOrder("2021/11/30 19:33","completed",products2,2);       
-        const InternalOrder3 = new InternalOrder.InternalOrder("2021/11/31 22:33","issued",[],1);
+        const InternalOrder1 = new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products,1);
+        const InternalOrder2 = new InternalOrder.InternalOrder("2021/11/30 19:33","completed",products,2);       
+        const InternalOrder3 = new InternalOrder.InternalOrder("2021/11/31 22:33","issued",products,1);
         
         let res = await InternalOrder_service.updateInternalOrder(InternalOrder1.issueDate,InternalOrder1.state,InternalOrder1.customerId,InternalOrder1.products);
         expect(res.status).toEqual(200);
@@ -120,12 +119,11 @@ describe("set InternalOrder", () => {
 describe("delete InternalOrder", () => {
     beforeEach(async () => {
         await IO_dao.deleteInternalOrderData();
-        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products1,1));
+        await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products,1));
     });
     test('delete InternalOrder', async () => {
         const idPos = 1;
         let res = await InternalOrder_service.deleteTestDescriptor(idPos);
-        expect(res).toEqual(true);
         res = await InternalOrder_service.getTestDescriptorByID(idPos);
         expect(res).toBeNull();
 

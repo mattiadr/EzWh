@@ -7,7 +7,10 @@ const TestDescriptor_service = new TestDescriptorService(testD_dao, sku_dao);
 
 // test case definition
 describe('get testDescriptors', () => {
-
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(() => {
         testD_dao.selectTestDescriptors.mockReset();
         testD_dao.selectTestDescriptorByID.mockReset();
@@ -51,6 +54,10 @@ describe('get testDescriptors', () => {
 });
 
 describe("set TestDescriptor", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(() => {
         sku_dao.selectSKUbyID.mockReset();
         testD_dao.selectTestDescriptorByID.mockReset();
@@ -100,6 +107,10 @@ describe("set TestDescriptor", () => {
 });
 
 describe("delete TestDescriptor", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(() => {
         testD_dao.deleteTestDescriptorByID.mockReset();
         testD_dao.deleteTestDescriptorByID.mockReturnValueOnce(true);

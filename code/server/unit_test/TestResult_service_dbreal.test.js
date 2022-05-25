@@ -30,6 +30,10 @@ async function testTestResult(id, idTestDescriptor, date, result, rfid) {
 
 // test case definition
 describe('get Test Results', () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
 
     beforeEach(async () => {
         await testR_dao.deleteTestResultData();
@@ -50,6 +54,10 @@ describe('get Test Results', () => {
 
 describe("set Test Result", () => {
 
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await testR_dao.deleteTestResultData();
         await testD_dao.deleteTestDescriptorData();
@@ -101,6 +109,10 @@ describe("set Test Result", () => {
 });
 
 describe("delete TestDescriptor", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await testR_dao.deleteTestResultData();
         await testR_dao.insertTestResult(new TestResult(1, 12, "2021/11/29", true, "12345678901234567890123456789014"));
@@ -109,7 +121,6 @@ describe("delete TestDescriptor", () => {
         const id = 1;
         const rfid = "12345678901234567890123456789014"
         let res = await TestResult_service.deleteTestResult(rfid, id);
-        expect(res).toEqual(true);
         res = await TestResult_service.getTestResultByID(rfid,id);
         expect(res).toBeNull();
 

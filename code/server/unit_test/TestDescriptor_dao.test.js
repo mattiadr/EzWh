@@ -68,6 +68,10 @@ async function testDeleteTestDescriptor(id, name, procedureDescription, idSKU) {
 }
 
 describe("testDao_selectTestDescriptors", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await testD_dao.deleteTestDescriptorData();
         await testD_dao.insertTestDescriptor(new TestDescriptor(1, "test descriptor 1", "This test is described by...", 1));
@@ -84,6 +88,10 @@ describe("testDao_selectTestDescriptors", () => {
 });
 
 describe('testDao_newTestDescriptor', () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await testD_dao.deleteTestDescriptorData();
     });
@@ -98,6 +106,10 @@ describe('testDao_newTestDescriptor', () => {
 
 describe('testDao_updateTestDescriptor', () => {
     beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
+    beforeAll(async () => {
         await testD_dao.deleteTestDescriptorData();
         await testD_dao.insertTestDescriptor(new TestDescriptor(1, "test descriptor 1", "This test is described by...", 1));
     });
@@ -106,6 +118,10 @@ describe('testDao_updateTestDescriptor', () => {
 });
 
 describe("testDao_deleteTestDescriptor", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await testD_dao.deleteTestDescriptorData();
         await testD_dao.insertTestDescriptor(new TestDescriptor(1, "test descriptor 1", "This test is described by...", 1));

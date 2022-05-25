@@ -30,7 +30,10 @@ async function testRestockOrder(id, issueDate, state, supplierId) {
 
 // test case definition
 describe('get RestockOrders', () => {
-
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData(); 
         await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
@@ -47,7 +50,10 @@ describe('get RestockOrders', () => {
 });
 
 describe('get RestockOrders Issued', () => {
-
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData(); 
         await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
@@ -64,7 +70,10 @@ describe('get RestockOrders Issued', () => {
 });
 
 describe("set RestockOrder", () => {
-
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData(); 
         await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
@@ -136,6 +145,10 @@ describe("set RestockOrder", () => {
 });
 
 describe("delete RestockOrder", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData();
         await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
@@ -143,7 +156,6 @@ describe("delete RestockOrder", () => {
     test('delete RestockOrder', async () => {
         const idPos = 1;
         let res = await RestockOrder_service.deleteTestDescriptor(idPos);
-        expect(res).toEqual(true);
         res = await RestockOrder_service.getTestDescriptorByID(idPos);
         expect(res).toBeNull();
 

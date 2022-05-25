@@ -23,7 +23,10 @@ async function testItem(id, description, price, SKUID, supplierId) {
 
 // test case definition
 describe('get Items', () => {
-
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await I_dao.deleteItemData(); 
         await I_dao.insertItem(new Item(1,"a new item",10.99,1,2));
@@ -40,7 +43,10 @@ describe('get Items', () => {
 });
 
 describe("set Item", () => {
-
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await I_dao.deleteItemData(); 
         await I_dao.insertItem(new Item(1,"a new item",10.99,1,2));
@@ -48,18 +54,13 @@ describe("set Item", () => {
     });
 
     test('new Item', async () => {
-        const Item1 = new Item(1,"a new item",10.99,1,2);
-        const Item2 = new Item(2,"another item",12.99,2,1);
-
+        const Item1 = new Item(12,"a new item",10.99,1,2);
+        
         let res = await Item_service.createItem(Item1.id,Item1.description,Item1.price,Item1.SKUID,Item1.supplierId);
         expect(res.status).toEqual(201);
         res = await Item_service.getItemByID(Item1.id);
         expect(res).toEqual(Item1);
 
-        res = await Item_service.createItem(Item2.id,Item2.description,Item2.price,Item2.SKUID,Item2.supplierId);
-        expect(res.status).toEqual(404);
-        res = await Item_service.getItemByID(Item2.id);
-        expect(res).toBeNull();
     });
 
     test('update Item', async () => {
@@ -73,29 +74,31 @@ describe("set Item", () => {
         expect(res).toEqual(Item1);
 
         res = await Item_service.updateItem(Item2.id,Item2.description,Item2.price,Item2.SKUID,Item2.supplierId);
-        expect(res.status).toEqual(404);
-        expect(res.body).toEqual("Item not found");
+        expect(res.status).toEqual(200)
         res = await Item_service.getItemByID(Item2.id);
         expect(res).toEqual({});
 
         res = await Item_service.updateItem(Item3.id,Item3.aisleID, Item3.row, Item3.col, Item3.maxWeight, Item3.maxVolume, Item3.occupiedWeight, Item3.occupiedVolume);
         expect(res.status).toEqual(404);
-        expect(res.body).toEqual("id not found");
+        expect(res.body).toEqual("item not found");
         res = await Item_service.getItemByID(Item3.id);
         expect(res).toBeNull();
     });
 });
 
 describe("delete Item", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await I_dao.deleteItemData();
         await I_dao.insertItem(new Item(1,"a new item",10.99,1,2));
     });
     test('delete Item', async () => {
-        const idPos = 1;
-        let res = await Item_service.deleteTestDescriptor(idPos);
-        expect(res).toEqual(true);
-        res = await Item_service.getTestDescriptorByID(idPos);
+        const idItem = 1;
+        let res = await Item_service.deleteItem(idItem);
+        res = await Item_service.getItemByID(idItem);
         expect(res).toBeNull();
 
     });

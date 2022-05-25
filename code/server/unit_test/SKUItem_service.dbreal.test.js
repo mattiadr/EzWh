@@ -25,6 +25,10 @@ async function testSKUItem(RFID, SKUID, available, dateOfStock){
 
 // test case definition
 describe("get SKU Items", () => {
+  beforeAll(async () => {
+    await DatabaseConnection.createConnection();
+    await DatabaseConnection.resetAllTables();
+});
   beforeEach(async () => {
     await skuItem_dao.deleteSKUItemData();
     await skuItem_dao.insertSKUItem(new SKUItem("12345678901234567890123456789014", 1, 0, "2021/11/29 12:30"));
@@ -40,6 +44,10 @@ describe("get SKU Items", () => {
 })
 
 describe("set SKU Items", () => {
+  beforeAll(async () => {
+    await DatabaseConnection.createConnection();
+    await DatabaseConnection.resetAllTables();
+});
   beforeEach(async () => {
     await skuItem_dao.deleteSKUItemData();
     await sku_dao.deleteSKUData()
@@ -88,6 +96,10 @@ describe("set SKU Items", () => {
 })
 
 describe("delete SKU Item", () => {
+  beforeAll(async () => {
+    await DatabaseConnection.createConnection();
+    await DatabaseConnection.resetAllTables();
+});
   beforeEach(async () => {
     await skuItem_dao.deleteSKUItemData();
     await skuItem_dao.insertSKUItem(new SKUItem("12345678901234567890123456789016", 1, 2, "2021/12/29 12:32"));
@@ -95,7 +107,6 @@ describe("delete SKU Item", () => {
   test('delete SKU', async () => {
     const RFID = "12345678901234567890123456789016";
     let res = await SKUItem_service.deleteSKUItem(RFID);
-    expect(res).toEqual(true);
     res = await SKUItem_service.getSKUItemByRFID(RFID);
     expect(res).toBeNull();
   });

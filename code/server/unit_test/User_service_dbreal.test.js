@@ -32,6 +32,10 @@ async function testUser(id, name, surname, email, passwordHash, passwordSalt, ro
 
 // test case definition
 describe('get Users', () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
 
     beforeEach(async () => {
         await U_dao.deleteUserData(); 
@@ -49,6 +53,10 @@ describe('get Users', () => {
 });
 
 describe('get Suppliers', () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
 
     beforeEach(async () => {
         await U_dao.deleteUserData(); 
@@ -66,6 +74,10 @@ describe('get Suppliers', () => {
 });
 
 describe("set User", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
 
     beforeEach(async () => {
         await U_dao.deleteUserData(); 
@@ -113,6 +125,10 @@ describe("set User", () => {
 });
 
 describe("delete User", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+    });
     beforeEach(async () => {
         await U_dao.deleteUserData();
         await U_dao.insertUser(new User.User(1,"John","Snow","john.snow@supplier.ezwh.com","supplier"));
@@ -120,7 +136,6 @@ describe("delete User", () => {
     test('delete User', async () => {
         const idPos = 1;
         let res = await User_service.deleteTestDescriptor(idPos);
-        expect(res).toEqual(true);
         res = await User_service.getTestDescriptorByID(idPos);
         expect(res).toBeNull();
 

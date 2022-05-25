@@ -30,6 +30,10 @@ async function testSKU(id, description, weight, volume, price, notes, positionId
 
 // test case definition
 describe("get SKUs", () => {
+  beforeAll(async () => {
+    await DatabaseConnection.createConnection();
+    await DatabaseConnection.resetAllTables();
+});
   beforeEach(async () => {
     await sku_dao.deleteSKUData();
     await sku_dao.insertSKU(new SKU(1, "sku1", 100, 50, 10.99, "first SKU", 50, "800234523412"));
@@ -45,6 +49,10 @@ describe("get SKUs", () => {
 })
 
 describe("set SKUs", () => {
+  beforeAll(async () => {
+    await DatabaseConnection.createConnection();
+    await DatabaseConnection.resetAllTables();
+});
   beforeEach(async () => {
     await sku_dao.deleteSKUData();
     await sku_dao.insertSKU(new SKU(1, "sku1", 100, 50, 10.99, "first SKU", 50, "800234523412"));
@@ -91,6 +99,10 @@ describe("set SKUs", () => {
 })
 
 describe("delete SKU", () => {
+beforeAll(async () => {
+    await DatabaseConnection.createConnection();
+    await DatabaseConnection.resetAllTables();
+});
   beforeEach(async () => {
     await sku_dao.deleteSKUData();
     await sku_dao.insertSKU(new SKU(1, "sku1", 100, 50, 10.99, "first SKU", 50, "800234523412"));
@@ -98,7 +110,6 @@ describe("delete SKU", () => {
   test('delete SKU', async () => {
     const idSKU = 1;
     let res = await SKU_service.deleteSKU(idSKU);
-    expect(res).toEqual(true);
     res = await SKU_service.getSKUbyId(idSKU);
     expect(res).toBeNull();
 
