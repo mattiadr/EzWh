@@ -51,12 +51,12 @@ describe("set Item", () => {
         const Item1 = new Item(1,"a new item",10.99,1,2);
         const Item2 = new Item(2,"another item",12.99,2,1);
 
-        let res = await Item_service.createItem(Item1.description,Item1.price,Item1.SKUID,Item1.supplierId);
+        let res = await Item_service.createItem(Item1.id,Item1.description,Item1.price,Item1.SKUID,Item1.supplierId);
         expect(res.status).toEqual(201);
         res = await Item_service.getItemByID(Item1.id);
         expect(res).toEqual(Item1);
 
-        res = await Item_service.createItem(Item2.description,Item2.price,Item2.SKUID,Item2.supplierId);
+        res = await Item_service.createItem(Item2.id,Item2.description,Item2.price,Item2.SKUID,Item2.supplierId);
         expect(res.status).toEqual(404);
         res = await Item_service.getItemByID(Item2.id);
         expect(res).toBeNull();
@@ -67,18 +67,18 @@ describe("set Item", () => {
         const Item2 = new Item(2,"another item",12.99,2,2);       
         const Item3 = new Item(3,"yet another item",15.99,3,5);
         
-        let res = await Item_service.updateItem(Item1.description,Item1.price,Item1.SKUID,Item1.supplierId);
+        let res = await Item_service.updateItem(Item1.id,Item1.description,Item1.price,Item1.SKUID,Item1.supplierId);
         expect(res.status).toEqual(200);
         res = await Item_service.getItemByID(Item1.id);
         expect(res).toEqual(Item1);
 
-        res = await Item_service.updateItem(Item2.description,Item2.price,Item2.SKUID,Item2.supplierId);
+        res = await Item_service.updateItem(Item2.id,Item2.description,Item2.price,Item2.SKUID,Item2.supplierId);
         expect(res.status).toEqual(404);
         expect(res.body).toEqual("Item not found");
         res = await Item_service.getItemByID(Item2.id);
         expect(res).toEqual({});
 
-        res = await Item_service.updateItem(Item3.aisleID, Item3.row, Item3.col, Item3.maxWeight, Item3.maxVolume, Item3.occupiedWeight, Item3.occupiedVolume);
+        res = await Item_service.updateItem(Item3.id,Item3.aisleID, Item3.row, Item3.col, Item3.maxWeight, Item3.maxVolume, Item3.occupiedWeight, Item3.occupiedVolume);
         expect(res.status).toEqual(404);
         expect(res.body).toEqual("id not found");
         res = await Item_service.getItemByID(Item3.id);

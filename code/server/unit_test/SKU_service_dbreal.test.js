@@ -55,12 +55,12 @@ describe("set SKUs", () => {
     const SKU3 = new SKU(3, "sku3", 102, 52, 12.99, "third SKU", 52, "800234523414")
     const SKU4 = new SKU(4, "sku4", 103, 53, 13.99, "fourth SKU", 53, "800234523415")
 
-    let res = await SKU_service.createSKU(SKU3.description, SKU3.weight, SKU3.volume, SKU3.notes, SKU3.price, SKU3.availableQuantity);
+    let res = await SKU_service.createSKU(SKU3.id,SKU3.description, SKU3.weight, SKU3.volume, SKU3.notes, SKU3.price, SKU3.availableQuantity);
     expect(res.status).toEqual(201);
     res = await SKU_service.getSKUbyId(SKU3.id)
     expect(res).toEqual(SKU3)
 
-    res = await SKU_service.createSKU(SKU4.description, SKU4.weight, SKU4.volume, SKU4.notes, SKU4.price, SKU4.availableQuantity);
+    res = await SKU_service.createSKU(SKU4.id,SKU4.description, SKU4.weight, SKU4.volume, SKU4.notes, SKU4.price, SKU4.availableQuantity);
     expect(res.status).toEqual(404);
     res = await SKU_service.getSKUbyId(SKU4.id)
     expect(res).toBeNull()
