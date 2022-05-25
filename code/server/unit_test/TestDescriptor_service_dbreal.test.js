@@ -1,3 +1,4 @@
+const DatabaseConnection = require("../database/DatabaseConnection");
 const TestDescriptor = require('../components/TestDescriptor');
 const SKU = require('../components/SKU');
 const TestDescriptorService = require('../services/TestDescriptor_service');
@@ -24,6 +25,10 @@ async function testTestDescriptor(id, name, procedureDescription, idSKU) {
 
 // test case definition
 describe('get testDescriptors', () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+		await DatabaseConnection.resetAllTables();
+    });
 
     beforeEach(async () => {
         await testD_dao.deleteTestDescriptorData();
@@ -41,6 +46,10 @@ describe('get testDescriptors', () => {
 });
 
 describe("set TestDescriptor", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+		await DatabaseConnection.resetAllTables();
+    });
 
     beforeEach(async () => {
         await testD_dao.deleteTestDescriptorData();
@@ -91,6 +100,11 @@ describe("set TestDescriptor", () => {
 });
 
 describe("delete TestDescriptor", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+		await DatabaseConnection.resetAllTables();
+    });
+
     beforeEach(async () => {
         await testD_dao.deleteTestDescriptorData();
         await testD_dao.insertTestDescriptor(new TestDescriptor(1, 'test descriptor 1', 'This test is described by...', 1));
