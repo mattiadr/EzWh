@@ -1433,8 +1433,7 @@ Version:
 
 ### Code coverage report
 
-    <Add here the screenshot report of the statement and branch coverage obtained using
-    the coverage tool. >
+    ![](images/coverage.png)
 
 
 ### Loop coverage analysis
@@ -1483,8 +1482,7 @@ Version:
 
 ### Loop coverage analysis
 
-    <Identify significant loops in the units and reports the test cases
-    developed to cover zero, one or multiple iterations >
+    ![](./coverage.png)
 
 |Unit name | Loop rows | Number of iterations | Jest test case |
 |---|---|---|---|
