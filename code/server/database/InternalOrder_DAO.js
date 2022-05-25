@@ -148,3 +148,16 @@ exports.deleteInternalOrder = (id) => {
 		});
 	}));
 }
+
+exports.deleteInternalOrderData = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE * FROM InternalOrder`;
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err.toString());
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
