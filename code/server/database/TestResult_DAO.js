@@ -73,16 +73,16 @@ exports.deleteTestResultByID = (rfid, id) => {
 	});
 }
 
-
+/** used for testing **/
 exports.deleteTestResultData = () => {
-    return new Promise((resolve, reject) => {
-        const sql = `DELETE * FROM TestResult`;
-        db.run(sql, [], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve(true);
-            }
-        });
-    });
+	return new Promise((resolve, reject) => {
+		const sql = `DELETE FROM TestResult`;
+		db.run(sql, [], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	});
 }

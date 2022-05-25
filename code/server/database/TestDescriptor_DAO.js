@@ -86,15 +86,16 @@ exports.deleteTestDescriptorByID = (id) => {
     });
 }
 
+/** used for testing **/
 exports.deleteTestDescriptorData = () => {
     return new Promise((resolve, reject) => {
-        const sql = `DELETE * FROM TestDescriptor`;
-        db.run(sql, [], (err) => {
+        const sql = 'DELETE FROM TestDescriptor';
+        db.run(sql, [], function (err) {
             if (err) {
                 reject(err.toString());
             } else {
-                resolve(true);
+                resolve();
             }
-        });
-    });
-}
+        })
+    })
+};

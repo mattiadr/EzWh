@@ -92,14 +92,15 @@ exports.deleteItemByID = (id) => {
     });
 }
 
+/** used for testing **/
 exports.deleteItemData = () => {
     return new Promise((resolve, reject) => {
-        const sql = `DELETE * FROM Item`;
+        const sql = `DELETE FROM Item`;
         db.run(sql, [], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
-                resolve(true);
+                resolve();
             }
         });
     });

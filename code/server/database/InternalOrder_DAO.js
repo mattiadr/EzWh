@@ -149,15 +149,27 @@ exports.deleteInternalOrder = (id) => {
 	}));
 }
 
+/** used for testing **/
 exports.deleteInternalOrderData = () => {
-    return new Promise((resolve, reject) => {
-        const sql = `DELETE * FROM InternalOrder`;
-        db.run(sql, [], (err) => {
-            if (err) {
-                reject(err.toString());
-            } else {
-                resolve(true);
-            }
-        });
-    });
+	return new Promise((resolve, reject) => {
+		// delete return order from InternalOrderProduct
+		const sql = `DELETE FROM InternalOrderProduct;`;
+		db.run(sql, [id], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}).then(() => new Promise((resolve, reject) => {
+		// delete return order from InternalOrder
+		const sql = `DELETE FROM InternalOrder;`;
+		db.run(sql, [id], (err) => {
+			if (err) {
+				reject(err.toString());
+			} else {
+				resolve();
+			}
+		});
+	}));
 }

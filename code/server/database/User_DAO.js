@@ -75,15 +75,15 @@ exports.deleteUserByID = (id) => {
     });
 }
 
-
+/** used for testing **/
 exports.deleteUserData = () => {
     return new Promise((resolve, reject) => {
-        const sql = `DELETE * FROM User`;
+        const sql = `DELETE FROM User`;
         db.run(sql, [], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
-                resolve(true);
+                resolve();
             }
         });
     });

@@ -89,15 +89,15 @@ exports.checkIfPositionOccupied = (positionID) => {
     });
 }
 
-
+/** used for testing **/
 exports.deleteSKUData = () => {
     return new Promise((resolve, reject) => {
-        const sql = `DELETE * FROM SKU`;
+        const sql = `DELETE FROM SKU;`;
         db.run(sql, [], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
-                resolve(true);
+                resolve();
             }
         });
     });
