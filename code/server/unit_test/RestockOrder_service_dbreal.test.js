@@ -33,12 +33,12 @@ describe('get RestockOrders', () => {
 
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData(); 
-        await RKO_dao.insertRestockOrder(new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
-        await RKO_dao.insertRestockOrder(new RestockOrder(null,"2021/11/21 10:33","issued",2,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null));
     });
 
-    const RestockOrders = [new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null),
-    new RestockOrder(null,"2021/11/21 10:33","issued",2,null,null)];
+    const RestockOrders = [new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null),
+    new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null)];
 
     testRestockOrders(RestockOrders);
     testRestockOrder(RestockOrders[0].id, RestockOrders[0].issueDate, RestockOrders[0].state, RestockOrders[0].supplierId);
@@ -50,12 +50,12 @@ describe('get RestockOrders Issued', () => {
 
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData(); 
-        await RKO_dao.insertRestockOrder(new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
-        await RKO_dao.insertRestockOrder(new RestockOrder(null,"2021/11/21 10:33","issued",2,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null));
     });
 
-    const RestockOrders = [new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null),
-    new RestockOrder(null,"2021/11/21 10:33","issued",2,null,null)];
+    const RestockOrders = [new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null),
+    new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null)];
 
     testRestockOrdersIssued(RestockOrders);
     testRestockOrder(RestockOrders[0].id, RestockOrders[0].issueDate, RestockOrders[0].state, RestockOrders[0].supplierId);
@@ -67,13 +67,13 @@ describe("set RestockOrder", () => {
 
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData(); 
-        await RKO_dao.insertRestockOrder(new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
-        await RKO_dao.insertRestockOrder(new RestockOrder(null,"2021/11/21 10:33","issued",2,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null));
     });
 
-    test('new RestockOrder', async () => {
-        const RestockOrder1 = new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null);
-        const RestockOrder2 = new RestockOrder(null,"2021/11/21 10:33","issued",2,null,null);
+    test('new RestockOrder.RestockOrder', async () => {
+        const RestockOrder1 = new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null);
+        const RestockOrder2 = new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null);
 
         let res = await RestockOrder_service.createRestockOrder(RestockOrder1.issueDate,RestockOrder1.state,RestockOrder1.supplierId);
         expect(res.status).toEqual(201);
@@ -87,9 +87,9 @@ describe("set RestockOrder", () => {
     });
 
     test('update RestockOrder state', async () => { 
-        const RestockOrder1 = new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null);
-        const RestockOrder2 = new RestockOrder(null,"2021/11/21 10:33","delivered",2,null,null);       
-        const RestockOrder3 = new RestockOrder(null,"2021/11/22 11:33","issued",3,null,null);
+        const RestockOrder1 = new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null);
+        const RestockOrder2 = new RestockOrder.RestockOrder(null,"2021/11/21 10:33","delivered",2,null,null);       
+        const RestockOrder3 = new RestockOrder.RestockOrder(null,"2021/11/22 11:33","issued",3,null,null);
         
         let res = await RestockOrder_service.updateRestockOrder(RestockOrder1.issueDate,RestockOrder1.state,RestockOrder1.supplierId);
         expect(res.status).toEqual(200);
@@ -110,7 +110,7 @@ describe("set RestockOrder", () => {
     });
 
     test('update RestockOrder transport note', async () => { 
-        const RestockOrder1 = new RestockOrder(null,"2021/11/20 09:33","issued",1,"2021/11/20 09:33",null);
+        const RestockOrder1 = new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,"2021/11/20 09:33",null);
         
         let res = await RestockOrder_service.updateRestockOrderTransportNote(RestockOrder1.id, RestockOrder.deliveryDate);
         expect(res.status).toEqual(404);
@@ -121,7 +121,7 @@ describe("set RestockOrder", () => {
     });
 
     test('update RestockOrder SKUItems', async () => { 
-        const RestockOrder1 = new RestockOrder(null,"2021/11/20 09:33","issued",1,"2021/11/20 09:33",null);
+        const RestockOrder1 = new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,"2021/11/20 09:33",null);
         
         skuItems = [new SKUItem("12345678901234567890123456789016",12,null,null), new SKUItem("12345678901234567890123456789017",12,null,null)];
     
@@ -138,7 +138,7 @@ describe("set RestockOrder", () => {
 describe("delete RestockOrder", () => {
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData();
-        await RKO_dao.insertRestockOrder(new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
     });
     test('delete RestockOrder', async () => {
         const idPos = 1;

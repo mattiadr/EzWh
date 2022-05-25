@@ -23,7 +23,7 @@ async function testReturnOrders(expectedReturnOrders){
 
 async function testReturnOrder(id, returnDate, restockOrderId, products){
   test('get Return Order', async () => {
-    let res = await returnOrder_dao.selectReturnOrderByID(id);
+    let res = await returnOrder_dao.getReturnOrderByID(id);
     expect(res.id).toStrictEqual(id);
     expect(res.returnDate).toStrictEqual(returnDate);
     expect(res.restockOrderId).toStrictEqual(restockOrderId);

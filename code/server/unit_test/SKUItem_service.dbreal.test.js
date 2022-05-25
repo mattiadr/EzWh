@@ -4,7 +4,6 @@ const SKUItemService = require('../services/SKUItem_service');
 
 const skuItem_dao = require('../database/SKUItem_DAO')
 const sku_dao = require('../database/SKU_DAO')
-
 const SKUItem_service = new SKUItemService(skuItem_dao, sku_dao)
 
 async function testSKUItems(expectedSKUItems){
@@ -16,7 +15,7 @@ async function testSKUItems(expectedSKUItems){
 
 async function testSKUItem(RFID, SKUID, available, dateOfStock){
   test('get SKU Item', async () => {
-    let res = await skuItem_dao.selectSKUItemByRFID(RFID);
+    let res = await skuItem_dao.getSKUItemByRFID(RFID);
     expect(res.RFID).toStrictEqual(RFID);
     expect(res.SKUID).toStrictEqual(SKUID);
     expect(res.available).toStrictEqual(available);
@@ -65,9 +64,9 @@ describe("set SKU Items", () => {
   })
 
   test('update SKU Item', async () => {
-    const SKUItem1 = new new SKUItem("12345678901234567890123456789024", 1, 2, "2021/11/29 12:30")
-    const SKUItem2 = new new SKUItem("12345678901234567890123456789025", 2, 2, "2021/11/29 12:30")
-    const SKUItem5 = new new SKUItem("12345678901234567890123456789066", 1, 3, "2021/11/29 12:30")
+    const SKUItem1 = new SKUItem("12345678901234567890123456789024", 1, 2, "2021/11/29 12:30")
+    const SKUItem2 = new SKUItem("12345678901234567890123456789025", 2, 2, "2021/11/29 12:30")
+    const SKUItem5 = new SKUItem("12345678901234567890123456789066", 1, 3, "2021/11/29 12:30")
 
     let res = await SKUItem_service.updateSKUItem(SKUItem1.RFID, SKUItem1.SKUID, SKUItem1.available, SKUItem1.dateOfStock)
     expect(res.status).toEqual(200);

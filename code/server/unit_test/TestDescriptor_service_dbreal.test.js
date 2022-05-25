@@ -47,7 +47,7 @@ describe("set TestDescriptor", () => {
         await sku_dao.deleteSKUData();
         await testD_dao.insertTestDescriptor(new TestDescriptor(1, 'test descriptor 1', 'This test is described by...', 1));
         await testD_dao.insertTestDescriptor(new TestDescriptor(2, 'test descriptor 2', 'This test is described by...', 1));
-        await sku_dao.insertSKU(new SKU (1, "first sku", 60, 20, 10.99, "notes: ...", 50, "800234543412"));
+        await sku_dao.insertSKU(new SKU(1, "first sku", 60, 20, 10.99, "notes: ...", 50, "800234543412"));
     });
 
     test('new TestDescriptor', async () => {

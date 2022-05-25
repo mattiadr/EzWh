@@ -16,7 +16,7 @@ async function testSKUs(expectedSKUs){
 
 async function testSKU(id, description, weight, volume, price, notes, positionId, availableQuantity){
   test('get SKU', async () => {
-    let res = await sku_dao.selectSKUbyID(id);
+    let res = await sku_dao.getSKUbyId(id);
     expect(res.id).toStrictEqual(id);
     expect(res.description).toStrictEqual(description);
     expect(res.weight).toStrictEqual(weight);
@@ -40,8 +40,8 @@ describe("get SKUs", () => {
                 new SKU(2, "sku2", 101, 51, 11.99, "second SKU", 51, "800234523413")]
 
   testSKUs(SKUs);
-  testSKU(SKU[0].id, SKU[0].description, SKU[0].weight, SKU[0].volume, SKU[0].price, SKU[0].notes,  SKU[0].positionId, SKU[0].availableQuantity);
-  testSKU(SKU[1].id, SKU[1].description, SKU[1].weight, SKU[1].volume, SKU[1].price, SKU[1].notes,  SKU[1].positionId, SKU[1].availableQuantity);
+  testSKU(SKUs[0].id, SKUs[0].description, SKUs[0].weight, SKUs[0].volume, SKUs[0].price, SKUs[0].notes,  SKUs[0].positionId, SKUs[0].availableQuantity);
+  testSKU(SKUs[1].id, SKUs[1].description, SKUs[1].weight, SKUs[1].volume, SKUs[1].price, SKUs[1].notes,  SKUs[1].positionId, SKUs[1].availableQuantity);
 })
 
 describe("set SKUs", () => {
