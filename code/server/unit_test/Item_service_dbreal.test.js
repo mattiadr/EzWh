@@ -27,6 +27,7 @@ describe('get Items', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await I_dao.deleteItemData(); 
@@ -47,21 +48,12 @@ describe("set Item", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await I_dao.deleteItemData(); 
         await I_dao.insertItem(new Item(1,"a new item",10.99,1,2));
         await I_dao.insertItem(new Item(2,"another item",12.99,2,1));
-    });
-
-    test('new Item', async () => {
-        const Item1 = new Item(12,"a new item",10.99,1,2);
-        
-        let res = await Item_service.createItem(Item1.id,Item1.description,Item1.price,Item1.SKUID,Item1.supplierId);
-        expect(res.status).toEqual(201);
-        res = await Item_service.getItemByID(Item1.id);
-        expect(res).toEqual(Item1);
-
     });
 
     test('update Item', async () => {
@@ -91,6 +83,7 @@ describe("delete Item", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await I_dao.deleteItemData();

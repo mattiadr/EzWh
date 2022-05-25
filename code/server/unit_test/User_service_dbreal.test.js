@@ -36,6 +36,7 @@ describe('get Users', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {
@@ -57,6 +58,7 @@ describe('get Suppliers', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {
@@ -78,6 +80,7 @@ describe("set User", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {
@@ -129,6 +132,7 @@ describe("delete User", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await U_dao.deleteUserData();

@@ -72,6 +72,7 @@ describe("testDao_selectTestDescriptors", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
 		await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {
@@ -93,6 +94,7 @@ describe('testDao_newTestDescriptor', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
 		await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {
@@ -111,6 +113,7 @@ describe('testDao_updateTestDescriptor', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
 		await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
         await testD_dao.deleteTestDescriptorData();
         await testD_dao.insertTestDescriptor(new TestDescriptor(1, "test descriptor 1", "This test is described by...", 1));
     });
@@ -122,6 +125,7 @@ describe("testDao_deleteTestDescriptor", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
 		await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {

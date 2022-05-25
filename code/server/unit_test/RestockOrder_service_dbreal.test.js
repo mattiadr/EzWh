@@ -5,6 +5,9 @@ const RKO_dao = require('../database/RestockOrder_DAO');
 const RestockOrder_service = new RestockOrderService(RKO_dao);
 const DatabaseConnection = require("../database/DatabaseConnection");
 
+const products = [{"SKUId":12,"description":"a product","price":10.99,"qty":30},
+    {"SKUId":180,"description":"another product","price":11.99,"qty":20}];
+
 async function testRestockOrders(expectedRestockOrders) {
     test('get all RestockOrders', async () => {
         let res = await RestockOrder_service.getRestockOrders();
@@ -34,15 +37,16 @@ describe('get RestockOrders', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData(); 
-        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
-        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,products));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,products));
     });
 
-    const RestockOrders = [new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null),
-    new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null)];
+    const RestockOrders = [new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,products),
+    new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,products)];
 
     testRestockOrders(RestockOrders);
     testRestockOrder(RestockOrders[0].id, RestockOrders[0].issueDate, RestockOrders[0].state, RestockOrders[0].supplierId);
@@ -54,15 +58,16 @@ describe('get RestockOrders Issued', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData(); 
-        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
-        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,products));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,products));
     });
 
-    const RestockOrders = [new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null),
-    new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null)];
+    const RestockOrders = [new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,products),
+    new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,products)];
 
     testRestockOrdersIssued(RestockOrders);
     testRestockOrder(RestockOrders[0].id, RestockOrders[0].issueDate, RestockOrders[0].state, RestockOrders[0].supplierId);
@@ -74,16 +79,17 @@ describe("set RestockOrder", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData(); 
-        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
-        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,products));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,products));
     });
 
     test('new RestockOrder.RestockOrder', async () => {
-        const RestockOrder1 = new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null);
-        const RestockOrder2 = new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,null);
+        const RestockOrder1 = new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,products);
+        const RestockOrder2 = new RestockOrder.RestockOrder(null,"2021/11/21 10:33","issued",2,null,products);
 
         let res = await RestockOrder_service.createRestockOrder(RestockOrder1.issueDate,RestockOrder1.state,RestockOrder1.supplierId);
         expect(res.status).toEqual(201);
@@ -97,7 +103,7 @@ describe("set RestockOrder", () => {
     });
 
     test('update RestockOrder state', async () => { 
-        const RestockOrder1 = new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null);
+        const RestockOrder1 = new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,products);
         const RestockOrder2 = new RestockOrder.RestockOrder(null,"2021/11/21 10:33","delivered",2,null,null);       
         const RestockOrder3 = new RestockOrder.RestockOrder(null,"2021/11/22 11:33","issued",3,null,null);
         
@@ -149,10 +155,11 @@ describe("delete RestockOrder", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await RKO_dao.deleteRestockOrderData();
-        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,null));
+        await RKO_dao.insertRestockOrder(new RestockOrder.RestockOrder(null,"2021/11/20 09:33","issued",1,null,products));
     });
     test('delete RestockOrder', async () => {
         const idPos = 1;

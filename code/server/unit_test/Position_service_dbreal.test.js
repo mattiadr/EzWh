@@ -30,6 +30,7 @@ describe('get Positions', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await P_dao.deletePositionData(); 
@@ -50,6 +51,7 @@ describe("set Position", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await P_dao.deletePositionData(); 
@@ -99,6 +101,7 @@ describe("delete Position", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await P_dao.deletePositionData();

@@ -35,7 +35,11 @@ async function testInternalOrder(id, issueDate, state, customerId, products) {
 
 // test case definition
 describe('get InternalOrders', () => {
-
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
+    });
     beforeEach(async () => {
         await IO_dao.deleteInternalOrderData(); 
         await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder(1,"2021/11/29 09:33","accepted",products,1));
@@ -53,7 +57,11 @@ describe('get InternalOrders', () => {
 
 // test case definition
 describe('get InternalOrders Issued', () => {
-
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
+    });
     beforeEach(async () => {
         await IO_dao.deleteInternalOrderData(); 
         await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products,1));
@@ -70,7 +78,11 @@ describe('get InternalOrders Issued', () => {
 });
 
 describe("set InternalOrder", () => {
-
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
+    });
     beforeEach(async () => {
         await IO_dao.deleteInternalOrderData(); 
         await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products,1));
@@ -118,6 +130,11 @@ describe("set InternalOrder", () => {
 });
 
 describe("delete InternalOrder", () => {
+    beforeAll(async () => {
+        await DatabaseConnection.createConnection();
+        await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
+    });
     beforeEach(async () => {
         await IO_dao.deleteInternalOrderData();
         await IO_dao.insertInternalOrder(new InternalOrder.InternalOrder("2021/11/29 09:33","accepted",products,1));

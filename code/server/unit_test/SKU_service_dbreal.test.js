@@ -32,6 +32,7 @@ describe("get SKUs", () => {
   beforeAll(async () => {
     await DatabaseConnection.createConnection();
     await DatabaseConnection.resetAllTables();
+    await DatabaseConnection.createDefaultUsers();
 });
   beforeEach(async () => {
     await sku_dao.deleteSKUData();
@@ -51,6 +52,7 @@ describe("set SKUs", () => {
   beforeAll(async () => {
     await DatabaseConnection.createConnection();
     await DatabaseConnection.resetAllTables();
+    await DatabaseConnection.createDefaultUsers();
 });
   beforeEach(async () => {
     await sku_dao.deleteSKUData();
@@ -101,6 +103,7 @@ describe("delete SKU", () => {
 beforeAll(async () => {
     await DatabaseConnection.createConnection();
     await DatabaseConnection.resetAllTables();
+    await DatabaseConnection.createDefaultUsers();
 });
   beforeEach(async () => {
     await sku_dao.deleteSKUData();

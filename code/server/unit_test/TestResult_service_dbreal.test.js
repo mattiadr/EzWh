@@ -32,6 +32,7 @@ describe('get Test Results', () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
 
     beforeEach(async () => {
@@ -56,6 +57,7 @@ describe("set Test Result", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await testR_dao.deleteTestResultData();
@@ -111,6 +113,7 @@ describe("delete TestDescriptor", () => {
     beforeAll(async () => {
         await DatabaseConnection.createConnection();
         await DatabaseConnection.resetAllTables();
+        await DatabaseConnection.createDefaultUsers();
     });
     beforeEach(async () => {
         await testR_dao.deleteTestResultData();

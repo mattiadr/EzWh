@@ -35,6 +35,7 @@ describe('get Return Order', () => {
   beforeAll(async () => {
     await DatabaseConnection.createConnection();
     await DatabaseConnection.resetAllTables();
+    await DatabaseConnection.createDefaultUsers();
 });
     beforeEach(async () => {
         await returnOrder_dao.deleteReturnOrderData(); 
@@ -54,6 +55,7 @@ describe("set Return Order", () => {
   beforeAll(async () => {
     await DatabaseConnection.createConnection();
     await DatabaseConnection.resetAllTables();
+    await DatabaseConnection.createDefaultUsers();
 });
     beforeEach(async () => {
         await returnOrder_dao.deleteReturnOrderData(); 
@@ -81,6 +83,7 @@ describe("delete Return Order", () => {
   beforeAll(async () => {
     await DatabaseConnection.createConnection();
     await DatabaseConnection.resetAllTables();
+    await DatabaseConnection.createDefaultUsers();
 });  
   beforeEach(async () => {
         await returnOrder_dao.deleteReturnOrderData();
