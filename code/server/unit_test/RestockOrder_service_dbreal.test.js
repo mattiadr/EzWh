@@ -1,4 +1,5 @@
 const RestockOrder = require('../components/RestockOrder');
+const skuItem = require('../components/SKUItem');
 const RestockOrderService = require('../services/RestockOrder_service');
 const RKO_dao = require('../database/RestockOrder_DAO');
 const RestockOrder_service = new RestockOrderService(RKO_dao);
@@ -16,8 +17,6 @@ async function testRestockOrdersIssued(expectedRestockOrders) {
         expect(res).toEqual(expectedRestockOrders);
     });
 }
-
-// how should I treat the Id? 
 
 async function testRestockOrder(id, issueDate, state, supplierId) {
     test('get RestockOrder', async () => {
@@ -76,39 +75,64 @@ describe("set RestockOrder", () => {
         const RestockOrder1 = new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null);
         const RestockOrder2 = new RestockOrder(null,"2021/11/21 10:33","issued",2,null,null);
 
-        let res = await RestockOrder_service.createRestockOrder(RestockOrder1.description,RestockOrder1.price,RestockOrder1.SKUID,RestockOrder1.supplierId);
+        let res = await RestockOrder_service.createRestockOrder(RestockOrder1.issueDate,RestockOrder1.state,RestockOrder1.supplierId);
         expect(res.status).toEqual(201);
         res = await RestockOrder_service.getRestockOrderByID(RestockOrder1.id);
         expect(res).toEqual(RestockOrder1);
 
-        res = await RestockOrder_service.createRestockOrder(RestockOrder2.description,RestockOrder2.price,RestockOrder2.SKUID,RestockOrder2.supplierId);
+        res = await RestockOrder_service.createRestockOrder(RestockOrder2.issueDate,RestockOrder2.state,RestockOrder2.supplierId);
         expect(res.status).toEqual(404);
         res = await RestockOrder_service.getRestockOrderByID(RestockOrder2.id);
         expect(res).toBeNull();
     });
 
-    test('update RestockOrder', async () => {
+    test('update RestockOrder state', async () => { 
         const RestockOrder1 = new RestockOrder(null,"2021/11/20 09:33","issued",1,null,null);
-        const RestockOrder2 = new RestockOrder(null,"2021/11/21 10:33","issued",2,null,null);       
+        const RestockOrder2 = new RestockOrder(null,"2021/11/21 10:33","delivered",2,null,null);       
         const RestockOrder3 = new RestockOrder(null,"2021/11/22 11:33","issued",3,null,null);
         
-        let res = await RestockOrder_service.updateRestockOrder(RestockOrder1.description,RestockOrder1.price,RestockOrder1.SKUID,RestockOrder1.supplierId);
+        let res = await RestockOrder_service.updateRestockOrder(RestockOrder1.issueDate,RestockOrder1.state,RestockOrder1.supplierId);
         expect(res.status).toEqual(200);
         res = await RestockOrder_service.getRestockOrderByID(RestockOrder1.id);
         expect(res).toEqual(RestockOrder1);
 
-        res = await RestockOrder_service.updateRestockOrder(RestockOrder2.description,RestockOrder2.price,RestockOrder2.SKUID,RestockOrder2.supplierId);
+        res = await RestockOrder_service.updateRestockOrderState(RestockOrder2.id,RestockOrder2.state);
         expect(res.status).toEqual(404);
         expect(res.body).toEqual("RestockOrder not found");
         res = await RestockOrder_service.getRestockOrderByID(RestockOrder2.id);
         expect(res).toEqual({});
 
-        res = await RestockOrder_service.updateRestockOrder(RestockOrder3.aisleID, RestockOrder3.row, RestockOrder3.col, RestockOrder3.maxWeight, RestockOrder3.maxVolume, RestockOrder3.occupiedWeight, RestockOrder3.occupiedVolume);
+        res = await RestockOrder_service.updateRestockOrder(RestockOrder3.issueDate,RestockOrder3.state,RestockOrder3.supplierId);
         expect(res.status).toEqual(404);
         expect(res.body).toEqual("id not found");
         res = await RestockOrder_service.getRestockOrderByID(RestockOrder3.id);
         expect(res).toBeNull();
     });
+
+    test('update RestockOrder transport note', async () => { 
+        const RestockOrder1 = new RestockOrder(null,"2021/11/20 09:33","issued",1,"2021/11/20 09:33",null);
+        
+        let res = await RestockOrder_service.updateRestockOrderTransportNote(RestockOrder1.id, RestockOrder.deliveryDate);
+        expect(res.status).toEqual(404);
+        expect(res.body).toEqual("RestockOrder not found");
+        res = await RestockOrder_service.getRestockOrderByID(RestockOrder2.id);
+        expect(res).toEqual({});
+
+    });
+
+    test('update RestockOrder SKUItems', async () => { 
+        const RestockOrder1 = new RestockOrder(null,"2021/11/20 09:33","issued",1,"2021/11/20 09:33",null);
+        
+        skuItems = [new SKUItem(12, "12345678901234567890123456789016"), new SKUItem(12, "12345678901234567890123456789017")];
+    
+        let res = await RestockOrder_service.addSkuItemsToRestockOrder(RestockOrder1.id, skuItems);
+        expect(res.status).toEqual(404);
+        expect(res.body).toEqual("RestockOrder not found");
+        res = await RestockOrder_service.getRestockOrderByID(RestockOrder2.id);
+        expect(res).toEqual({});
+
+    });
+
 });
 
 describe("delete RestockOrder", () => {
