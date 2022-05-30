@@ -30,12 +30,12 @@ router.get('/skus/:id',
 
 /* POST */
 router.post('/sku',
-	body("description").exists(),
-	body("weight").isInt(),
-	body("volume").isInt(),
-	body("notes").exists(),
-	body("price").isFloat(),
-	body("availableQuantity").isInt(),
+	body("description").isString().isLength({min: 1}),
+	body("weight").isInt({min: 0}),
+	body("volume").isInt({min: 0}),
+	body("notes").exists().isLength({min: 1}),
+	body("price").isFloat({min: 0}),
+	body("availableQuantity").isInt({min: 1}),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
 		let result = await SKU_service.createSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
@@ -45,12 +45,12 @@ router.post('/sku',
 /* PUT */
 router.put('/sku/:id',
 	param("id").isInt(),
-	body("newDescription").exists(),
-	body("newWeight").isInt(),
-	body("newVolume").isInt(),
-	body("newNotes").exists(),
-	body("newPrice").isFloat(),
-	body("newAvailableQuantity").isInt(),
+	body("newDescription").isString().isLength({min: 1}),
+	body("newWeight").isInt({min: 0}),
+	body("newVolume").isInt({min: 0}),
+	body("newNotes").isString().isLength({min: 1}),
+	body("newPrice").isFloat({min: 0}),
+	body("newAvailableQuantity").isInt({min: 1}),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
 		let result = await SKU_service.updateSKU(req.params.id, undefined, req.body.newDescription, req.body.newWeight, req.body.newVolume, req.body.newNotes, req.body.newPrice, req.body.newAvailableQuantity);
@@ -58,7 +58,7 @@ router.put('/sku/:id',
 	});
 router.put('/sku/:id/position',
 	param("id").isInt(),
-	body("position").exists(),
+	body("position").isString().isLength({min: 12, max: 12}),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
 		let result = await SKU_service.updateSKU(req.params.id, req.body.position);

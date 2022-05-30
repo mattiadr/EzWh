@@ -35,8 +35,8 @@ router.get("/testDescriptors/:id",
 
 /* POST */
 router.post("/testDescriptor",
-	body("name").exists(),
-	body("procedureDescription").exists(),
+	body("name").isString().isLength({min: 1}),
+	body("procedureDescription").isString().isLength({min: 1}),
 	body("idSKU").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
@@ -47,8 +47,8 @@ router.post("/testDescriptor",
 /* PUT */
 router.put("/testDescriptor/:id",
 	param("id").isInt(),
-	body("newName").exists(),
-	body("newProcedureDescription").exists(),
+	body("newName").isString().isLength({min: 1}),
+	body("newProcedureDescription").isString().isLength({min: 1}),
 	body("newIdSKU").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
