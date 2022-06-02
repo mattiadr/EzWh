@@ -58,7 +58,7 @@ router.put('/sku/:id',
 	});
 router.put('/sku/:id/position',
 	param("id").isInt(),
-	body("position").isString().isLength({min: 12, max: 12}),
+	body("position").isString().isNumeric().isLength({min: 12, max: 12}),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
 		let result = await SKU_service.updateSKU(req.params.id, req.body.position);
