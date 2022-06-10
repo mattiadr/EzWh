@@ -12,14 +12,14 @@ const router = express.Router();
 
 /* GET */
 router.get("/skuitems/:rfid/testResults",
-	param("rfid").exists(),
+	param("rfid").isNumeric().isLength({min: 32, max: 32}),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid rfid");
 		const result = await TestResult_service.getTestResults(req.params.rfid);
 		return res.status(result.status).json(result.body);
 });
 router.get("/skuitems/:rfid/testResults/:id",
-	param("rfid").exists(),
+	param("rfid").isNumeric().isLength({min: 32, max: 32}),
 	param("id").isInt(),
 	async (req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params");
@@ -29,7 +29,7 @@ router.get("/skuitems/:rfid/testResults/:id",
 
 /* POST */
 router.post("/skuitems/testResult",
-	body("rfid").exists(),
+	body("rfid").isNumeric().isLength({min: 32, max: 32}),
 	body("idTestDescriptor").isInt(),
 	body("Date").isDate(),
 	body("Result").isBoolean(),
@@ -41,7 +41,7 @@ router.post("/skuitems/testResult",
 
 /* PUT */
 router.put("/skuitems/:rfid/testResult/:id",
-	param("rfid").exists(),
+	param("rfid").isNumeric().isLength({min: 32, max: 32}),
 	param("id").isInt(),
 	body("newIdTestDescriptor").isInt(),
 	body("newDate").isDate(),
@@ -54,7 +54,7 @@ router.put("/skuitems/:rfid/testResult/:id",
 
 /* DELETE */
 router.delete("/skuitems/:rfid/testResult/:id",
-	param("rfid").exists(),
+	param("rfid").isNumeric().isLength({min: 32, max: 32}),
 	param("id").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid params");

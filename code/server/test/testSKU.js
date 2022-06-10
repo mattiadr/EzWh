@@ -323,7 +323,7 @@ describe("Test SKU API", () => {
 	});
 	describe("modifying invalid SKU position", () => {
 		testModifySKUPosition(6, {position: position[1].positionID}, 404); // sku not found
-		testModifySKUPosition(2, {position: 123412341234}, 404); // position not found
+		testModifySKUPosition(2, {position: "123412341234"}, 404); // position not found
 		testModifySKUPosition(2, {position: position[0].positionID}, 422); // position already assigned
 	});
 	describe("modifying SKU", () => {

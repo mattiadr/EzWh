@@ -24,8 +24,8 @@ router.post('/position',
 	body("aisleID").isNumeric().isLength({min: 4, max: 4}),
 	body("row").isNumeric().isLength({min: 4, max: 4}),
 	body("col").isNumeric().isLength({min: 4, max: 4}),
-	body("maxWeight").isInt(),
-	body("maxVolume").isInt(),
+	body("maxWeight").isInt({min: 0}),
+	body("maxVolume").isInt({min: 0}),
 	async (req, res) =>{
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid body");
 		let result = await Position_service.createPosition(req.body.positionID, req.body.aisleID, req.body.row, req.body.col, req.body.maxWeight, req.body.maxVolume);
@@ -38,10 +38,10 @@ router.put('/position/:positionID',
 	body("newAisleID").isNumeric().isLength({min: 4, max: 4}),
 	body("newRow").isNumeric().isLength({min: 4, max: 4}),
 	body("newCol").isNumeric().isLength({min: 4, max: 4}),
-	body("newMaxWeight").isInt(),
-	body("newMaxVolume").isInt(),
-	body("newOccupiedWeight").isInt(),
-	body("newOccupiedVolume").isInt(),
+	body("newMaxWeight").isInt({min: 0}),
+	body("newMaxVolume").isInt({min: 0}),
+	body("newOccupiedWeight").isInt({min: 0}),
+	body("newOccupiedVolume").isInt({min: 0}),
 	async (req, res) =>{
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid param or body");
 		let result = await Position_service.updatePosition(req.params.positionID, undefined, req.body.newAisleID, req.body.newRow, req.body.newCol, req.body.newMaxWeight, req.body.newMaxVolume, req.body.newOccupiedWeight, req.body.newOccupiedVolume);
