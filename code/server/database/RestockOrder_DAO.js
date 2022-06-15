@@ -7,12 +7,12 @@ const selectProductsIntoRestockOrder = (restockOrder) => {
 		// propagate restockOrder null
 		if (!restockOrder) resolve(null);
 
-		const sql = `SELECT RestockOrderProduct.skuid, description, price, quantity FROM RestockOrderProduct, Item WHERE RestockOrderProduct.skuid = Item.SKUID AND roid = ?;`;
+		const sql = `SELECT RestockOrderProduct.skuid, Item.id, description, price, quantity FROM RestockOrderProduct, Item WHERE RestockOrderProduct.skuid = Item.SKUID AND roid = ?;`;
 		DatabaseConnection.db.all(sql, [restockOrder.id], (err, rows) => {
 			if (err) {
 				reject(err.toString());
 			} else {
-				restockOrder.products = rows.map((rop) => ({SKUId: rop.skuid, description: rop.description, price: rop.price, qty: rop.quantity}));
+				restockOrder.products = rows.map((rop) => ({SKUId: rop.skuid, itemId: rop.id, description: rop.description, price: rop.price, qty: rop.quantity}));
 				resolve(restockOrder);
 			}
 		});

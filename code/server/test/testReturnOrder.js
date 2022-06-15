@@ -13,18 +13,18 @@ const restockOrders = [
 	{
 		"issueDate": "2021/11/29 09:33",
 		"products": [
-			{"SKUId": 1, "description": "a product", "price": 10.99, "qty": 30},
-			{"SKUId": 2, "description": "another product", "price": 11.99, "qty": 20}
+			{"SKUId": 1, "itemId": 1 , "description": "a product", "price": 10.99, "qty": 30},
+			{"SKUId": 2, "itemId": 2,"description": "another product", "price": 11.99, "qty": 20}
 		],
 		"supplierId": 1
 	},
 	{
 		"issueDate": "2021/11/29 09:33",
 		"products": [
-			{"SKUId": 3, "description": "a product", "price": 10.99, "qty": 30},
-			{"SKUId": 4, "description": "another product", "price": 11.99, "qty": 20}
+			{"SKUId": 3, "itemId": 3, "description": "a product", "price": 10.99, "qty": 30},
+			{"SKUId": 4, "itemId": 4, "description": "another product", "price": 11.99, "qty": 20}
 		],
-		"supplierId": 1
+		"supplierId": 2
 	},
 ];
 
@@ -98,16 +98,16 @@ const returnOrders = [
 	{
 		"returnDate": "2021/11/29 09:33",
 		"products": [
-			{"SKUId": 1, "description": "a product", "price": 10.99, "RFID": "00000000000000000000000000000001"},
-			{"SKUId": 2, "description": "another product", "price": 11.99, "RFID": "00000000000000000000000000000002"}
+			{"SKUId": 1, "itemId": 1,"description": "a product", "price": 10.99, "RFID": "00000000000000000000000000000001"},
+			{"SKUId": 2, "itemId": 2,"description": "another product", "price": 11.99, "RFID": "00000000000000000000000000000002"}
 		],
 		"restockOrderId": 1
 	},
 	{
 		"returnDate": "2021/11/29 11:50",
 		"products": [
-			{"SKUId": 3, "description": "a product", "price": 10.99, "RFID": "00000000000000000000000000000003"},
-			{"SKUId": 4, "description": "another product", "price": 11.99, "RFID": "00000000000000000000000000000004"}
+			{"SKUId": 3, "itemId": 3,"description": "a product", "price": 10.99, "RFID": "00000000000000000000000000000003"},
+			{"SKUId": 4, "itemId": 4,"description": "another product", "price": 11.99, "RFID": "00000000000000000000000000000004"}
 		],
 		"restockOrderId": 2
 	}
@@ -189,8 +189,8 @@ function testCreateReturnOrder(returnOrder, expectedStatus) {
 }
 
 function testGetReturnOrders(expectedStatus, expectedReturnOrders) {
-	it(`GET /api/returnOrders`, (done) => {
-		agent.get(`/api/returnOrders`)
+	it("GET /api/returnOrders", (done) => {
+		agent.get("/api/returnOrders")
 			.end((err, res) => {
 				if (err) {
 					done(err);
@@ -203,14 +203,15 @@ function testGetReturnOrders(expectedStatus, expectedReturnOrders) {
 							returnDate: "string",
 							restockOrderId: "number",
 							products: "array",
-						}).should.be.true;
+						}).should.be.true; 
 
 						res.body.every((ac) => expectedReturnOrders.some((ex) => compareArray(ac.products, ex.products, {
 							SKUId: "number",
+							itemId: "number",
 							description: "string",
 							price: "number",
 							RFID: "string"
-						}))).should.be.true;
+						}))).should.be.true; 
 					}
 					done();
 				}

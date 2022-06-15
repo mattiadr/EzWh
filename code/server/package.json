@@ -12,14 +12,14 @@
     "chai-http": "^4.3.0",
     "check-code-coverage": "^1.10.0",
     "jest": "^27.5.1",
-    "nodemon": "^2.0.16",
     "mocha": "^9.2.2",
     "mochawesome": "^7.1.3",
     "mochawesome-report-generator": "^6.2.0",
+    "nodemon": "^2.0.16",
     "nyc": "^15.1.0"
   },
   "scripts": {
-    "apiTest": "./node_modules/.bin/mocha test --runInBand--timeout 10000 --exit > ./studentApiTestResult.txt",
+    "apiTest": "mocha test --exit",
     "test": "node_modules/.bin/jest --runInBand --coverage > ./unitTestResult.txt",
     "acceptanceTest": "npx mocha --runInBand --spec acceptanceTest/testEzWhAPI.js --reporter mochawesome --timeout 10000 --exit",
     "totalcoverage": "./node_modules/.bin/nyc ./node_modules/.bin/mocha test --runInBand --timeout 10000 --exit"

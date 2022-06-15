@@ -31,9 +31,9 @@ describe('test Restock Order apis', () => {
                                                            "Date":"2021/11/28", "Result": false });
     });
 
-    const products1 = [ {"SKUId": 1, "description": "a product", "price": 10.99, "qty": 30},
-                        {"SKUId": 2, "description": "another product", "price": 11.99, "qty": 20}];
-    const products2 = [ {"SKUId": 1, "description": "a product", "price": 10.99, "qty": 10}];
+    const products1 = [ {"SKUId": 1, "itemId":1, "description": "a product", "price": 10.99, "qty": 30},
+                        {"SKUId": 2, "itemId":2, "description": "another product", "price": 11.99, "qty": 20}];
+    const products2 = [ {"SKUId": 1, "itemId":1, "description": "a product", "price": 10.99, "qty": 10}];
 
     newRestockOrder(201, "2021/11/29 09:33", products1, 1);
     newRestockOrder(422, "abc", products1, 1);
@@ -74,7 +74,7 @@ describe('test Restock Order apis', () => {
     getRestockOrders(200, restockOrders[0], 1);
     getIssuedRestockOrders(200, []);
     newRestockOrder(201, "2021/12/20 12:12", products2, 2);
-    getIssuedRestockOrders(200, [{"id": 3, "issueDate": "2021/12/20 12:12", "state": "ISSUED", "products": products2, "supplierId" : 2, "transportNote":{"deliveryDate": "Invalid Date"}, "skuItems" : []}]);
+    getIssuedRestockOrders(200, [{"id": 2, "issueDate": "2021/12/20 12:12", "state": "ISSUED", "products": products2, "supplierId" : 2, "transportNote":{"deliveryDate": "Invalid Date"}, "skuItems" : []}]);
     
     getReturnedItemsOfRestockOrder(422, [skuitems[0]], 2);
     updateStateRestockOrder(200, 2, "COMPLETEDRETURN");

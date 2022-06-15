@@ -7,12 +7,12 @@ const selectProductsIntoReturnOrder = (returnOrder) => {
 		// propagate returnOrder null
 		if (!returnOrder) resolve(null);
 
-		const sql = `SELECT ReturnOrderProduct.skuid, description, price, rfid FROM ReturnOrderProduct, Item WHERE ReturnOrderProduct.skuid = Item.SKUID AND reoid = ?;`;
+		const sql = `SELECT ReturnOrderProduct.skuid, Item.id, description, price, rfid FROM ReturnOrderProduct, Item WHERE ReturnOrderProduct.skuid = Item.SKUID AND reoid = ?;`;
 		DatabaseConnection.db.all(sql, [returnOrder.id], (err, rows) => {
 			if (err) {
 				reject(err.toString());
 			} else {
-				returnOrder.products = rows.map((reop) => ({SKUId: reop.skuid, description: reop.description, price: reop.price, RFID: reop.rfid || undefined}));
+				returnOrder.products = rows.map((reop) => ({SKUId: reop.skuid, itemId: reop.id, description: reop.description, price: reop.price, RFID: reop.rfid || undefined}));
 				resolve(returnOrder);
 			}
 		});
