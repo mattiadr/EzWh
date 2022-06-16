@@ -181,8 +181,6 @@ function testCreateReturnOrder(returnOrder, expectedStatus) {
 				if (err) {
 					done(err);
 				} else {
-					console.log(res.status);
-					console.log(res.body);
 					res.should.have.status(expectedStatus);
 					done();
 				}
