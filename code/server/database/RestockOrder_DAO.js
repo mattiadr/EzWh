@@ -29,7 +29,7 @@ const selectSKUItemsIntoRestockOrder = (restockOrder) => {
 			if (err) {
 				reject(err.toString());
 			} else {
-				restockOrder.addSKUItems(rows.map((r) => ({SKUId: r.skuid, itemId: r.itemid, rfid: r.rfid})));
+				restockOrder.addSKUItems(rows.map((r) => ({SKUId: r.skuid, itemId: r.itemId, rfid: r.rfid})));
 				resolve(restockOrder);
 			}
 		});
