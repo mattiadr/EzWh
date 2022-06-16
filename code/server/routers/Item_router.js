@@ -18,11 +18,13 @@ router.get("/items",
 			res.status(500).send(err);
 		});
 });
-router.get("/items/:id",
+router.get("/items/:id/:supplierId",
 	param("id").isInt(),
+	param("supplierId").isInt(),
 	(req, res) => {
+		console.log("requesting item", req.params)
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
-		Item_service.getItemByID(req.params.id).then((item) => {
+		Item_service.getItemByID(req.params.id, req.params.supplierId).then((item) => {
 			if (item) {
 				res.status(200).json({id: item.id, description: item.description, price: item.price, SKUId: item.SKUID, supplierId: item.supplierId});
 			} else {
@@ -47,23 +49,25 @@ router.post("/item",
 });
 
 /* PUT */
-router.put("/item/:id",
+router.put("/item/:id/:supplierId",
 	param("id").isInt(),
+	param("supplierId").isInt(),
 	body("newDescription").exists(),
 	body("newPrice").isFloat(),
 	async (req, res) => {
 		if (!req.is("application/json")) return res.status(422).send("malformed body");
 		if (!validationResult(req).isEmpty()) return res.status(422).send("missing id");
-		const result = await Item_service.updateItem(req.params.id, req.body.newDescription, req.body.newPrice);
+		const result = await Item_service.updateItem(req.params.id, req.body.newDescription, req.body.newPrice, req.params.supplierId);
 		return res.status(result.status).send(result.body);
 });
 
 /* DELETE */
-router.delete("/items/:id",
+router.delete("/items/:id/:supplierId",
 	param("id").isInt(),
+	param("supplierId").isInt(),
 	(req, res) => {
 		if (!validationResult(req).isEmpty()) return res.status(422).send("invalid id");
-		Item_service.deleteItem(req.params.id).then(() => {
+		Item_service.deleteItem(req.params.id, req.params.supplierId).then(() => {
 			res.status(204).end();
 		}).catch((err) => {
 			res.status(500).send(err);
