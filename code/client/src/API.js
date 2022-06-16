@@ -997,15 +997,6 @@ const getSKUItemsToReturn = async (id) => {
   }
 };
 
-const getREO = async () => {
-  // call: GET /api/returnOrders
-  const response = await fetch("/api/returnOrders");
-  const REOs = await response.json();
-  if (response.ok) {
-    return REOs;
-  }
-};
-
 function addREO(newREO) {
   // call: POST /api/returnOrder
   return new Promise((resolve, reject) => {
@@ -1189,7 +1180,6 @@ function deleteItem(id){
     getSingleSKUItem,
     editSKUItem,
     getSKUItemsToReturn,
-    getREO,
     addREO,
     getItem,
     addItem,

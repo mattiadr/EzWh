@@ -53,7 +53,6 @@ function App() {
   const [updateIOAccepted, setUpdateIOAccepted] = useState(true);
   const [updateROIssued, setUpdateROIssued] = useState(true);
   const [updateRO, setUpdateRO] = useState(true);
-  const [updateREO, setUpdateREO] = useState(true);
   const [updateSKUItem, setUpdateSKUItem] = useState(true);
   const [updateItem, setUpdateItem] = useState(true);
 
@@ -212,18 +211,6 @@ function App() {
     }
     fetchData();
   }, [updateRO, loggedIn]);
-
-    //update REO
-    useEffect(() => {
-      async function fetchData(){
-        if(updateREO || loggedIn){
-          const REOs = await API.getREO();
-          setREO(REOs);
-          setUpdateREO(false);
-        }
-      }
-      fetchData();
-    }, [updateREO, loggedIn]);
 
   //update items
   useEffect(() => {
