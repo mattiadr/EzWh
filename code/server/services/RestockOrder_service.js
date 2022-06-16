@@ -3,10 +3,11 @@ const dayjs = require("dayjs");
 const {RestockOrder, RestockOrderState} = require("../components/RestockOrder");
 
 class RestockOrderService {
-	#restockOrder_DAO;
+	#restockOrder_DAO; #item_DAO;
 
-	constructor(restockOrder_DAO) {
+	constructor(restockOrder_DAO, item_DAO) {
 		this.#restockOrder_DAO = restockOrder_DAO;
+		this.#item_DAO = item_DAO;
 	}
 
 	getRestockOrders() {
@@ -39,6 +40,16 @@ class RestockOrderService {
 	async createRestockOrder(issueDate, supplierId, products) {
 		try {
 			const restockOrder = new RestockOrder(null, issueDate, RestockOrderState.ISSUED, supplierId, null, products);
+			const correct = await products.every(async (p) => {
+				// check if all fields are present
+				if (!(typeof p.SKUId === "number" && typeof p.itemId === "number" && typeof p.description === "string" && typeof p.price === "number" && typeof p.qty === "number")) return false;
+				const item = await this.#item_DAO.selectItemByID(p.itemId, supplierId);
+				// check if supplier sells this product
+				if (!item) return false;
+				// check if skuid matches item
+				return item.SKUID === p.SKUId;
+			});
+			if (!correct) return {status: 422, body: "bad products"};
 			await this.#restockOrder_DAO.insertRestockOrder(restockOrder);
 			return {status: 201, body: ""};
 		} catch (e) {
@@ -69,6 +80,8 @@ class RestockOrderService {
 				status: 422,
 				body: "restock order is in invalid state"
 			};
+			const correct = skuItems.every((skuItem) => typeof skuItem.SKUId === "number" && typeof skuItem.itemId === "number" && typeof skuItem.RFID === "string" && skuItem.RFID.length === 32);
+			if (!correct) return {status: 422, body: "bad skuItems"};
 			await this.#restockOrder_DAO.insertRestockOrderSKUItems(id, skuItems);
 			return {status: 200, body: ""};
 		} catch (e) {
