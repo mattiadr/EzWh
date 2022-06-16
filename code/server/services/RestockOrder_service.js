@@ -46,6 +46,16 @@ class RestockOrderService {
 				else if (item.SKUID !== p.SKUId) return {status: 422, body: ""};
 			};
 			const restockOrder = new RestockOrder(null, issueDate, RestockOrderState.ISSUED, supplierId, null, products);
+			const correct = await products.every(async (p) => {
+				// check if all fields are present
+				if (!(typeof p.SKUId === "number" && typeof p.itemId === "number" && typeof p.description === "string" && typeof p.price === "number" && typeof p.qty === "number")) return false;
+				const item = await this.#item_DAO.selectItemByID(p.itemId, supplierId);
+				// check if supplier sells this product
+				if (!item) return false;
+				// check if skuid matches item
+				return item.SKUID === p.SKUId;
+			});
+			if (!correct) return {status: 422, body: "bad products"};
 			await this.#restockOrder_DAO.insertRestockOrder(restockOrder);
 			return {status: 201, body: ""};
 		} catch (e) {
