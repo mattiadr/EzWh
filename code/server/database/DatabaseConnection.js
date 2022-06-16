@@ -103,6 +103,7 @@ class DatabaseConnection {
 		const createTableRestockOrderSKUItem = `CREATE TABLE IF NOT EXISTS RestockOrderSKUItem (
 			roid INTEGER NOT NULL,
 			skuid INTEGER NOT NULL,
+			itemid INTEGER NOT NULL,
 			rfid VARCHAR(32) NOT NULL,
 			PRIMARY KEY (roid, skuid, rfid)
 		);`;

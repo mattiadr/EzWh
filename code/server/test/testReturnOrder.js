@@ -83,14 +83,14 @@ const items = [
 		"description": "a product",
 		"price": 10.99,
 		"SKUId": 3,
-		"supplierId": 1
+		"supplierId": 2
 	},
 	{
 		"id": 4,
 		"description": "another product",
 		"price": 11.99,
 		"SKUId": 4,
-		"supplierId": 1
+		"supplierId": 2
 	},
 ];
 
@@ -181,6 +181,8 @@ function testCreateReturnOrder(returnOrder, expectedStatus) {
 				if (err) {
 					done(err);
 				} else {
+					console.log(res.status);
+					console.log(res.body);
 					res.should.have.status(expectedStatus);
 					done();
 				}
@@ -267,8 +269,6 @@ describe("Test ReturnOrder API", () => {
 	/** INIT **/
 	before(async () => {
 		await agent.delete("/api/resetDatabase");
-		await agent.post("/api/restockOrder").send(restockOrders[0]);
-		await agent.post("/api/restockOrder").send(restockOrders[1]);
 		await agent.post("/api/sku").send(SKUs[0]);
 		await agent.post("/api/sku").send(SKUs[1]);
 		await agent.post("/api/sku").send(SKUs[2]);
@@ -277,6 +277,8 @@ describe("Test ReturnOrder API", () => {
 		await agent.post("/api/item").send(items[1]);
 		await agent.post("/api/item").send(items[2]);
 		await agent.post("/api/item").send(items[3]);
+		await agent.post("/api/restockOrder").send(restockOrders[0]);
+		await agent.post("/api/restockOrder").send(restockOrders[1]);
 	});
 
 	/** POST **/

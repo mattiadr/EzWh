@@ -29,7 +29,7 @@ const selectSKUItemsIntoRestockOrder = (restockOrder) => {
 			if (err) {
 				reject(err.toString());
 			} else {
-				restockOrder.addSKUItems(rows.map((r) => ({SKUId: r.skuid, rfid: r.rfid})));
+				restockOrder.addSKUItems(rows.map((r) => ({SKUId: r.skuid, itemId: r.itemid, rfid: r.rfid})));
 				resolve(restockOrder);
 			}
 		});
@@ -84,14 +84,14 @@ exports.selectRestockOrderByID = (id) => {
 
 exports.selectRestockOrderByIDReturnItems = (id) => {
 	return new Promise((resolve, reject) => {
-		const sql = `SELECT skuid, RestockOrderSKUItem.rfid FROM RestockOrderSKUItem, TestResult
-			WHERE RestockOrderSKUItem.rfid = TestResult.rfid AND roid = ? AND result = ?
-			GROUP BY skuid, RestockOrderSKUItem.rfid;`;
+		const sql = `SELECT RestockOrderSKUItem.skuid, Item.id, RestockOrderSKUItem.rfid FROM RestockOrderSKUItem, TestResult, Item
+			WHERE RestockOrderSKUItem.rfid = TestResult.rfid AND RestockOrderSKUItem.skuid = Item.SKUID AND roid = ? AND result = ?
+			GROUP BY RestockOrderSKUItem.skuid, RestockOrderSKUItem.rfid;`;
 		DatabaseConnection.db.all(sql, [id, false], (err, rows) => {
 			if (err) {
 				reject(err.toString());
 			} else {
-				resolve(rows.map((r) => ({SKUId: r.skuid, rfid: r.rfid})));
+				resolve(rows.map((r) => ({SKUId: r.skuid, itemId: r.id, rfid: r.rfid})));
 			}
 		});
 	});
@@ -123,8 +123,8 @@ exports.insertRestockOrder = (restockOrder) => {
 
 exports.insertRestockOrderSKUItems = (roid, skuItems) => {
 	return Promise.all(skuItems.map((skuItem) => new Promise(((resolve, reject) => {
-		const sql = `INSERT INTO RestockOrderSKUItem(roid, skuid, rfid) VALUES (?, ?, ?);`;
-		DatabaseConnection.db.run(sql, [roid, skuItem.SKUId, skuItem.rfid], (err) => {
+		const sql = `INSERT INTO RestockOrderSKUItem(roid, skuid, itemid, rfid) VALUES (?, ?, ?, ?);`;
+		DatabaseConnection.db.run(sql, [roid, skuItem.SKUId, skuItem.itemId, skuItem.rfid], (err) => {
 			if (err) {
 				reject(err.toString());
 			} else {
