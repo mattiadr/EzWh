@@ -18,8 +18,8 @@ Report effort figures from the timesheet, compute size from the source code.
 | Measure| Value |
 |---|---|
 |effort E (report here effort in person hours, for all activities in the period, from your timesheet)  | 260 |
-|size S (report here size in LOC of all code written, excluding test cases)  | 3350 |
-|productivity P = S/E | 12.88 |
+|size S (report here size in LOC of all code written, excluding test cases)  | 2920 |
+|productivity P = S/E | 11.23 |
 |defects before release D_before (number of defects found and fixed before may 25) | 15 |
 
 
@@ -31,10 +31,10 @@ Report effort figures from the timesheet, compute size from the source code.
 | effort for non-quality ENQ (effort for all activities in release 2, or effort to fix defects found when running official acceptance tests) | 2 |
 | effort for non quality, relative = ENQ / E | 0.0077 |
 |defects after release D (number of defects found running official acceptance tests and  fixed in release 2) | 28 |
-| defects before release vs defects after release = D/D_before | 0 |
-|DD = defect density = D/S| 0.0084 |
+| defects before release vs defects after release = D/D_before | 0.54 |
+|DD = defect density = D/S| 0.0096 |
 |D_fix = average effort to fix a defect = ENQ / D | 0.071 |
-|overall productivity OP = S/(E + ENQ)| 12.79 |
+|overall productivity OP = S/(E + ENQ)| 11.15 |
 
 ## Second estimation
 
@@ -43,9 +43,9 @@ Now it is possible to repeat the estimate using values from the past. We can als
 |             | Estimate                        |             
 | ----------- | ------------------------------- |  
 | NC =  Estimated number of classes to be developed                 |              10           |             
-|  A = Estimated average size per class, in LOC                     |                34            | 
-| S_e = Estimated size of project, in LOC (= NC * A)                  |                  3400              |
-| E = Estimated effort, in person hours (here use overall productivity OP)  |                262                  |   
-| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                   |      7860   | 
-| D_e = Estimated number of defects = DD * S_e|29|
+|  A = Estimated average size per class, in LOC                     |                29            | 
+| S_e = Estimated size of project, in LOC (= NC * A)                  |                  2900              |
+| E = Estimated effort, in person hours (here use overall productivity OP)  |                260                  |   
+| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro)                   |      7800   | 
+| D_e = Estimated number of defects = DD * S_e|30|
 | Estimated effort for non quality = D_e * D_fix |2|
