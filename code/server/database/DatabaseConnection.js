@@ -73,12 +73,12 @@ class DatabaseConnection {
 
 		/** Item **/
 		const createTableItem = `CREATE TABLE IF NOT EXISTS Item (
-			id varchar(12) NOT NULL,
+			id INTEGER NOT NULL,
 			description varchar(100) NOT NULL,
 			price double NOT NULL,
 			SKUID INTEGER NOT NULL,
-			supplierId varchar(12) NOT NULL,
-			PRIMARY KEY (id)
+			supplierId INTEGER NOT NULL,
+			PRIMARY KEY (id, supplierId)
 		);`;
 
 		/** Restock Order */
@@ -103,6 +103,7 @@ class DatabaseConnection {
 		const createTableRestockOrderSKUItem = `CREATE TABLE IF NOT EXISTS RestockOrderSKUItem (
 			roid INTEGER NOT NULL,
 			skuid INTEGER NOT NULL,
+			itemid INTEGER NOT NULL,
 			rfid VARCHAR(32) NOT NULL,
 			PRIMARY KEY (roid, skuid, rfid)
 		);`;

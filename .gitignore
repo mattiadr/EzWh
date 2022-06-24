@@ -2,6 +2,8 @@
 code/server/coverage/
 code/server/node_modules/
 code/client/node_modules/
-code/server/.idea/
-code/client/.idea/
+.idea/
 code/server/database/ezwh.db
+.nyc_output
+unitTestResult.txt
+studentApiTestResult.txt

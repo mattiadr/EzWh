@@ -15,10 +15,10 @@ exports.selectItems = () => {
     });
 }
 
-exports.selectItemByID = (id) => {
+exports.selectItemByID = (id, supplierId) => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT * FROM Item WHERE id = ?;`;
-        DatabaseConnection.db.get(sql, [id], (err, row) => {
+        const sql = `SELECT * FROM Item WHERE id = ? AND supplierId = ?;`;
+        DatabaseConnection.db.get(sql, [id, supplierId], (err, row) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -65,9 +65,9 @@ exports.insertItem = (item) => {
 exports.updateItem = (item) => {
     return new Promise((resolve, reject) => {
         const sql = `UPDATE Item SET
-                     description = ?, price = ?, SKUID = ?, supplierId = ?
-                     WHERE id = ?;`;
-        DatabaseConnection.db.run(sql, [item.description, item.price, item.SKUID, item.supplierId, item.id], (err) => {
+                     description = ?, price = ?, SKUID = ?
+                     WHERE id = ? AND supplierId = ?;`;
+        DatabaseConnection.db.run(sql, [item.description, item.price, item.SKUID, item.id, item.supplierId], (err) => {
             if (err) {
                 reject(err.toString());
             } else {
@@ -77,10 +77,10 @@ exports.updateItem = (item) => {
     });
 }
 
-exports.deleteItemByID = (id) => {
+exports.deleteItemByID = (id, supplierId) => {
     return new Promise((resolve, reject) => {
-        const sql = `DELETE FROM Item WHERE id = ?`;
-        DatabaseConnection.db.run(sql, [id], (err) => {
+        const sql = `DELETE FROM Item WHERE id = ? AND supplierId = ?;`;
+        DatabaseConnection.db.run(sql, [id, supplierId], (err) => {
             if (err) {
                 reject(err.toString());
             } else {

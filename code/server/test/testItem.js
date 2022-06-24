@@ -32,23 +32,25 @@ describe('test Item apis', () => {
     const items =  [{ id: 12, description: 'new item', price: 10.99, SKUId: 1, supplierId: 2},
                     { id: 13, description: 'new item', price: 19.99, SKUId: 2, supplierId: 3}];
     getItems(200, items);
-    getItems(200, items[0], 12);
-    getItems(404, items, 14);
+    getItems(200, items[0], 12, 2);
+    getItems(404, items, 12, 3);
     getItems(422, items[0], '2a');
+    getItems(422, items[0], 4, "abc");
     
-    updateItem(200, 13, '(update) new item', 11.99);
-    updateItem(422, 12);
-    updateItem(422, 12, '(update) new item', 'abc');
-    updateItem(404, 10, '(update) new item', 21.99);
+    updateItem(200, 13, 3, '(update) new item', 11.99);
+    updateItem(422, 12, 2);
+    updateItem(422, 12, 2, '(update) new item', 'abc');
+    updateItem(404, 10, 10, '(update) new item', 21.99);
     
-    deleteItem(204, 13);
-    getItems(404, items[1], 13);
-    deleteItem(422, "abc");
+    deleteItem(204, 13, 3);
+    getItems(404, items[1], 13, 3);
+    deleteItem(422, "abc", 2);
+    deleteItem(422, 12, "def");
 });
 
-function deleteItem(expectedHTTPStatus, id) {
+function deleteItem(expectedHTTPStatus, id, supplierId) {
     it('Deleting item', function (done) {
-        agent.delete('/api/items/' + id)
+        agent.delete(`/api/items/${id}/${supplierId}`)
             .then(function (res) {
                 res.should.have.status(expectedHTTPStatus);
                 done();
@@ -77,7 +79,7 @@ function newItem(expectedHTTPStatus, id, description, price, SKUId, supplierId) 
 }
 
 
-function getItems(expectedHTTPStatus, expectedItems, id) {
+function getItems(expectedHTTPStatus, expectedItems, id, supplierId) {
     it('getting item datas from the system', function (done) {
         if (id === undefined) { //ALL ITEMS
             agent.get('/api/items')
@@ -89,7 +91,7 @@ function getItems(expectedHTTPStatus, expectedItems, id) {
                     done();
                 });
         } else {
-            agent.get('/api/items/' + id)
+            agent.get(`/api/items/${id}/${supplierId}`)
                 .then(function (res) {
                     res.should.have.status(expectedHTTPStatus);
                     if (res.status == 200) {
@@ -101,18 +103,18 @@ function getItems(expectedHTTPStatus, expectedItems, id) {
     });
 }
 
-function updateItem(expectedHTTPStatus, id, newDescription, newPrice) {
+function updateItem(expectedHTTPStatus, id, supplierId, newDescription, newPrice) {
     it('update an item', function (done) {
         if (newDescription !== undefined) {
             let item = { newDescription: newDescription, newPrice: newPrice }
-            agent.put('/api/item/' + id)
+            agent.put(`/api/item/${id}/${supplierId}`)
                 .send(item)
                 .then(function (res) {
                     res.should.have.status(expectedHTTPStatus);
                     done();
                 });
         } else {
-            agent.put('/api/item/' + id) //we are not sending any data
+            agent.put(`/api/item/${id}/${supplierId}`) //we are not sending any data
                 .then(function (res) {
                     res.should.have.status(expectedHTTPStatus);
                     done();

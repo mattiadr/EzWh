@@ -22,7 +22,8 @@ class ReturnOrderService {
 		try {
 			const restockOrder = await this.#restockOrder_DAO.selectRestockOrderByID(restockOrderId);
 			if (!restockOrder) return {status: 404, body: "restock order not found"};
-			const correct = products.every((p) => typeof p.SKUId === "number" && typeof p.description === "string" && typeof p.price === "number" && typeof p.RFID === "string" && p.RFID.length === 32);
+			const correct = products.every((p) => typeof p.SKUId === "number" && typeof p.itemId === "number"
+				&& typeof p.description === "string" && typeof p.price === "number" && typeof p.RFID === "string" && p.RFID.length === 32);
 			if (!correct) return {status: 422, body: "bad products"};
 			await this.#returnOrder_DAO.insertReturnOrder(new ReturnOrder(null, returnDate, restockOrderId, products));
 			return {status: 201, body: ""};

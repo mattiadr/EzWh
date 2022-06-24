@@ -7,7 +7,8 @@ const RestockOrderService = require("../services/RestockOrder_service");
 const {RestockOrderState} = require("../components/RestockOrder");
 
 const ro_db = require("../database/RestockOrder_DAO");
-const RestockOrder_service = new RestockOrderService(ro_db);
+const item_db = require("../database/Item_DAO");
+const RestockOrder_service = new RestockOrderService(ro_db, item_db);
 
 const router = express.Router();
 dayjs.extend(customParseFormat);

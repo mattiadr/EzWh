@@ -13,15 +13,15 @@ class ItemService {
 		return this.#item_DAO.selectItems();
 	}
 
-	getItemByID(id) {
-		return this.#item_DAO.selectItemByID(id);
+	getItemByID(id, supplierId) {
+		return this.#item_DAO.selectItemByID(id, supplierId);
 	}
 
 	async createItem(id, description, price, skuid, supplierId) {
 		try {
 			const SKU = await this.#sku_DAO.selectSKUbyID(skuid);
 			if (!SKU) return {status: 404, body: "sku not found"};
-			let item = await this.#item_DAO.selectItemByID(id);
+			let item = await this.#item_DAO.selectItemByID(id, supplierId);
 			if (item) return {status: 422, body: "supplier sells item with same id"};
 			item = await this.#item_DAO.selectItemBySKUID(skuid);
 			if (item) return {status: 422, body: "supplier sells item with same skuid"};
@@ -32,9 +32,9 @@ class ItemService {
 		}
 	}
 
-	async updateItem(id, description, price) {
+	async updateItem(id, description, price, supplierId) {
 		try {
-			const item = await this.#item_DAO.selectItemByID(id);
+			const item = await this.#item_DAO.selectItemByID(id, supplierId);
 			if (!item) return {status: 404, body: "item not found"};
 			item.description = description;
 			item.price = price;
@@ -45,8 +45,8 @@ class ItemService {
 		}
 	}
 
-	async deleteItem(id) {
-		return this.#item_DAO.deleteItemByID(id);
+	async deleteItem(id, supplierId) {
+		return this.#item_DAO.deleteItemByID(id, supplierId);
 	}
 }
 
